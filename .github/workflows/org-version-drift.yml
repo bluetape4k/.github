@@ -40,6 +40,10 @@ jobs:
             bluetape4k-projects
             bluetape4k-text
             bluetape4k-workshop
+            clinic-appointment
+            exposed-workshop
+            exposed-r2dbc-workshop
+            timefold-workshop
           )
           for repo in "${repos[@]}"; do
             gh repo clone "bluetape4k/${repo}" "workspace/${repo}" -- --depth 1
