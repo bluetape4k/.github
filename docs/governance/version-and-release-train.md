@@ -99,6 +99,12 @@ The same report also auto-discovers shared version aliases across
 declare the same alias and the values differ, the report lists the drift and
 marks the `bluetape4k-projects` value as the default baseline when present.
 
+The report also fails compatibility-line alias violations. Aliases such as
+`ignite`/`ignite3`, `kafka3`/`kafka4`, `spring-kafka`/`spring-kafka4`,
+`jackson`/`jackson3`, and `spring-boot`/`spring-boot4` encode supported major
+lines. A PR that changes `ignite` to 3.x or `spring-kafka4` to 3.x is invalid
+even if the dependency coordinates resolve.
+
 Allowed drift must be documented in the release notes or a linked issue before
 release freeze. Experimental and Java 25-only modules may deviate when the
 reason is explicit.
@@ -119,6 +125,7 @@ Use this validation ladder:
 |---|---|
 | Patch/minor library update scoped to one repository | Repository CI, then targeted Nightly only when the touched dependency is used by integration tests or runtime adapters. |
 | Shared baseline update such as Kotlin, Spring Boot, Gradle, Testcontainers, Jackson, Redis clients, Exposed, AWS SDK, or Apache Fory | Repository CI plus affected repository Nightly. Dispatch all governed library Nightlies when the affected set is unclear. |
+| Compatibility-line alias update such as `ignite`, `ignite3`, `kafka3`, `kafka4`, `spring-kafka`, or `spring-kafka4` | Verify the alias stays on its encoded major line. Reject cross-line updates and update the matching alias instead. |
 | `bluetape4k-dependencies` BOM update | Version drift report plus Nightly for release/snapshot target repositories. |
 | Major upgrade, compiler/plugin/runtime change, or release-freeze update | Version drift report, affected Nightly, and manual Weekly Full Nightly before release. |
 | Documentation or GitHub Actions-only update | Workflow validation or repository CI only. |

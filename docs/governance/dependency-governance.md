@@ -20,6 +20,10 @@ readiness depends on cross-repository consistency.
 - Auto-discovered shared aliases across `bluetape4k-*` library repositories.
   Any alias declared by at least two library repositories is checked for drift,
   and `bluetape4k-projects` is shown as the default baseline when present.
+- Compatibility-line aliases such as `ignite`/`ignite3`, `kafka3`/`kafka4`,
+  `spring-kafka`/`spring-kafka4`, `jackson`/`jackson3`, and
+  `spring-boot`/`spring-boot4`. These aliases must stay on their encoded major
+  line even when the Maven coordinates look upgrade-compatible to Dependabot.
 
 ## Governed Repositories
 
@@ -55,6 +59,7 @@ misspelled custom values are not valid Dependabot configuration.
 | Local patch/minor dependency | Repository CI. |
 | Dependency used by integration tests, containers, serialization, persistence, or runtime adapters | Repository CI plus affected Nightly before merge or explicitly deferred in the PR. |
 | Shared baseline dependency such as Kotlin, Spring Boot, Gradle, Testcontainers, Jackson, Redis clients, Exposed, AWS SDK, or Apache Fory | Repository CI plus affected repository Nightly. Run all governed library Nightlies when the affected set is unclear. |
+| Compatibility-line alias update such as `ignite`, `ignite3`, `kafka3`, `kafka4`, `spring-kafka`, or `spring-kafka4` | Treat as a platform-line change. Reject PRs that move the alias to a different major; create or update the correct alias instead. |
 | `bluetape4k-dependencies` BOM | Version drift report plus release/snapshot target Nightlies. |
 | Major/runtime/compiler/plugin update | Version drift report, affected Nightly, and manual Weekly Full Nightly before release. |
 
@@ -67,6 +72,11 @@ Testcontainers, Jackson, and Redis client baselines are expected to stay aligned
 across governed repositories. For Redis clients such as Lettuce and Redisson,
 start major-version adoption in `bluetape4k-projects`, validate the affected
 runtime adapters there first, then align the rest of the organization.
+
+Compatibility-line aliases are not interchangeable. `ignite` means Apache
+Ignite 2.x, while `ignite3` means Apache Ignite 3.x. `spring-kafka` means the
+3.x line, while `spring-kafka4` means the 4.x line. Do not merge Dependabot PRs
+that rewrite the older alias to the newer major.
 
 Apache Fory currently has known drift because its use is concentrated in
 serialization-heavy modules and examples. Before the May 2026 release freeze,

@@ -41,11 +41,19 @@ VERSION_GROUPS = {
     "bluetape4k": ("bluetape4k",),
     "bluetape4k dependencies BOM": ("bluetape4k-dependencies",),
     "Kotlin": ("kotlin",),
-    "Spring Boot": ("spring-boot", "spring-boot4"),
+    "Spring Boot": ("spring-boot",),
+    "Spring Boot 3": ("spring-boot3",),
+    "Spring Boot 4": ("spring-boot4",),
+    "Kafka 3": ("kafka3",),
+    "Kafka 4": ("kafka4",),
+    "Spring Kafka 3": ("spring-kafka",),
+    "Spring Kafka 4": ("spring-kafka4",),
     "Testcontainers": ("testcontainers",),
     "Jackson 2": ("jackson",),
     "Jackson 3": ("jackson3",),
     "Exposed": ("exposed",),
+    "Apache Ignite 2": ("ignite",),
+    "Apache Ignite 3": ("ignite3",),
     "Lettuce": ("lettuce",),
     "Redisson": ("redisson",),
     "AWS Kotlin SDK": ("aws-kotlin",),
@@ -53,6 +61,26 @@ VERSION_GROUPS = {
     "Kover": ("kover",),
     "Apache Fory": ("fory", "fory-kotlin"),
 }
+
+COMPATIBILITY_LINE_ALIASES = {
+    "ignite3": "3",
+    "jackson2": "2",
+    "jackson3": "3",
+    "kafka3": "3",
+    "kafka4": "4",
+    "spring-boot3": "3",
+    "spring-boot4": "4",
+    "spring-kafka3": "3",
+    "spring-kafka4": "4",
+}
+
+PAIRED_LEGACY_LINE_ALIASES = {
+    "ignite": ("ignite3", "2"),
+    "jackson": ("jackson3", "2"),
+    "spring-kafka": ("spring-kafka4", "3"),
+}
+
+VERSION_MAJOR = re.compile(r"^(\d+)")
 
 VERSION_LINE = re.compile(r'^([A-Za-z0-9_.-]+)\s*=\s*"([^"]+)"')
 INLINE_VERSION_LINE = re.compile(r'^([A-Za-z0-9_.-]+)\s*=\s*\{.*\bversion\s*=\s*"([^"]+)".*}')
@@ -134,6 +162,32 @@ def collect_shared_alias_drift(workspace: Path) -> dict[str, list[VersionHit]]:
         for alias, hits in sorted(aliases.items())
         if len({hit.repo for hit in hits}) >= 2 and status_for(hits) == "drift"
     }
+
+
+def collect_compatibility_line_violations(workspace: Path) -> list[VersionHit]:
+    repo_versions = collect_repository_versions(workspace, (*LIBRARY_REPOSITORIES, *WORKSHOP_REPOSITORIES))
+    violations: list[VersionHit] = []
+
+    for repo, versions in repo_versions.items():
+        for alias, expected_major in COMPATIBILITY_LINE_ALIASES.items():
+            version = versions.get(alias)
+            if version is None:
+                continue
+
+            major_match = VERSION_MAJOR.match(version)
+            if major_match is None or major_match.group(1) != expected_major:
+                violations.append(VersionHit(repo, alias, version))
+
+        for alias, (paired_alias, expected_major) in PAIRED_LEGACY_LINE_ALIASES.items():
+            version = versions.get(alias)
+            if version is None or paired_alias not in versions:
+                continue
+
+            major_match = VERSION_MAJOR.match(version)
+            if major_match is None or major_match.group(1) != expected_major:
+                violations.append(VersionHit(repo, alias, version))
+
+    return violations
 
 
 def status_for(hits: list[VersionHit]) -> str:
@@ -232,6 +286,31 @@ def render_shared_alias_drift(shared_alias_drift: dict[str, list[VersionHit]]) -
     return "\n".join(lines) + "\n", True
 
 
+def render_compatibility_line_violations(violations: list[VersionHit]) -> tuple[str, bool]:
+    lines: list[str] = [
+        "",
+        "## Compatibility-Line Alias Violations",
+        "",
+        "These aliases encode product or platform compatibility lines. Dependabot may see the same Maven coordinates and propose a newer major, but these aliases must stay on their declared line unless the alias itself changes.",
+        "",
+        "| Repository | Alias | Expected major | Actual version |",
+        "|---|---|---|---|",
+    ]
+
+    if not violations:
+        lines.append("| - | - | - | No compatibility-line alias violations. |")
+        return "\n".join(lines) + "\n", False
+
+    for hit in sorted(violations, key=lambda item: (item.repo, item.alias)):
+        if hit.alias in COMPATIBILITY_LINE_ALIASES:
+            expected_major = COMPATIBILITY_LINE_ALIASES[hit.alias]
+        else:
+            expected_major = PAIRED_LEGACY_LINE_ALIASES[hit.alias][1]
+        lines.append(f"| `{hit.repo}` | `{hit.alias}` | `{expected_major}.x` | `{hit.version}` |")
+
+    return "\n".join(lines) + "\n", True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -251,9 +330,13 @@ def main() -> int:
     grouped = collect(workspace)
     markdown, has_drift = render_markdown(grouped)
     shared_markdown, has_shared_alias_drift = render_shared_alias_drift(collect_shared_alias_drift(workspace))
+    compatibility_markdown, has_compatibility_violations = render_compatibility_line_violations(
+        collect_compatibility_line_violations(workspace),
+    )
     sys.stdout.write(markdown)
     sys.stdout.write(shared_markdown)
-    has_drift = has_drift or has_shared_alias_drift
+    sys.stdout.write(compatibility_markdown)
+    has_drift = has_drift or has_shared_alias_drift or has_compatibility_violations
     return 1 if args.fail_on_drift and has_drift else 0
 
 
