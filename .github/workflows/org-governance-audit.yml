@@ -1,0 +1,69 @@
+name: Org Governance Audit
+
+on:
+  pull_request:
+    paths:
+      - 'org-workflows.json'
+      - 'scripts/**'
+      - 'docs/governance/**'
+      - '.github/workflows/org-governance-audit.yml'
+  workflow_dispatch:
+    inputs:
+      failOnDrift:
+        description: 'Fail when governance drift is detected'
+        required: false
+        default: true
+        type: boolean
+  schedule:
+    - cron: '30 0 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Repository inventory and workflow drift
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN || github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone governed repositories
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > /tmp/governed-repos.txt
+          import json
+          data = json.load(open("org-workflows.json", encoding="utf-8"))
+          for repo in data["governance"]:
+              if repo != ".github":
+                  print(repo)
+          PY
+          mkdir -p workspace
+          cp -a . "workspace/.github"
+          while IFS= read -r repo; do
+            gh repo clone "bluetape4k/${repo}" "workspace/${repo}" -- --depth 1
+          done < /tmp/governed-repos.txt
+
+      - name: Run governance audits
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/workflow_drift_audit.py scripts/security_baseline_audit.py scripts/repo_ruleset_guard.py
+          args=(--config org-workflows.json --workspace workspace)
+          if [[ "${{ inputs.failOnDrift || true }}" == "true" ]]; then
+            args+=(--fail-on-drift)
+          fi
+          python3 scripts/workflow_drift_audit.py "${args[@]}" | tee workflow-drift-audit.md
+          python3 scripts/security_baseline_audit.py --workspace workspace | tee security-baseline-audit.md
+          cat workflow-drift-audit.md security-baseline-audit.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload audit reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: org-governance-audit
+          path: |
+            workflow-drift-audit.md
+            security-baseline-audit.md
+          retention-days: 30

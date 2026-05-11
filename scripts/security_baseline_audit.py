@@ -2,6 +2,7 @@
 """Report security baseline coverage across governed bluetape4k repositories."""
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 
@@ -40,7 +41,11 @@ def yes_no(value: bool) -> str:
 
 
 def main() -> int:
-    root = Path.cwd()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--workspace", type=Path, default=Path.cwd())
+    args = parser.parse_args()
+
+    root = args.workspace.resolve()
     has_default_security = (root / ".github" / "SECURITY.md").exists()
     rows: list[tuple[str, str, str, str, str, str]] = []
 
