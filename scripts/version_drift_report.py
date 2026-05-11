@@ -27,7 +27,7 @@ LIBRARY_REPOSITORIES = (
     "bluetape4k-text",
 )
 
-BASELINE_REPOSITORY = "bluetape4k-projects"
+BASELINE_REPOSITORY = "bluetape4k-dependencies"
 
 WORKSHOP_REPOSITORIES = (
     "bluetape4k-workshop",
@@ -255,7 +255,7 @@ def render_shared_alias_drift(shared_alias_drift: dict[str, list[VersionHit]]) -
         "## Auto-Discovered Shared Alias Drift",
         "",
         "`bluetape4k-*` library repositories are scanned for version aliases declared by at least two repositories.",
-        f"When `{BASELINE_REPOSITORY}` declares the same alias, its value is the default baseline.",
+        f"When `{BASELINE_REPOSITORY}` declares the same alias, its value is the source-of-truth baseline.",
         "",
         "| Alias | Baseline | Versions | Repositories |",
         "|---|---|---|---|",
