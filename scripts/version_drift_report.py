@@ -44,6 +44,8 @@ VERSION_GROUPS = {
     "Jackson 2": ("jackson",),
     "Jackson 3": ("jackson3",),
     "Exposed": ("exposed",),
+    "Lettuce": ("lettuce",),
+    "Redisson": ("redisson",),
     "AWS Kotlin SDK": ("aws-kotlin",),
     "Smithy Kotlin": ("aws-smithy-kotlin",),
     "Kover": ("kover",),
