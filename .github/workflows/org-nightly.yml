@@ -6,14 +6,11 @@ on:
       scope:
         description: 'Nightly scope for repositories that support scoped dispatch'
         required: true
-        default: full
+        default: smoke
         type: choice
         options:
           - smoke
           - full
-          - testcontainers
-          - graphdb
-          - aws
       repositories:
         description: '`all` or comma-separated repository names'
         required: true

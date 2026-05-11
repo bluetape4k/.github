@@ -39,7 +39,12 @@
   "repositories": {
     "bluetape4k-aws": {
       "default_ref": "develop",
-      "nightly": { "workflow": "nightly.yml" },
+      "nightly": {
+        "workflow": "nightly.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      },
       "snapshot": { "workflow": "snapshot.yml" },
       "release": {
         "workflow": "release.yml",
@@ -66,7 +71,12 @@
     },
     "bluetape4k-exposed": {
       "default_ref": "develop",
-      "nightly": { "workflow": "nightly.yml" },
+      "nightly": {
+        "workflow": "nightly.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      },
       "snapshot": { "workflow": "publish-snapshot.yml" },
       "release": {
         "workflow": "release.yml",
@@ -78,7 +88,12 @@
     },
     "bluetape4k-graph": {
       "default_ref": "develop",
-      "nightly": { "workflow": "nightly.yml" },
+      "nightly": {
+        "workflow": "nightly.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      },
       "snapshot": { "workflow": "publish-snapshot.yml" },
       "release": {
         "workflow": "release.yml",
@@ -90,7 +105,12 @@
     },
     "bluetape4k-image": {
       "default_ref": "develop",
-      "nightly": { "workflow": "nightly.yml" },
+      "nightly": {
+        "workflow": "nightly.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      },
       "snapshot": { "workflow": "snapshot.yml" },
       "release": {
         "workflow": "release.yml",
@@ -102,7 +122,12 @@
     },
     "bluetape4k-javers": {
       "default_ref": "develop",
-      "nightly": { "workflow": "nightly.yml" },
+      "nightly": {
+        "workflow": "nightly.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      },
       "snapshot": { "workflow": "snapshot.yml" },
       "release": {
         "workflow": "release.yml",
@@ -114,7 +139,12 @@
     },
     "bluetape4k-leader": {
       "default_ref": "develop",
-      "nightly": { "workflow": "nightly.yml" },
+      "nightly": {
+        "workflow": "nightly.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      },
       "snapshot": { "workflow": "publish-snapshot.yml" },
       "release": {
         "workflow": "release.yml",
@@ -160,7 +190,12 @@
     },
     "bluetape4k-workshop": {
       "default_ref": "develop",
-      "nightly": { "workflow": "nightly.yml" }
+      "nightly": {
+        "workflow": "nightly.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      }
     }
   }
 }
