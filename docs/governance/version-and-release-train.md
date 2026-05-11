@@ -7,6 +7,9 @@ It defines the central operating surface for shared dependency drift checks,
 organization-wide Nightly dispatch, snapshot publishing, and release train
 dispatch.
 
+Dependency update ownership and validation tiers are defined in
+`docs/governance/dependency-governance.md`.
+
 ## Token Requirement
 
 Cross-repository workflow dispatch requires an organization-scoped token. The
@@ -80,6 +83,7 @@ Before running `Org Snapshot Dispatch` with `dryRun=false`:
 Organization-governed version groups are tracked by
 `scripts/version_drift_report.py`:
 
+- bluetape4k artifacts and bluetape4k-dependencies BOM
 - Kotlin
 - Spring Boot
 - Testcontainers
@@ -92,3 +96,27 @@ Organization-governed version groups are tracked by
 Allowed drift must be documented in the release notes or a linked issue before
 release freeze. Experimental and Java 25-only modules may deviate when the
 reason is explicit.
+
+The drift report covers the main bluetape4k libraries plus governed
+workshop/example repositories. `ocean-workshop` and `kotlin-dev-agent` are
+intentionally excluded from this governance scope.
+
+## Dependency Update Validation
+
+Dependabot is the update detector and PR generator. The central drift report is
+the cross-repository consistency gate. Do not rely on Dependabot alone for
+release readiness because it operates per repository.
+
+Use this validation ladder:
+
+| Change type | Required validation |
+|---|---|
+| Patch/minor library update scoped to one repository | Repository CI, then targeted Nightly only when the touched dependency is used by integration tests or runtime adapters. |
+| Shared baseline update such as Kotlin, Spring Boot, Gradle, Testcontainers, Jackson, Exposed, AWS SDK, or Apache Fory | Repository CI plus affected repository Nightly. Dispatch all governed library Nightlies when the affected set is unclear. |
+| `bluetape4k-dependencies` BOM update | Version drift report plus Nightly for release/snapshot target repositories. |
+| Major upgrade, compiler/plugin/runtime change, or release-freeze update | Version drift report, affected Nightly, and manual Weekly Full Nightly before release. |
+| Documentation or GitHub Actions-only update | Workflow validation or repository CI only. |
+
+If a dependency update can break another repository later, do not merge on CI
+alone. Either run the affected Nightly before merge or document the deferred
+Nightly run in the PR.

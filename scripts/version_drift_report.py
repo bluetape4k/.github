@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-REPOSITORIES = (
+LIBRARY_REPOSITORIES = (
     "bluetape4k-aws",
     "bluetape4k-dependencies",
     "bluetape4k-experimental",
@@ -25,10 +25,19 @@ REPOSITORIES = (
     "bluetape4k-leader",
     "bluetape4k-projects",
     "bluetape4k-text",
+)
+
+WORKSHOP_REPOSITORIES = (
     "bluetape4k-workshop",
+    "clinic-appointment",
+    "exposed-workshop",
+    "exposed-r2dbc-workshop",
+    "timefold-workshop",
 )
 
 VERSION_GROUPS = {
+    "bluetape4k": ("bluetape4k",),
+    "bluetape4k dependencies BOM": ("bluetape4k-dependencies",),
     "Kotlin": ("kotlin",),
     "Spring Boot": ("spring-boot", "spring-boot4"),
     "Testcontainers": ("testcontainers",),
@@ -81,7 +90,7 @@ def parse_versions(path: Path) -> dict[str, str]:
 def collect(workspace: Path) -> dict[str, list[VersionHit]]:
     grouped: dict[str, list[VersionHit]] = {name: [] for name in VERSION_GROUPS}
 
-    for repo in REPOSITORIES:
+    for repo in (*LIBRARY_REPOSITORIES, *WORKSHOP_REPOSITORIES):
         catalog = workspace / repo / "gradle" / "libs.versions.toml"
         if not catalog.exists():
             continue
@@ -106,6 +115,16 @@ def status_for(hits: list[VersionHit]) -> str:
 def render_markdown(grouped: dict[str, list[VersionHit]]) -> tuple[str, bool]:
     lines: list[str] = [
         "# bluetape4k Shared Version Drift Report",
+        "",
+        "## Scope",
+        "",
+        "Library repositories: "
+        + ", ".join(f"`{repo}`" for repo in LIBRARY_REPOSITORIES)
+        + ".",
+        "",
+        "Workshop/example repositories: "
+        + ", ".join(f"`{repo}`" for repo in WORKSHOP_REPOSITORIES)
+        + ".",
         "",
         "| Group | Status | Versions | Repositories |",
         "|---|---|---|---|",
@@ -139,6 +158,7 @@ def render_markdown(grouped: dict[str, list[VersionHit]]) -> tuple[str, bool]:
             "- `missing` means the repository has no matching alias in its version catalog; it may still use the dependency transitively or not at all.",
             "- `aligned` means all repositories that declare the group use the same version value.",
             "- `drift` means at least two declared values exist and should be resolved or documented before release freeze.",
+            "- `ocean-workshop` and `kotlin-dev-agent` are intentionally excluded from this governance scope.",
         ],
     )
     return "\n".join(lines) + "\n", has_drift
