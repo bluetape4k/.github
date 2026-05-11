@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="./assets/bluetape4k-profile.png" alt="bluetape4k profile mark" width="160" />
-</p>
-
 # bluetape4k
 
 [English](./README.md) | [한국어](./README.ko.md)
