@@ -89,9 +89,15 @@ Organization-governed version groups are tracked by
 - Testcontainers
 - Jackson 2 and Jackson 3
 - Exposed
+- Lettuce and Redisson
 - AWS Kotlin SDK and Smithy Kotlin
 - Kover
 - Apache Fory
+
+The same report also auto-discovers shared version aliases across
+`bluetape4k-*` library repositories. If at least two library repositories
+declare the same alias and the values differ, the report lists the drift and
+marks the `bluetape4k-projects` value as the default baseline when present.
 
 Allowed drift must be documented in the release notes or a linked issue before
 release freeze. Experimental and Java 25-only modules may deviate when the
@@ -112,7 +118,7 @@ Use this validation ladder:
 | Change type | Required validation |
 |---|---|
 | Patch/minor library update scoped to one repository | Repository CI, then targeted Nightly only when the touched dependency is used by integration tests or runtime adapters. |
-| Shared baseline update such as Kotlin, Spring Boot, Gradle, Testcontainers, Jackson, Exposed, AWS SDK, or Apache Fory | Repository CI plus affected repository Nightly. Dispatch all governed library Nightlies when the affected set is unclear. |
+| Shared baseline update such as Kotlin, Spring Boot, Gradle, Testcontainers, Jackson, Redis clients, Exposed, AWS SDK, or Apache Fory | Repository CI plus affected repository Nightly. Dispatch all governed library Nightlies when the affected set is unclear. |
 | `bluetape4k-dependencies` BOM update | Version drift report plus Nightly for release/snapshot target repositories. |
 | Major upgrade, compiler/plugin/runtime change, or release-freeze update | Version drift report, affected Nightly, and manual Weekly Full Nightly before release. |
 | Documentation or GitHub Actions-only update | Workflow validation or repository CI only. |
@@ -120,3 +126,9 @@ Use this validation ladder:
 If a dependency update can break another repository later, do not merge on CI
 alone. Either run the affected Nightly before merge or document the deferred
 Nightly run in the PR.
+
+When `bluetape4k-projects` declares a shared runtime library alias, treat that
+version as the default organization baseline. Major updates for Redis clients,
+serialization libraries, persistence adapters, or other shared runtime
+components should begin in `bluetape4k-projects` before individual repositories
+advance.
