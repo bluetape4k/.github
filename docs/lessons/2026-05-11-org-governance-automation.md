@@ -18,6 +18,11 @@ branch protection, security baseline visibility, and repository inventory drift.
   `spring-boot3`/`spring-boot4` encode supported platform lines, but Dependabot
   only sees Maven coordinates or plugin IDs and can incorrectly rewrite the
   older line to the newer major.
+- Numeric suffixes are not the only signal. Unsuffixed aliases can also encode
+  an older compatibility line: `ignite` means Apache Ignite 2.x, `ignite3`
+  means Apache Ignite 3.x; `spring-kafka` means 3.x, while `spring-kafka4`
+  means 4.x. Central drift checks must validate the expected major per alias,
+  not just compare alias names across repositories.
 - Not every dependency update deserves Full Nightly. A tiered validation ladder
   is cheaper and more useful: repository CI for local updates, affected Nightly
   for shared runtime/compiler/container/serialization dependencies, and Full
