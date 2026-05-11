@@ -39,7 +39,7 @@ jobs:
     env:
       ORG_WORKFLOW_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Confirm real snapshot dispatch
         if: ${{ !inputs.dryRun && inputs.confirm != 'deploy snapshots' }}
