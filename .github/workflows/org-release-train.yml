@@ -1,0 +1,74 @@
+name: Org Release Train
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version to publish. Target repositories must already have matching tags.'
+        required: true
+        type: string
+      repositories:
+        description: '`all` or comma-separated repository names'
+        required: true
+        default: all
+        type: string
+      wait:
+        description: 'Wait for each release workflow before dispatching the next repository'
+        required: false
+        default: true
+        type: boolean
+      diagnoseSigning:
+        description: 'Run signing diagnostics where the target workflow supports it'
+        required: false
+        default: false
+        type: boolean
+      dryRun:
+        description: 'Print dispatch plan without triggering releases'
+        required: false
+        default: true
+        type: boolean
+      confirm:
+        description: 'Type "release train" to run with dryRun=false'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    name: Dispatch org release train
+    runs-on: ubuntu-latest
+    env:
+      ORG_WORKFLOW_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Confirm real release dispatch
+        if: ${{ !inputs.dryRun && inputs.confirm != 'release train' }}
+        shell: bash
+        run: |
+          echo "::error::Set confirm to 'release train' when dryRun=false."
+          exit 1
+
+      - name: Dispatch release workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            --kind release
+            --version "${{ inputs.version }}"
+            --repositories "${{ inputs.repositories }}"
+            --serial
+          )
+          if [[ "${{ inputs.wait }}" == "true" ]]; then
+            args+=(--wait)
+          fi
+          if [[ "${{ inputs.diagnoseSigning }}" == "true" ]]; then
+            args+=(--diagnose-signing)
+          fi
+          if [[ "${{ inputs.dryRun }}" == "true" ]]; then
+            args+=(--dry-run)
+          fi
+          python3 scripts/dispatch_org_workflows.py "${args[@]}"
