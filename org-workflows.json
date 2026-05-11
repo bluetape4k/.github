@@ -1,0 +1,158 @@
+{
+  "owner": "bluetape4k",
+  "trains": {
+    "nightly": [
+      "bluetape4k-aws",
+      "bluetape4k-experimental",
+      "bluetape4k-exposed",
+      "bluetape4k-graph",
+      "bluetape4k-image",
+      "bluetape4k-javers",
+      "bluetape4k-leader",
+      "bluetape4k-projects",
+      "bluetape4k-text",
+      "bluetape4k-workshop"
+    ],
+    "snapshot": [
+      "bluetape4k-projects",
+      "bluetape4k-exposed",
+      "bluetape4k-aws",
+      "bluetape4k-graph",
+      "bluetape4k-image",
+      "bluetape4k-javers",
+      "bluetape4k-leader",
+      "bluetape4k-text",
+      "bluetape4k-dependencies"
+    ],
+    "release": [
+      "bluetape4k-projects",
+      "bluetape4k-exposed",
+      "bluetape4k-aws",
+      "bluetape4k-graph",
+      "bluetape4k-image",
+      "bluetape4k-javers",
+      "bluetape4k-leader",
+      "bluetape4k-text"
+    ]
+  },
+  "repositories": {
+    "bluetape4k-aws": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" },
+      "snapshot": { "workflow": "snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-dependencies": {
+      "default_ref": "develop",
+      "snapshot": { "workflow": "publish-snapshot.yml" }
+    },
+    "bluetape4k-experimental": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" }
+    },
+    "bluetape4k-exposed": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" },
+      "snapshot": { "workflow": "publish-snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-graph": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" },
+      "snapshot": { "workflow": "publish-snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-image": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" },
+      "snapshot": { "workflow": "snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-javers": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" },
+      "snapshot": { "workflow": "snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-leader": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" },
+      "snapshot": { "workflow": "publish-snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-projects": {
+      "default_ref": "develop",
+      "nightly": {
+        "workflow": "nightly-tests.yml",
+        "inputs": {
+          "scope": "{scope}"
+        }
+      },
+      "snapshot": {
+        "workflow": "publish-snapshot.yml",
+        "inputs": {
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-text": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" },
+      "snapshot": { "workflow": "snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
+    },
+    "bluetape4k-workshop": {
+      "default_ref": "develop",
+      "nightly": { "workflow": "nightly.yml" }
+    }
+  }
+}

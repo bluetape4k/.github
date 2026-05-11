@@ -1,0 +1,69 @@
+name: Org Snapshot Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      repositories:
+        description: '`all` or comma-separated repository names'
+        required: true
+        default: all
+        type: string
+      wait:
+        description: 'Wait for each snapshot workflow before dispatching the next repository'
+        required: false
+        default: true
+        type: boolean
+      diagnoseSigning:
+        description: 'Run signing diagnostics where the target workflow supports it'
+        required: false
+        default: false
+        type: boolean
+      dryRun:
+        description: 'Print dispatch plan without triggering snapshot publishing'
+        required: false
+        default: true
+        type: boolean
+      confirm:
+        description: 'Type "deploy snapshots" to run with dryRun=false'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    name: Dispatch org snapshot workflows
+    runs-on: ubuntu-latest
+    env:
+      ORG_WORKFLOW_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Confirm real snapshot dispatch
+        if: ${{ !inputs.dryRun && inputs.confirm != 'deploy snapshots' }}
+        shell: bash
+        run: |
+          echo "::error::Set confirm to 'deploy snapshots' when dryRun=false."
+          exit 1
+
+      - name: Dispatch snapshot workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            --kind snapshot
+            --repositories "${{ inputs.repositories }}"
+            --serial
+          )
+          if [[ "${{ inputs.wait }}" == "true" ]]; then
+            args+=(--wait)
+          fi
+          if [[ "${{ inputs.diagnoseSigning }}" == "true" ]]; then
+            args+=(--diagnose-signing)
+          fi
+          if [[ "${{ inputs.dryRun }}" == "true" ]]; then
+            args+=(--dry-run)
+          fi
+          python3 scripts/dispatch_org_workflows.py "${args[@]}"

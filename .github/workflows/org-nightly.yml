@@ -1,0 +1,60 @@
+name: Org Nightly Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'Nightly scope for repositories that support scoped dispatch'
+        required: true
+        default: full
+        type: choice
+        options:
+          - smoke
+          - full
+          - testcontainers
+          - graphdb
+          - aws
+      repositories:
+        description: '`all` or comma-separated repository names'
+        required: true
+        default: all
+        type: string
+      wait:
+        description: 'Wait for dispatched workflow runs to complete'
+        required: false
+        default: true
+        type: boolean
+      dryRun:
+        description: 'Print dispatch plan without triggering workflows'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    name: Dispatch org nightly workflows
+    runs-on: ubuntu-latest
+    env:
+      ORG_WORKFLOW_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dispatch nightly workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            --kind nightly
+            --scope "${{ inputs.scope }}"
+            --repositories "${{ inputs.repositories }}"
+          )
+          if [[ "${{ inputs.wait }}" == "true" ]]; then
+            args+=(--wait)
+          fi
+          if [[ "${{ inputs.dryRun }}" == "true" ]]; then
+            args+=(--dry-run)
+          fi
+          python3 scripts/dispatch_org_workflows.py "${args[@]}"

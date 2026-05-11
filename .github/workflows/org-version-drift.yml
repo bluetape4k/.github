@@ -1,0 +1,64 @@
+name: Org Version Drift
+
+on:
+  workflow_dispatch:
+    inputs:
+      failOnDrift:
+        description: 'Fail the workflow when any governed version group has drift'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: Shared version drift report
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN || github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone bluetape4k repositories
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p workspace
+          repos=(
+            bluetape4k-aws
+            bluetape4k-dependencies
+            bluetape4k-experimental
+            bluetape4k-exposed
+            bluetape4k-graph
+            bluetape4k-image
+            bluetape4k-javers
+            bluetape4k-leader
+            bluetape4k-projects
+            bluetape4k-text
+            bluetape4k-workshop
+          )
+          for repo in "${repos[@]}"; do
+            gh repo clone "bluetape4k/${repo}" "workspace/${repo}" -- --depth 1
+          done
+
+      - name: Generate version drift report
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--workspace workspace)
+          if [[ "${{ inputs.failOnDrift || false }}" == "true" ]]; then
+            args+=(--fail-on-drift)
+          fi
+          python3 scripts/version_drift_report.py "${args[@]}" | tee version-drift-report.md
+          cat version-drift-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-drift-report
+          path: version-drift-report.md
+          retention-days: 30
