@@ -27,6 +27,8 @@ LIBRARY_REPOSITORIES = (
     "bluetape4k-text",
 )
 
+BASELINE_REPOSITORY = "bluetape4k-projects"
+
 WORKSHOP_REPOSITORIES = (
     "bluetape4k-workshop",
     "clinic-appointment",
@@ -107,6 +109,33 @@ def collect(workspace: Path) -> dict[str, list[VersionHit]]:
     return grouped
 
 
+def collect_repository_versions(workspace: Path, repositories: tuple[str, ...]) -> dict[str, dict[str, str]]:
+    repo_versions: dict[str, dict[str, str]] = {}
+    for repo in repositories:
+        catalog = workspace / repo / "gradle" / "libs.versions.toml"
+        if catalog.exists():
+            repo_versions[repo] = parse_versions(catalog)
+    return repo_versions
+
+
+def collect_shared_alias_drift(workspace: Path) -> dict[str, list[VersionHit]]:
+    repo_versions = collect_repository_versions(workspace, LIBRARY_REPOSITORIES)
+    manual_aliases = {alias for aliases in VERSION_GROUPS.values() for alias in aliases}
+
+    aliases: dict[str, list[VersionHit]] = {}
+    for repo, versions in repo_versions.items():
+        for alias, version in versions.items():
+            if alias in manual_aliases:
+                continue
+            aliases.setdefault(alias, []).append(VersionHit(repo, alias, version))
+
+    return {
+        alias: hits
+        for alias, hits in sorted(aliases.items())
+        if len({hit.repo for hit in hits}) >= 2 and status_for(hits) == "drift"
+    }
+
+
 def status_for(hits: list[VersionHit]) -> str:
     if not hits:
         return "missing"
@@ -166,6 +195,43 @@ def render_markdown(grouped: dict[str, list[VersionHit]]) -> tuple[str, bool]:
     return "\n".join(lines) + "\n", has_drift
 
 
+def render_shared_alias_drift(shared_alias_drift: dict[str, list[VersionHit]]) -> tuple[str, bool]:
+    lines: list[str] = [
+        "",
+        "## Auto-Discovered Shared Alias Drift",
+        "",
+        "`bluetape4k-*` library repositories are scanned for version aliases declared by at least two repositories.",
+        f"When `{BASELINE_REPOSITORY}` declares the same alias, its value is the default baseline.",
+        "",
+        "| Alias | Baseline | Versions | Repositories |",
+        "|---|---|---|---|",
+    ]
+
+    if not shared_alias_drift:
+        lines.append("| - | - | - | No drift among shared library aliases. |")
+        return "\n".join(lines) + "\n", False
+
+    for alias, hits in shared_alias_drift.items():
+        by_version: dict[str, list[str]] = {}
+        baseline = "-"
+        for hit in hits:
+            by_version.setdefault(hit.version, []).append(hit.repo)
+            if hit.repo == BASELINE_REPOSITORY:
+                baseline = hit.version
+
+        versions = "<br>".join(
+            f"`{version}`: {len(repos)}"
+            for version, repos in sorted(by_version.items())
+        )
+        repos = "<br>".join(
+            f"`{version}` -> " + ", ".join(f"`{repo}`" for repo in sorted(repos))
+            for version, repos in sorted(by_version.items())
+        )
+        lines.append(f"| `{alias}` | `{baseline}` | {versions} | {repos} |")
+
+    return "\n".join(lines) + "\n", True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -184,7 +250,10 @@ def main() -> int:
     workspace = args.workspace.resolve()
     grouped = collect(workspace)
     markdown, has_drift = render_markdown(grouped)
+    shared_markdown, has_shared_alias_drift = render_shared_alias_drift(collect_shared_alias_drift(workspace))
     sys.stdout.write(markdown)
+    sys.stdout.write(shared_markdown)
+    has_drift = has_drift or has_shared_alias_drift
     return 1 if args.fail_on_drift and has_drift else 0
 
 

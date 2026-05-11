@@ -14,6 +14,13 @@ Dependency updates are handled in three layers:
 This split is intentional. Dependabot is repository-scoped, while release
 readiness depends on cross-repository consistency.
 
+`scripts/version_drift_report.py` has two scopes:
+
+- Curated release-train groups for dependencies that are known release gates.
+- Auto-discovered shared aliases across `bluetape4k-*` library repositories.
+  Any alias declared by at least two library repositories is checked for drift,
+  and `bluetape4k-projects` is shown as the default baseline when present.
+
 ## Governed Repositories
 
 The governed scope covers the main bluetape4k libraries plus:

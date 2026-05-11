@@ -94,6 +94,11 @@ Organization-governed version groups are tracked by
 - Kover
 - Apache Fory
 
+The same report also auto-discovers shared version aliases across
+`bluetape4k-*` library repositories. If at least two library repositories
+declare the same alias and the values differ, the report lists the drift and
+marks the `bluetape4k-projects` value as the default baseline when present.
+
 Allowed drift must be documented in the release notes or a linked issue before
 release freeze. Experimental and Java 25-only modules may deviate when the
 reason is explicit.
