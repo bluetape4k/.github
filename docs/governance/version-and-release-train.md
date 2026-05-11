@@ -52,9 +52,9 @@ Snapshot dispatch uses this default order:
 `bluetape4k-dependencies` is last because it is the ecosystem BOM and should be
 published after the libraries it coordinates.
 
-Release dispatch currently uses the same order without `bluetape4k-dependencies`
-because that repository has a snapshot workflow but no release workflow yet.
-`bluetape4k-experimental` and `bluetape4k-workshop` are Nightly-only by default.
+Release dispatch uses the same order, including `bluetape4k-dependencies` as
+the final BOM publication. `bluetape4k-experimental` and `bluetape4k-workshop`
+are Nightly-only by default.
 
 ## Release Preconditions
 

@@ -32,7 +32,8 @@
       "bluetape4k-image",
       "bluetape4k-javers",
       "bluetape4k-leader",
-      "bluetape4k-text"
+      "bluetape4k-text",
+      "bluetape4k-dependencies"
     ]
   },
   "repositories": {
@@ -50,7 +51,14 @@
     },
     "bluetape4k-dependencies": {
       "default_ref": "develop",
-      "snapshot": { "workflow": "publish-snapshot.yml" }
+      "snapshot": { "workflow": "publish-snapshot.yml" },
+      "release": {
+        "workflow": "release.yml",
+        "inputs": {
+          "version": "{version}",
+          "diagnoseSigning": "{diagnose_signing}"
+        }
+      }
     },
     "bluetape4k-experimental": {
       "default_ref": "develop",

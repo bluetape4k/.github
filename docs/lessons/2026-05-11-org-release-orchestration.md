@@ -40,6 +40,9 @@ signing keys, package permissions, and release workflow behavior.
   PAT with cross-repository Actions write access.
 - Keep organization workflows as dispatchers only; avoid duplicating publish
   logic in the central repo.
+- Add repo-local release workflows before including a repository in the release
+  train; the central train should dispatch existing workflows, not invent target
+  repository release behavior.
 - Run snapshot train successfully before real release train dispatch.
 - Treat drift report failures as release-freeze blockers unless the exception is
   documented in the release notes or a linked issue.
