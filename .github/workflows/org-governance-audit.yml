@@ -40,8 +40,8 @@ jobs:
               if repo != ".github":
                   print(repo)
           PY
-          mkdir -p workspace
-          cp -a . "workspace/.github"
+          mkdir -p workspace/.github
+          git archive HEAD | tar -x -C "workspace/.github"
           while IFS= read -r repo; do
             gh repo clone "bluetape4k/${repo}" "workspace/${repo}" -- --depth 1
           done < /tmp/governed-repos.txt
