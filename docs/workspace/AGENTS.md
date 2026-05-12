@@ -212,6 +212,13 @@ Store durable project design/history artifacts in repo-local docs paths:
 - Do not add ktlint auto-format hooks; use IntelliJ formatting and `.editorconfig`.
 - If `.github/workflows/ci.yml` changes, check whether nightly workflow changes
   are also required.
+- When adding a new module, update the repository's CI and Nightly workflows so
+  the module's tests run in the appropriate scope. Container-backed module tests
+  should usually be added to Full Nightly rather than the daily smoke path.
+- When `.github/workflows/nightly.yml` changes, explicitly run the Nightly
+  workflow with `workflow_dispatch` before DoD and record the run URL/result.
+  For module coverage changes, use `scope=full` unless the change is strictly
+  smoke-only.
 
 ## Spring Boot Auto-Configuration
 
