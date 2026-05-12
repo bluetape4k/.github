@@ -49,6 +49,9 @@ through the repository-local workflow dispatch UI.
 
 - Keep expensive new Nightly jobs behind `scope=full` unless there is a written
   operational reason to run them daily.
+- When a repository adds a new module, update its repository-local Nightly
+  workflow in the same PR or an immediate follow-up PR so the new module's tests
+  run in the appropriate smoke/full scope.
 - Add a manual `scope` input when a repository gains heavy integration tests.
 - Keep coverage artifacts available for full runs; smoke coverage is optional
   unless the repository depends on it for a quality gate.
