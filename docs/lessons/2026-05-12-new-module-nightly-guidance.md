@@ -19,6 +19,7 @@
 ## Outcome
 
 - `docs/workspace/AGENTS.md`에 신규 module 생성 시 CI/Nightly workflow 갱신 지침을 추가했다.
+- `docs/workspace/AGENTS.md`에 Nightly workflow 변경 시 `workflow_dispatch` 실행과 run URL/result 기록을 요구했다.
 - `docs/governance/nightly-workflow-governance.md`에 신규 module Nightly follow-up criterion을 추가했다.
 
 ## Verification
@@ -34,4 +35,5 @@
   - `bom` 또는 dependency docs 영향 확인.
   - `.github/workflows/ci.yml` module path filter와 test job 확인.
   - `.github/workflows/nightly.yml` smoke/full scope에 module test 추가.
+  - Nightly 변경이 있으면 `workflow_dispatch`로 실행하고 run URL/result 기록.
   - Lessons 작성.
