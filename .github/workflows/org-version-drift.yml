@@ -21,7 +21,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN || github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Clone bluetape4k repositories
         shell: bash
@@ -61,7 +61,7 @@ jobs:
           cat version-drift-report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: version-drift-report
           path: version-drift-report.md
