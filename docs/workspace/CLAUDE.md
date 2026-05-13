@@ -113,6 +113,7 @@ catch (e: Exception) { log.warn(e) { "실패" } }
 - `val` 우선 사용
 - 기존 객체 변경 금지 — 항상 새 인스턴스 반환
 - options/state → `data class`
+- 모든 `data class` 는 `java.io.Serializable` 을 구현하고 `serialVersionUID` 를 정의한다.
 
 ### 함수 인자 — 동종 타입 파라미터는 data class로 래핑
 
@@ -412,6 +413,8 @@ import org.jetbrains.exposed.v1.jdbc.exists  // Table.exists()
 - **`develop`** — 기본 브랜치. 모든 PR 대상. 직접 push 금지.
 - **`main`** — 릴리즈 전용. `develop` → `main` PR 로만 업데이트.
 - **feature 브랜치** — `.worktrees/<branch>` 에서 작업.
+- 로컬 worktree/branch 이름에 `codex/` prefix를 쓰지 않는다. `feat/`,
+  `fix/`, `docs/`, `refactor/`, `test/`, `build/`, `chore/` 같은 일반 prefix를 쓴다.
 
 ### 작업 흐름 (MANDATORY)
 
@@ -439,7 +442,7 @@ git branch -d feat/<name>
 gh pr create --base main --head develop --title "release: vX.Y.Z"
 ```
 
-- **Commits**: 한국어 + prefix (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, `perf:`)
+- **Commits**: English + prefix (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, `perf:`)
 - **PR**: One issue = one PR, squash-merge
 - **Branch protection**: `develop`, `main` 모두 PR 필수 (모든 레포 적용됨)
 
@@ -460,12 +463,18 @@ Per-repo 공통 스크립트 (`repo-status`, `repo-diff`, `repo-test-summary`, `
 
 ---
 
-## 스킬 참조
+## 스킬 라우팅
+
+설치된 bluetape4k skill을 프로젝트 source of truth로 사용한다. 세부
+체크리스트를 이 문서에 복제하지 말고, 구현 전에 관련 skill과 references를
+로드한다.
 
 | 스킬 | 용도 |
 |------|------|
-| `bluetape4k-patterns` | Kotlin 코드 작성·검토 시 항상 적용 |
-| `bluetape4k-workflow` | 작업 유형 자동 분류 후 최소 필요 단계 실행 (Full Design / Fast Track / Bug Fix / Code Review / Maintenance) |
-| `design` | 신규 기능·모듈·대규모 리팩터링 |
-| `coroutines-kotlin` | Coroutines, Flow, Channel, structured concurrency |
-| `kotlin-spring` | Spring Boot + Kotlin 통합 |
+| `bluetape4k-workflow` | bluetape4k 작업의 first-stop router. Full Design, Fast Track, Bug Fix, Code Review, Maintenance를 분류하고 최소 안전 lane과 검증 수준을 선택한다. |
+| `bluetape4k-design` | 신규 모듈, 신규 서비스/서브시스템, broad API 설계, 대규모 리팩터링, 신규 dependency, multi-layer 변경. spec/plan/advisor-review/DoD와 new-module checks를 소유한다. |
+| `bluetape4k-patterns` | bluetape4k Kotlin 구현·리뷰. 현재 references는 testing, Spring Boot auto-config, new-module setup, final checklist/IDE diagnostics를 다룬다. |
+| domain skills | 필요 시 `ecc-kotlin-patterns`, `ecc-kotlin-exposed`, `ecc-springboot-kotlin`, `ecc-kotlin-testing`, `kotlin-coroutines-skill`, `kotlin-spring`, `kotlin-expert`를 함께 로드한다. |
+
+workflow 또는 skill-maintenance 요청에서는 durable guidance를 바꾸기 전에
+관련 repo-local `docs/lessons/*.md`를 읽는다.
