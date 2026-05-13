@@ -114,6 +114,7 @@ functions, use `java.util.concurrent.atomic.*`.
 - Prefer `val`.
 - Return new instances instead of mutating existing state.
 - Model options/state as `data class` values.
+- All `data class` declarations must implement `java.io.Serializable` and define `serialVersionUID`.
 
 ### Same-type parameters
 
@@ -251,9 +252,13 @@ Store durable project design/history artifacts in repo-local docs paths:
 - `develop` is the default integration branch; do not push directly.
 - `main` is release-only and updated through `develop -> main` PRs.
 - Prefer feature branches under `.worktrees/<branch>`.
+- Do not use `codex/` for local worktree names or branch names. Use conventional
+  prefixes such as `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `build/`, or
+  `chore/`.
 - Commits commonly use prefixes such as `feat:`, `fix:`, `refactor:`, `build:`,
   `docs:`, `chore:`, `test:`, `perf:`.
-- Korean commit text is acceptable, but keep the intent line concise.
+- Commit text that will be pushed to GitHub must be English. Keep the intent
+  line concise.
 
 ## Workspace Scripts
 
@@ -285,15 +290,26 @@ GitHub/CI preference:
   cleanup is explicitly requested, because they delete local branches and remove
   associated worktrees.
 
-## Recommended Skills
+## Skill Routing
 
-- `bluetape4k-patterns`: Kotlin implementation/review rules.
-- `bluetape4k-workflow`: classify bluetape4k work type and choose the lightest
-  safe lane.
-- `design`: new feature, new module, or significant refactor.
-- `coroutines-kotlin`: coroutine, Flow, Channel, structured concurrency work.
-- `kotlin-spring`: Spring Boot + Kotlin integration.
-- `kotlin-expert`: advanced Kotlin API or DSL design.
+Use the installed bluetape4k skills as the project source of truth. Do not
+duplicate their detailed checklists here; load the relevant skill and its
+references before implementation.
+
+- `bluetape4k-workflow`: first-stop router for bluetape4k work. It classifies
+  Full Design, Fast Track, Bug Fix, Code Review, and Maintenance work, then
+  selects the lightest safe lane and verification level.
+- `bluetape4k-design`: use for new modules, new services/subsystems, broad API
+  design, large refactors, new dependencies, or multi-layer changes. It owns the
+  spec/plan/advisor-review/DoD workflow and new-module checks.
+- `bluetape4k-patterns`: use for Kotlin implementation or review in this
+  ecosystem. Its current references cover testing, Spring Boot auto-config,
+  new-module setup, and final checklist/IDE diagnostics.
+- Add domain skills when the touched area requires them: `ecc-kotlin-patterns`,
+  `ecc-kotlin-exposed`, `ecc-springboot-kotlin`, `ecc-kotlin-testing`,
+  `kotlin-coroutines-skill`, `kotlin-spring`, or `kotlin-expert`.
+- For workflow or skill-maintenance requests, read relevant repo-local
+  `docs/lessons/*.md` files before changing durable guidance.
 
 ## GitHub Issue And Pull Request Workflow
 
