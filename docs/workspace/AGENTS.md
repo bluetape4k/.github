@@ -5,9 +5,32 @@ Each child directory is an independent Git repository. This file applies to all
 repositories below this directory; repo-local `AGENTS.md` files add narrower
 rules and take precedence inside their own repo.
 
-Keep conversations with the user in Korean. Keep agent-facing guidance such as
-`AGENTS.md` in concise English unless a repo-local document explicitly requires
-Korean wording.
+Keep conversations with the user in Korean. Keep agent-facing guidance and
+memory such as `AGENTS.md`, `CLAUDE.md`, `SKILL.md`, `.omx/notepad.md`, and
+`~/.codex/memories/*` in concise English unless a repo-local document explicitly
+requires different wording.
+
+Use audience-based document language:
+
+| Primary reader | Artifacts | Language |
+|---|---|---|
+| End user | README locale set | Multilingual |
+| Contributor (public, human) | KDoc, GitHub PR/issue/commit, CHANGELOG, release notes | English |
+| AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, agent memory, notepad | English |
+| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean OK |
+
+- Conversations with the user: Korean.
+- Library user documentation: multilingual where applicable. Keep `README.md`
+  in English and preserve/update existing localized README files such as
+  `README.ko.md`; additional locales such as Japanese or Chinese may be added
+  over time.
+- Public API KDoc and contributor/developer-facing public artifacts: English.
+  This includes KDoc, CHANGELOG entries, release notes, GitHub issues, GitHub
+  PR titles/bodies, and commit messages that will be pushed to GitHub.
+- Internal human-readable artifacts may be Korean. This includes specs, plans,
+  research notes, and lessons learned.
+- Agent memory and agent-facing guidance must be English for token efficiency,
+  LLM consistency, and cross-tool reuse.
 
 ## Repositories
 
@@ -37,6 +60,23 @@ Korean wording.
 | `clinic-appointment/` | Clinic appointment example app |
 | `timefold-workshop/` | Timefold Solver workshop |
 | `kotlin-dev-agent/` | Kotlin development agent experiment |
+
+## Knowledge Retrieval
+
+- When looking for similar implementations, prior examples, benchmark results,
+  discussions, plans, specs, lessons, or scattered project documentation, query
+  qmd first before filesystem search.
+- Follow the user-scope qmd command selection rules. For routine lookup, prefer
+  `qmdq "<query>" -c <collection>` unless reranking is needed.
+- Use `qmdq "<query>" -c bluetape4k-docs` for workspace documentation and
+  examples. This collection indexes Markdown under `/Users/debop/work/bluetape4k`
+  with `**/*.md`.
+- Use `qmdq "<query>" -c wiki` for personal or cross-project knowledge under
+  `~/.codex/wiki`.
+- Use `rg` first for exact code symbols, filenames, or current implementation
+  locations.
+- If qmd is unavailable, stale, or returns weak matches, fall back to `rg` and
+  mention the indexing gap when it affects the answer.
 
 ## Shared Stack
 
@@ -164,7 +204,8 @@ abstract class AbstractRedisTest {
 ## Public API Documentation
 
 Public classes, interfaces, objects, and extension functions need KDoc in the
-style already used by the repo. Include:
+style already used by the repo. KDoc is public-facing documentation and must be
+written in English for new or updated public APIs. Include:
 
 - One-line summary.
 - Contract/behavior section.
@@ -172,15 +213,18 @@ style already used by the repo. Include:
 
 ## README Rules
 
-For bluetape4k modules, keep English and Korean README files together:
+For bluetape4k modules, keep user-facing README files multilingual where
+localized files exist:
 
 - `README.md`
 - `README.ko.md`
 
-Each README must include the language switch directly below the title. Module
-README structure should cover architecture, core features, usage examples,
-configuration options, and dependency instructions. Mermaid diagrams are
-preferred for architecture. Do not use Vega-Lite for README diagrams.
+Additional localized README files such as `README.ja.md` or `README.zh.md` may
+be added over time. Each README should include the language switch directly
+below the title when multiple locales exist. Module README structure should
+cover architecture, core features, usage examples, configuration options, and
+dependency instructions. Mermaid diagrams are preferred for architecture. Do not
+use Vega-Lite for README diagrams.
 
 ## Project Documentation Artifacts
 
@@ -192,10 +236,10 @@ Store durable project design/history artifacts in repo-local docs paths:
 - Lessons Learned / work retrospectives: `docs/lessons/YYYY-MM-DD-{slug}.md`
 - Use lowercase ASCII kebab-case slugs; include `issue-{number}-` when the
   artifact is tied to a GitHub issue.
-- After a large task completes, or when a reusable lesson is identified during
-  work, create or update a concise `docs/lessons/YYYY-MM-DD-{slug}.md` entry
-  automatically. Include the context, decision, outcome, verification evidence,
-  and what future agents should do differently.
+- After every completed PR or work item, create or update a concise
+  `docs/lessons/YYYY-MM-DD-{slug}.md` entry automatically. Keep it short for
+  small work, but always include the context, decision, outcome, verification
+  evidence, and what future agents should do differently.
 - At the end of each substantial workday or multi-task session, consolidate new
   `docs/lessons/` entries: merge duplicates, keep event-specific evidence in the
   lesson, and promote repeatable rules to `AGENTS.md` or the relevant
@@ -203,6 +247,8 @@ Store durable project design/history artifacts in repo-local docs paths:
 - Treat `.omx/plans`, `.omx/notepad.md`, chat summaries, and runtime notes as
   transient. Promote durable decisions and lessons into `docs/superpowers/` or
   `docs/lessons/`.
+- Specs, plans, research notes, and lessons are internal working artifacts and
+  may be written in Korean.
 
 ## Build and Coverage
 
@@ -216,10 +262,6 @@ Store durable project design/history artifacts in repo-local docs paths:
 - When adding a new module, update the repository's CI and Nightly workflows so
   the module's tests run in the appropriate scope. Container-backed module tests
   should usually be added to Full Nightly rather than the daily smoke path.
-- When `.github/workflows/nightly.yml` changes, explicitly run the Nightly
-  workflow with `workflow_dispatch` before DoD and record the run URL/result.
-  For module coverage changes, use `scope=full` unless the change is strictly
-  smoke-only.
 
 ## Spring Boot Auto-Configuration
 
@@ -244,7 +286,8 @@ Store durable project design/history artifacts in repo-local docs paths:
 
 - IDE diagnostics: zero errors and no unresolved deprecations in touched code.
 - Compile and test affected modules.
-- Update `README.md` and `README.ko.md` when behavior or public API changes.
+- Update `README.md` and existing localized README files when behavior or
+  public API changes.
 - Add or update KDoc for new/changed public API.
 
 ## Git Workflow
