@@ -13,7 +13,7 @@ Kotlin/JVM backend libraries, infrastructure adapters, and workshops held togeth
 `bluetape4k` is a Kotlin-first backend ecosystem for pragmatic server-side development:
 
 - coroutine-friendly APIs for blocking, async, and reactive integration points
-- Spring Boot 3/4 and Java 21/25 era infrastructure modules
+- Spring Boot 4 and Java 21/25 era infrastructure modules
 - persistence, caching, graph, image, text, AWS, audit, and leader-election utilities
 - real workshop projects that keep examples close to production constraints
 - tests built around JUnit 5, Testcontainers, Kover, and repeatable Gradle builds
@@ -65,7 +65,7 @@ It is the kind of app where the blue tape stops being a joke and starts being a 
 - Kotlin-first, coroutine-first APIs
 - Gradle multi-module builds
 - Java 21 for core libraries, Java 25 for newer experimental/application work
-- Spring Boot 3.x and 4.x compatibility where the module needs it
+- Spring Boot 4.x is the supported Spring Boot line
 - JUnit 5, MockK, Testcontainers, and Kover
 - README documentation in English and Korean for bluetape4k modules
 - small, reviewable changes with explicit verification

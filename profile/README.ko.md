@@ -13,7 +13,7 @@
 `bluetape4k`는 Kotlin 중심의 실용적인 서버 개발 생태계입니다.
 
 - blocking, async, reactive 경계를 다루는 coroutine-friendly API
-- Spring Boot 3/4, Java 21/25 시대의 인프라 모듈
+- Spring Boot 4, Java 21/25 시대의 인프라 모듈
 - persistence, caching, graph, image, text, AWS, audit, leader election 유틸리티
 - 실제 제약을 반영한 workshop 프로젝트
 - JUnit 5, Testcontainers, Kover, Gradle 기반의 반복 가능한 검증
@@ -65,7 +65,7 @@
 - Kotlin-first, coroutine-first API
 - Gradle multi-module build
 - core library는 Java 21, 최신 실험/애플리케이션은 Java 25 중심
-- 필요 모듈에 Spring Boot 3.x/4.x 호환성 고려
+- Spring Boot 연동은 Spring Boot 4.x만 지원
 - JUnit 5, MockK, Testcontainers, Kover
 - bluetape4k 모듈은 영어/한국어 README 동시 관리
 - 작은 단위의 reviewable change와 명시적인 verification
