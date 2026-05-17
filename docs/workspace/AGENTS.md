@@ -361,3 +361,6 @@ assign them to `debop` by default unless the user explicitly says otherwise.
 Use `--assignee debop` with `gh issue create` and `gh pr create`, or the
 equivalent GitHub API `assignees` field. If a repository rejects the assignee,
 report that blocker instead of creating an unassigned issue or PR silently.
+Add relevant topic labels to GitHub pull requests when the labels exist or can
+be inferred safely from the work scope, such as `examples`, `ktor`,
+`spring-boot`, `r2dbc`, `exposed`, `documentation`, or `testing`.
