@@ -67,11 +67,11 @@ Use audience-based document language:
   discussions, plans, specs, lessons, or scattered project documentation, query
   qmd first before filesystem search.
 - Follow the user-scope qmd command selection rules. For routine lookup, prefer
-  `qmdq "<query>" -c <collection>` unless reranking is needed.
-- Use `qmdq "<query>" -c bluetape4k-docs` for workspace documentation and
+  `qmd query "<query>" -c <collection> --no-rerank`.
+- Use `qmd query "<query>" -c bluetape4k-docs --no-rerank` for workspace documentation and
   examples. This collection indexes Markdown under `/Users/debop/work/bluetape4k`
   with `**/*.md`.
-- Use `qmdq "<query>" -c wiki` for personal or cross-project knowledge under
+- Use `qmd query "<query>" -c wiki --no-rerank` for personal or cross-project knowledge under
   `~/.codex/wiki`.
 - Use `rg` first for exact code symbols, filenames, or current implementation
   locations.
