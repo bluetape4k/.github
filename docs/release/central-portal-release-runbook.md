@@ -238,6 +238,56 @@ Only tag `bluetape4k-dependencies` after all lines return `200`.
 
 ## Post-release
 
+Do not open the next development snapshot PRs until the whole release batch is
+actually complete:
+
+1. every upstream library repository in the release batch has a successful
+   `release.yml` run
+2. every released upstream BOM/artifact is visible from Maven Central with HTTP
+   200
+3. `bluetape4k-dependencies` has been released last
+4. `bluetape4k-dependencies` BOM and version catalog are also visible from Maven
+   Central with HTTP 200
+
+Only after those checks pass, open the next patch snapshot line. The rule is
+`X.Y.Z -> X.Y.(Z+1)-SNAPSHOT`, not `X.(Y+1).0-SNAPSHOT`.
+
+Examples from the 2026-05-17 release batch:
+
+| Repository | Released | Next development snapshot |
+|---|---:|---:|
+| `bluetape4k-projects` | `1.8.0` | `1.8.1-SNAPSHOT` |
+| `bluetape4k-aws` | `0.1.0` | `0.1.1-SNAPSHOT` |
+| `bluetape4k-image` | `0.1.0` | `0.1.1-SNAPSHOT` |
+| `bluetape4k-text` | `0.1.0` | `0.1.1-SNAPSHOT` |
+| `bluetape4k-graph` | `0.3.0` | `0.3.1-SNAPSHOT` |
+| `bluetape4k-leader` | `0.1.0` | `0.1.1-SNAPSHOT` |
+| `bluetape4k-exposed` | `1.8.0` | `1.8.1-SNAPSHOT` |
+| `bluetape4k-javers` | `0.1.0` | `0.1.1-SNAPSHOT` |
+| `bluetape4k-dependencies` | `1.0.0` | `1.0.1-SNAPSHOT` |
+
+For upstream library repos, set:
+
+```properties
+baseVersion=X.Y.(Z+1)
+snapshotVersion=-SNAPSHOT
+```
+
+For `bluetape4k-dependencies`, also update
+`gradle/libs.versions.toml` source-of-truth entries so every released
+`bluetape4k-*` BOM points at its next patch snapshot, then run:
+
+```bash
+python3 scripts/sync-shared-versions.py --write --summary
+python3 scripts/sync-shared-versions.py --check --summary
+python3 scripts/sync-managed-catalog.py --check --summary
+```
+
+Open and merge upstream snapshot-line PRs first. Keep the
+`bluetape4k-dependencies` snapshot-line PR last, because its CI checks
+downstream `develop` catalogs and should reflect already-merged upstream
+snapshot lines.
+
 ```bash
 gh release view X.Y.Z --json tagName,publishedAt,url
 git status --short --branch

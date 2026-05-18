@@ -165,7 +165,24 @@ curl -s "https://repo1.maven.org/maven2/io/github/bluetape4k/<artifact>/X.Y.Z/<a
 - [ ] `bluetape4k-dependencies` 버전 카탈로그 업데이트 PR 생성
 - [ ] BOM/NMCP 집계에서 `examples/`, `*-examples`, `*-demo`,
       `benchmark/`, `*-benchmark` 모듈 제외 확인
-- [ ] 소스 레포 다음 버전(`X.(Y+1).0-SNAPSHOT`) bump PR 생성
+- [ ] **전체 배포 완료 후에만** 소스 레포 다음 patch snapshot
+      (`X.Y.(Z+1)-SNAPSHOT`) bump PR 생성
+
+다음 patch snapshot bump는 모든 upstream release와 `bluetape4k-dependencies`
+release가 끝난 뒤에만 수행한다. GitHub Actions 성공만으로는 부족하고,
+Maven Central 공개 repo에서 대표 artifact/BOM POM이 HTTP 200으로 확인되어야
+한다. 예: `1.8.0 -> 1.8.1-SNAPSHOT`, `0.1.0 -> 0.1.1-SNAPSHOT`,
+`0.3.0 -> 0.3.1-SNAPSHOT`, `bluetape4k-dependencies 1.0.0 -> 1.0.1-SNAPSHOT`.
+
+`bluetape4k-dependencies`는 마지막에 처리한다. 먼저 각 upstream repo의
+snapshot-line PR을 merge하고, 이후 `gradle/libs.versions.toml` source-of-truth
+block을 다음 patch snapshot들로 맞춘 뒤 아래 검증을 통과시킨다.
+
+```bash
+python3 scripts/sync-shared-versions.py --write --summary
+python3 scripts/sync-shared-versions.py --check --summary
+python3 scripts/sync-managed-catalog.py --check --summary
+```
 
 ### 8-1. Central Portal 전파 확인
 
