@@ -7,15 +7,63 @@
 
 ## 1. 의존성 버전 점검
 
+### 1-0. BOM / catalog 역할 분리
+
+`bluetape4k-dependencies` repo는 사용자용 BOM과 내부 빌드 catalog의
+source를 함께 가진다. 배포 방식은 분리한다.
+
+- `bluetape4k-dependencies`: 최종 사용자용 Maven BOM. semantic version을
+  사용한다. 예: `1.1.3`
+- `bluetape4k-dependencies/gradle/libs.versions.toml`: bluetape4k repo
+  빌드/기여자용 Gradle catalog source. `bluetape4k-*` repo들이 사용하는
+  외부 라이브러리와 Gradle plugin 버전을 통일하기 위해 사용한다.
+  Maven Central에 별도 catalog artifact로 publish하지 말고,
+  `catalog/YYYY-MM-DD-NN` 같은 `bluetape4k-dependencies` git ref로 고정한다.
+
+```bash
+grep -E '^(baseVersion|snapshotVersion|bluetape4kDependenciesCatalogPath|bluetape4kDependenciesCatalogRef|bluetape4kDependenciesVersion)=' gradle.properties || true
+rg -n 'bluetape4kDependenciesCatalog(Path|Ref)|BLUETAPE4K_DEPENDENCIES_CATALOG_(PATH|REF)|bluetape4kDependenciesVersion|bluetape4k-version-catalog|bluetape4k-dependencies' settings.gradle.kts build.gradle.kts gradle.properties gradle/libs.versions.toml
+```
+
+- [ ] `bluetape4k-*` 라이브러리 repo가 shared catalog를 import한다면
+      `bluetape4k-dependencies/gradle/libs.versions.toml`을 checkout된 git ref
+      경로에서 읽을 수 있는가? 일반 PR CI fallback은 허용하지만 release
+      validation은 명시 path/env 또는 `bluetape4kDependenciesCatalogRef`를
+      사용해야 한다.
+- [ ] `bluetape4kDependenciesVersion`은 실제 BOM/platform import에만
+      사용되고, Gradle catalog import에는 사용되지 않는가?
+- [ ] release train catalog source ref(`catalog/YYYY-MM-DD-NN`)가 존재하고
+      downstream CI/local build가 그 ref를 checkout하도록 되어 있는가?
+- [ ] catalog source ref를 내부 `bluetape4k-*` 의존 release version source로
+      사용하지 않는가? 내부 bluetape4k 참조는 배포 순서에 따라 신규
+      배포된 release version을 명시해야 한다.
+- [ ] 같은 release train 안의 repo가 아직 배포되지 않은 최종
+      `bluetape4k-dependencies` BOM 버전에 의존하지 않는가?
+
 ### 1-1. 내부 bluetape4k-* 의존성
 
 ```bash
+rg -n 'bluetape4k(-[a-z]+)? = "|bluetape4k-.*-bom = "|io\.github\.bluetape4k' \
+  gradle/libs.versions.toml build.gradle.kts **/build.gradle.kts
+
+rg -n 'exposed|bluetape4k-exposed|io\.github\.bluetape4k\.exposed|bluetape4k\.exposed' \
+  settings.gradle.kts gradle/libs.versions.toml build.gradle.kts **/build.gradle.kts
+
 # SNAPSHOT 참조 전수 확인
 rg "SNAPSHOT" gradle/libs.versions.toml gradle.properties build.gradle.kts \
   --glob "!gradle.properties" | grep -v "snapshotVersion\|central-snapshot\|maven-snapshots\|# "
 ```
 
-- [ ] `gradle/libs.versions.toml` 의 모든 `bluetape4k-*` 버전이 릴리즈 버전인가?
+- [ ] 참조하는 내부 `bluetape4k-*` repo가 이번 release train 대상이면,
+      그 upstream repo의 목표 버전이 배포되어 Maven Central HTTP 200이
+      될 때까지 대기했는가?
+- [ ] `javers-exposed` 같은 신규 bridge module이 추가되어 release order가
+      바뀌지 않았는가? 특히 `bluetape4k-javers`가
+      `bluetape4k-exposed`를 참조하면 `exposed` 목표 버전 배포 후에만
+      `javers`를 준비/배포해야 한다.
+- [ ] 참조하는 내부 `bluetape4k-*` repo가 이번 release train 대상이
+      아니라면, `gradle/libs.versions.toml`의 버전이 Maven Central에 공개된
+      가장 최신 upstream release version인가?
 - [ ] `io.github.bluetape4k` 와 `io.github.bluetape4k.exposed` 등 **groupId가 다른 아티팩트**는 별도 version key를 사용하는가?
 - [ ] 해당 버전이 **Maven Central에 실제로 존재**하는가?
   ```bash
@@ -37,6 +85,22 @@ rg "SNAPSHOT" gradle/libs.versions.toml gradle.properties build.gradle.kts \
 ---
 
 ## 2. 코드 품질
+
+### 2-0. 버전별 milestone
+
+```bash
+gh api "repos/bluetape4k/$(basename "$PWD")/milestones?state=open&per_page=100" \
+  --jq '.[] | [.title,.open_issues,.closed_issues] | @tsv'
+gh issue list --state open --milestone "<target-version>" --limit 100
+gh pr list --state open --search "milestone:<target-version>"
+```
+
+- [ ] 배포 대상 버전과 정확히 같은 GitHub milestone이 존재하는가?
+- [ ] 대상 milestone의 open issue가 0이거나, 이번 배포에 포함할 항목으로
+      명시되어 있는가?
+- [ ] 대상 milestone의 issue를 close하는 open PR이 남아있지 않은가?
+- [ ] backlog/다음 minor milestone의 feature issue가 이번 patch 배포에
+      묵시적으로 섞이지 않았는가?
 
 ### 2-1. 오픈 이슈
 
@@ -104,12 +168,16 @@ git status --porcelain                    # 미커밋 변경 없음
 ## 5. 버전 파일 점검
 
 ```bash
-grep "baseVersion\|snapshotVersion" gradle.properties
+grep -E "baseVersion|snapshotVersion|bluetape4kDependenciesCatalogPath|bluetape4kDependenciesCatalogRef|bluetape4kDependenciesVersion" gradle.properties || true
 ```
 
 - [ ] `baseVersion=X.Y.Z` — 배포할 버전이 맞는가?
 - [ ] `snapshotVersion=` — 릴리즈 기본값은 비어 있는가?
 - [ ] SNAPSHOT 배포는 파일 수정이 아니라 `-PsnapshotVersion=-SNAPSHOT` 파라미터로 수행하는가?
+- [ ] downstream `bluetape4k-*` repo의 shared catalog import는
+      `bluetape4kDependenciesCatalogPath`, `BLUETAPE4K_DEPENDENCIES_CATALOG_PATH`,
+      `bluetape4kDependenciesCatalogRef`, 또는
+      `BLUETAPE4K_DEPENDENCIES_CATALOG_REF`로 관리되는가?
 
 ---
 
@@ -129,18 +197,27 @@ grep -A5 "on:" .github/workflows/release.yml | head -15
 ## 7. 배포 의존 순서 확인
 
 복수 레포지토리가 서로 의존할 경우 **의존성 그래프 순서**대로 배포해야 한다.
+아래 순서는 기본값일 뿐이며, 매 release train마다 실제 build/settings/catalog
+파일을 스캔해 다시 확정한다.
 
 ```
 기준 순서:
 bluetape4k-projects
-  → aws/text/graph/javers
-  → exposed/leader/image
+  → exposed/text/graph/javers
+  → aws/leader
+  → image
   → bluetape4k-dependencies
 ```
 
 - [ ] 이 레포가 참조하는 하위 레포가 **먼저** 배포되었는가?
 - [ ] 각 하위 레포의 배포 버전이 Maven Central에서 resolve 가능한가?
 - [ ] `bluetape4k-dependencies` 배포 전, imported BOM 전체가 Maven Central HTTP 200 인가?
+- [ ] release train 중간에 downstream build alias 또는 upstream BOM 버전이
+      필요하면 `bluetape4k-dependencies`의 새 `catalog/YYYY-MM-DD-NN` ref를
+      만들고 downstream repo CI/local build가 그 ref를 checkout하도록
+      갱신했는가?
+- [ ] 최종 `bluetape4k-dependencies` BOM은 모든 하위 repo 배포 이후에만
+      publish하는가?
 
 > ⚠️ **함정**: 버전 번호가 우연히 같아도 groupId가 다르면 별도로 배포해야 한다.
 
@@ -227,7 +304,11 @@ echo "=== 5. Nightly CI (최근 3회) ==="
 gh run list --workflow="Nightly" --limit 3 2>/dev/null
 
 echo "=== 6. gradle.properties ==="
-grep "baseVersion\|snapshotVersion" gradle.properties
+grep -E "baseVersion|snapshotVersion|bluetape4kDependenciesCatalogPath|bluetape4kDependenciesCatalogRef|bluetape4kDependenciesVersion" gradle.properties || true
+
+echo "=== 6b. BOM/catalog role split ==="
+rg -n "bluetape4kDependenciesCatalog(Path|Ref)|BLUETAPE4K_DEPENDENCIES_CATALOG_(PATH|REF)|bluetape4kDependenciesVersion|bluetape4k-version-catalog|bluetape4k-dependencies" \
+  settings.gradle.kts build.gradle.kts gradle.properties gradle/libs.versions.toml 2>/dev/null || true
 
 echo "=== 7. release metadata exclusions ==="
 rg -n "SNAPSHOT|examples|demo|benchmark" build/publications gradle/libs.versions.toml build.gradle.kts 2>/dev/null || true

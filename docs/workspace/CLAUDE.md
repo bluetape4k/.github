@@ -81,15 +81,17 @@ meaningfully changed public API KDoc must be English.
 - All `bluetape4k-*` library repositories must treat
   `bluetape4k-dependencies` as the source of truth for centrally governed
   dependency, plugin, and compatibility-line versions.
-- `bluetape4k-*` repositories should import the published Gradle catalog
-  `io.github.bluetape4k:bluetape4k-version-catalog` and read centrally
-  governed aliases from that catalog instead of pinning the same versions in
-  repo-local `gradle/libs.versions.toml`.
+- `bluetape4k-*` repositories should import
+  `bluetape4k-dependencies/gradle/libs.versions.toml` from a checked-out
+  `bluetape4k-dependencies` git ref and read centrally governed aliases from
+  that catalog instead of pinning the same versions in repo-local
+  `gradle/libs.versions.toml`.
 - Local version catalogs may keep repository-local aliases and coordinates, but
   centrally governed versions should not be duplicated locally unless the
   exception is temporary, documented, and linked to a release/governance issue.
-- Start shared version changes in `bluetape4k-dependencies` first, then update
-  downstream `bluetape4k-*` repositories to consume the new catalog version.
+- Start shared version changes in `bluetape4k-dependencies` first, cut a
+  release-train catalog ref such as `catalog/YYYY-MM-DD-NN`, then update
+  downstream `bluetape4k-*` repositories and CI to read that checked-out ref.
 
 ## Knowledge Retrieval
 
