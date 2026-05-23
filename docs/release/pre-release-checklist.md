@@ -165,6 +165,7 @@ curl -s "https://repo1.maven.org/maven2/io/github/bluetape4k/<artifact>/X.Y.Z/<a
 - [ ] `bluetape4k-dependencies` 버전 카탈로그 업데이트 PR 생성
 - [ ] BOM/NMCP 집계에서 `examples/`, `*-examples`, `*-demo`,
       `benchmark/`, `*-benchmark` 모듈 제외 확인
+- [ ] `bluetape4k.github.io` 공개 문서 최신화 PR 생성 및 머지
 - [ ] 소스 레포 다음 버전(`X.(Y+1).0-SNAPSHOT`) bump PR 생성
 
 ### 8-1. Central Portal 전파 확인
@@ -184,6 +185,21 @@ done
 
 주의: zsh에서 루프 변수명을 `path`로 쓰지 말 것. `PATH`를 덮어써서
 `curl`, `sleep` 같은 명령을 찾지 못할 수 있다.
+
+### 8-2. 공개 사이트 문서 최신화
+
+최종 BOM과 `bluetape4k-dependencies`가 Maven Central에서 HTTP 200을 반환하면
+`bluetape4k.github.io` 문서를 같은 배포 작업 안에서 갱신한다.
+
+- [ ] quick start 예제의 `bluetape4k-dependencies` / `bluetape4k-bom`
+      버전이 최신인가?
+- [ ] Version Governance 표의 repository-specific BOM 버전이 최신인가?
+- [ ] Repository 목록의 latest release 문구가 최신인가?
+- [ ] English/Korean 문서를 함께 갱신했는가?
+- [ ] `npm run build` 성공
+- [ ] `Deploy Website` GitHub Actions 성공
+- [ ] 라이브 페이지에서 최신 버전 확인:
+  `https://bluetape4k.github.io/ecosystem/version-governance/`
 
 ---
 
