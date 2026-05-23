@@ -361,6 +361,13 @@ GitHub/CI preference:
 - Use `clean-branches` and `all-clean-branches` only when branch/worktree
   cleanup is explicitly requested, because they delete local branches and remove
   associated worktrees.
+- For documentation-only PRs, do not wait for heavyweight CI unless branch
+  protection explicitly requires it. Verify locally with content review plus
+  `git diff --check`; run repository-specific documentation builds only when
+  rendered docs or the public website are affected.
+- Treat GitHub `Automatic Dependency Submission` / `submit-gradle` checks as
+  non-blocking for documentation-only PRs unless GitHub branch protection marks
+  them required.
 
 ## Skill Routing
 

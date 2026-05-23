@@ -362,3 +362,10 @@ Prefer workspace helper scripts before raw commands when they are available:
 Per-repo helper commands may be available on `PATH`: `repo-status`,
 `repo-diff`, `repo-test-summary`, `clean-branches`, `worktree-new`,
 `worktree-list`, and `ci-status`.
+
+For documentation-only pull requests, do not wait for heavyweight CI unless
+branch protection explicitly requires it. Verify with content review and
+`git diff --check`; run repository-specific documentation builds only when
+rendered docs or the public website are affected. GitHub `Automatic Dependency
+Submission` / `submit-gradle` checks are non-blocking for documentation-only
+PRs unless they are configured as required branch-protection checks.
