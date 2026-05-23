@@ -236,6 +236,43 @@ done
 
 Only tag `bluetape4k-dependencies` after all lines return `200`.
 
+## Website Documentation Refresh
+
+After the final release artifacts are visible from Maven Central, update
+`bluetape4k.github.io` in the same release train. The website is the public
+entrypoint for current dependency coordinates, so it must not lag behind the
+published BOMs.
+
+Update at least these pages in both English and Korean when the released
+versions change:
+
+- `src/content/docs/getting-started.mdx`
+- `src/content/docs/ko/getting-started.mdx`
+- `src/content/docs/ecosystem/version-governance.mdx`
+- `src/content/docs/ko/ecosystem/version-governance.mdx`
+- `src/content/docs/ecosystem/repositories.mdx`
+- `src/content/docs/ko/ecosystem/repositories.mdx`
+
+Verification:
+
+```bash
+cd ../bluetape4k.github.io
+npm run build
+git diff --check
+```
+
+After merging the website PR, verify the GitHub Pages deployment and live page:
+
+```bash
+gh run list --workflow="Deploy Website" --limit 3 \
+  --json databaseId,status,conclusion,headBranch,headSha,createdAt
+curl -fsSL https://bluetape4k.github.io/ecosystem/version-governance/ \
+  | rg 'bluetape4k-dependencies|bluetape4k-bom|bluetape4k-.*-bom'
+```
+
+Record the website PR, deploy run URL, and live-page evidence in the release
+notes or release lesson.
+
 ## Post-release
 
 ```bash
@@ -248,6 +285,7 @@ Record:
 - release workflow run ID
 - GitHub Release URL
 - Maven Central HTTP 200 evidence for representative artifacts
+- `bluetape4k.github.io` PR and GitHub Pages deployment evidence
 - any Central validation failures and recovery PRs
 
 ## Common Failures
