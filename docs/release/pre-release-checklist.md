@@ -86,6 +86,18 @@ rg "SNAPSHOT" gradle/libs.versions.toml gradle.properties build.gradle.kts \
 
 ## 2. 코드 품질
 
+### 2-0a. 브랜치 라인 정책
+
+- [ ] `develop`의 `baseVersion`이 현재 active release line과 일치하는가?
+- [ ] open patch milestone이 남아 있는데 `develop`을 다음 minor로 올리지
+      않았는가? 단, patch milestone을 명시적으로 close/defer했다면 예외.
+- [ ] `develop`이 이미 다음 minor로 진행된 뒤 이전 minor patch가 필요하면,
+      마지막 release tag에서 `release/X.Y.x` maintenance branch를 만들고
+      거기서 patch version을 올리는가?
+- [ ] maintenance branch fix는 bug/security/compatibility fix로 제한하고,
+      같은 fix를 `develop`으로 forward-port할 계획이 있는가?
+- [ ] 다음 minor feature/API 작업을 maintenance branch로 backport하지 않는가?
+
 ### 2-0. 버전별 milestone
 
 ```bash
