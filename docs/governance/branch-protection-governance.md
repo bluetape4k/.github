@@ -29,6 +29,20 @@ Approvals and required status checks should be added after repository inventory
 and workflow drift audits provide stable job names. Adding check names before
 that would create brittle rules that break valid maintenance PRs.
 
+## Documentation-Only PR Policy
+
+Documentation-only PRs should not wait for heavyweight CI unless branch
+protection explicitly requires a status check. The expected local gate is:
+
+- review the changed documentation content;
+- run `git diff --check`;
+- run a repository-specific documentation build only when rendered docs,
+  generated docs, or the public website are affected.
+
+GitHub `Automatic Dependency Submission` / `submit-gradle` checks are useful
+background signals, but they are non-blocking for documentation-only PRs unless
+they are explicitly configured as required branch-protection checks.
+
 ## Operating Command
 
 Audit:
