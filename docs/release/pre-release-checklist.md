@@ -163,6 +163,8 @@ curl -s "https://repo1.maven.org/maven2/io/github/bluetape4k/<artifact>/X.Y.Z/<a
 - [ ] Maven Central에서 주요 아티팩트 HTTP 200 확인
 - [ ] 릴리즈 노트 한영 이중 작성 완료
 - [ ] `bluetape4k-dependencies` 버전 카탈로그 업데이트 PR 생성
+- [ ] workshop/application repo는 `bluetape4k-dependencies`만 버전 source로
+      사용하고, `io.github.bluetape4k*` artifact는 versionless로 선언됨
 - [ ] BOM/NMCP 집계에서 `examples/`, `*-examples`, `*-demo`,
       `benchmark/`, `*-benchmark` 모듈 제외 확인
 - [ ] `bluetape4k.github.io` 공개 문서 최신화 PR 생성 및 머지

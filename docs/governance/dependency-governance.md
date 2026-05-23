@@ -37,6 +37,40 @@ The governed scope covers the main bluetape4k libraries plus:
 
 `ocean-workshop` and `kotlin-dev-agent` are intentionally excluded.
 
+## Workshop and Application Consumers
+
+Workshop, example, and application repositories consume bluetape4k releases;
+they do not own independent bluetape4k ecosystem versions. These repositories
+should keep `bluetape4k-dependencies` as the only bluetape4k version source in
+`gradle/libs.versions.toml`:
+
+- `bluetape4k-workshop`
+- `clinic-appointment`
+- `exposed-workshop`
+- `exposed-r2dbc-workshop`
+- `timefold-workshop`
+
+Required catalog shape:
+
+- Define one `bluetape4k-dependencies = "<version>"` version alias.
+- Define one library alias for
+  `io.github.bluetape4k:bluetape4k-dependencies`.
+- Import that BOM through dependency management or Gradle platform
+  configuration.
+- Declare `io.github.bluetape4k*` artifacts without versions, including core,
+  exposed, leader, assertions, and test helper artifacts.
+
+Do not keep consumer-side aliases such as `bluetape4k`, `bluetape4k-bom`,
+`bluetape4k-leader`, `bluetape4k-assertions-version`, or
+`version.ref = "bluetape4k"` for bluetape4k artifacts. If a historical accessor
+name must remain for compatibility, keep the accessor name but point it at the
+current BOM-managed artifact and omit the version.
+
+Release-upgrade PRs for these repositories should verify that
+`bluetape4k-dependencies` is the only bluetape4k version source, grep for
+forbidden direct bluetape4k version references, and compile changed examples or
+the full repository when practical.
+
 ## Dependabot Baseline
 
 Each governed repository should define `.github/dependabot.yml` with:
