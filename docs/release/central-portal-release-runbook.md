@@ -18,8 +18,151 @@ library repositories. It reflects the 2026-05-17 Central Portal release batch:
   artifacts.
 - `bluetape4k-dependencies` is released last, after every imported BOM is
   visible from Maven Central.
+- Do not use the final `bluetape4k-dependencies` BOM version as the build-time
+  Gradle catalog version for repositories that are part of the same release
+  train. That creates a cycle: the final BOM cannot exist until those
+  repositories are already released.
+- Treat `bluetape4k-dependencies` as two different things with different
+  distribution paths:
+  - `bluetape4k-dependencies` is the final consumer BOM and uses semantic
+    versions such as `1.1.3`.
+  - `gradle/libs.versions.toml` is the internal build/contributor catalog for
+    external library and plugin version alignment across `bluetape4k-*`
+    repositories. Pin it by checking out the `bluetape4k-dependencies` repo at
+    the release-train tag or commit; do not publish it as a Maven Central
+    artifact.
 - Public release artifacts, PRs, issues, changelog entries, and commit messages
   are written in English.
+
+## BOM vs Catalog Roles
+
+Keep these roles separate in every release decision.
+
+`bluetape4k-dependencies` is a Maven BOM for users. It belongs in application
+or workshop dependency declarations as a platform:
+
+```kotlin
+dependencies {
+    implementation(platform("io.github.bluetape4k:bluetape4k-dependencies:1.1.3"))
+    implementation("io.github.bluetape4k.leader:bluetape4k-leader-core")
+}
+```
+
+The BOM participates in dependency resolution. If the user imports the BOM,
+versionless `io.github.bluetape4k*` dependencies resolve to the BOM-managed
+versions.
+
+`bluetape4k-dependencies/gradle/libs.versions.toml` is a Gradle authoring
+catalog for repository builds. It gives contributors centrally governed
+external library and plugin versions such as `fory.kotlin`, Kotlin, Spring,
+Ktor, Exposed, Testcontainers, and build plugins. It does not flow transitively
+from the BOM and users do not need it when they use the BOM directly.
+
+Do not use the catalog source ref as the release-version source for
+`bluetape4k-*` to `bluetape4k-*` dependencies. Internal bluetape4k references
+must point to the newly published upstream release version in dependency order.
+That is why repository releases are ordered.
+
+Repository builds must therefore read the catalog file from a checked-out
+`bluetape4k-dependencies` repo for release-train validation:
+
+```properties
+bluetape4kDependenciesCatalogPath=../bluetape4k-dependencies/gradle/libs.versions.toml
+bluetape4kDependenciesCatalogRef=catalog/2026-05-23-00
+```
+
+and import the catalog from that file:
+
+```kotlin
+val bluetape4kDependenciesCatalogFile = file(
+    providers.gradleProperty("bluetape4kDependenciesCatalogPath")
+        .orElse(providers.environmentVariable("BLUETAPE4K_DEPENDENCIES_CATALOG_PATH"))
+        .orElse("../bluetape4k-dependencies/gradle/libs.versions.toml")
+        .get(),
+)
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("bt4k") {
+            from(files(bluetape4kDependenciesCatalogFile))
+        }
+    }
+}
+```
+
+Normal development and PR CI may fall back to the repo-local
+`bluetape4k-dependencies` raw TOML from `develop`, but release validation must
+pass an explicit checked-out path or `bluetape4kDependenciesCatalogRef` so the
+train is pinned to an auditable source ref.
+
+Do not name this property `bluetape4kDependenciesVersion`. That name is
+reserved for the final user-facing BOM when a repository actually imports
+`io.github.bluetape4k:bluetape4k-dependencies` as a platform.
+
+### Catalog Source Ref Format
+
+Use date-stamped tags or branch names for internal catalog source cuts:
+
+```text
+catalog/YYYY-MM-DD-NN
+```
+
+Examples:
+
+- `catalog/2026-05-23-00`: first catalog source cut for the release train.
+- `catalog/2026-05-23-02`: second catalog source cut after an upstream
+  repository in the train has been released and later repositories need that
+  new BOM.
+
+The counter is per day and starts at `00`. Increment it only when publishing a
+new immutable source ref. Do not rewrite a tag that release work has consumed.
+
+Example: tag `bluetape4k-dependencies` as `catalog/2026-05-23-00`, check that
+tag out in downstream release jobs, and verify their builds with
+`bluetape4kDependenciesCatalogPath` pointing at that checkout. Cut a new
+catalog tag only after the previous source cut proves the catalog shape.
+
+### Release-Train Catalog Flow
+
+For a multi-repository release train:
+
+1. Audit every candidate repository from its last tag to `origin/develop`.
+   Confirm open bug/blocker issues, open PRs, milestone state, and whether the
+   post-tag changes belong in the next patch release.
+2. Cut a build catalog source ref first if downstream repositories need new
+   shared external library or plugin versions.
+   Example: tag `bluetape4k-dependencies` as `catalog/2026-05-23-00`
+   containing external versions such as `fory-kotlin:0.17.0`.
+3. Update downstream release jobs or local builds to read
+   `gradle/libs.versions.toml` from that checked-out `bluetape4k-dependencies`
+   ref through `bluetape4kDependenciesCatalogPath`, then run the snapshot
+   validation gate below before any downstream release tag is pushed.
+4. If the catalog content changes during the train, cut a new
+   `catalog/YYYY-MM-DD-NN` ref and update downstream jobs to that ref.
+5. Release repositories in dependency order. If a later repository needs a BOM
+   from an earlier repository in the same train, first publish the earlier
+   repository, wait until its BOM is visible from Maven Central, then bump the
+   later repository's local internal bluetape4k version reference. Do not use
+   the catalog source ref as the internal bluetape4k release-version source.
+6. After all imported BOMs are visible from Maven Central, release the final
+   `bluetape4k-dependencies` BOM. This release publishes the user-facing BOM;
+   it does not publish the internal build catalog.
+7. Verify user-facing downstream builds with the final
+   `bluetape4k-dependencies` BOM and versionless `io.github.bluetape4k*`
+   dependencies.
+
+This flow prevents the common cycle:
+
+```text
+repo A needs final dependencies BOM
+final dependencies BOM needs repo A release
+```
+
+The catalog can centralize external dependency versions and lead downstream
+build migration, but it must not replace repository release order. For
+`bluetape4k-*` to `bluetape4k-*` dependencies, the referenced upstream release
+version must be set as the newly published release version and publicly
+resolvable. The final BOM closes the train.
 
 ## Repository Order
 
@@ -27,16 +170,81 @@ Use dependency order, not convenience order.
 
 1. `bluetape4k-projects`
 2. Repositories that depend only on `projects`, as applicable:
-   `bluetape4k-aws`, `bluetape4k-text`, `bluetape4k-graph`,
+   `bluetape4k-exposed`, `bluetape4k-text`, `bluetape4k-graph`,
    `bluetape4k-javers`
-3. Repositories that depend on other released bluetape4k repos:
-   `bluetape4k-exposed`, `bluetape4k-leader`, `bluetape4k-image`
-4. `bluetape4k-dependencies`
+3. Repositories that depend on released `exposed` or other bluetape4k repos:
+   `bluetape4k-aws`, `bluetape4k-leader`
+4. Repositories that depend on released `aws`:
+   `bluetape4k-image`
+5. `bluetape4k-dependencies`
+
+This list is a default, not a shortcut. Recompute the repository dependency
+graph for every release train from current `settings.gradle.kts`,
+`gradle/libs.versions.toml`, and all `build.gradle.kts` files before accepting
+the order. If `bluetape4k-javers` adds a `javers-exposed` module or any
+`io.github.bluetape4k.exposed` reference, move `javers` behind the target
+`bluetape4k-exposed` release and wait for that exposed version to return Maven
+Central HTTP 200.
 
 For the 2026-05-17 batch, `bluetape4k-projects 1.8.0` was already released and
 was not republished. `bluetape4k-image` waited until `bluetape4k-aws 0.1.0`
 was visible from Maven Central. `bluetape4k-dependencies 1.0.0` waited until
 all imported BOMs returned HTTP 200 from Maven Central.
+
+## Internal Reference Preflight
+
+Before preparing each repository in the order above, inspect every
+`io.github.bluetape4k*` version that repository references. The referenced
+version must be the intended upstream release version and must return HTTP 200
+from Maven Central.
+
+If the referenced upstream repository is part of the same release train, wait
+for that upstream target version to be released and publicly resolvable before
+preparing or releasing the downstream repository. Do not fall back to the
+previous public release just because it is the latest version currently
+available.
+
+If the referenced upstream repository is not part of the release train, use the
+latest public upstream release version and verify it from Maven Central.
+
+This check is separate from `bluetape4kDependenciesCatalogPath`. The shared
+catalog is for external library/plugin version alignment; internal bluetape4k
+release versions follow repository release order.
+
+Typical checks:
+
+```bash
+rg -n 'bluetape4k(-[a-z]+)? = "|bluetape4k-.*-bom = "|io\.github\.bluetape4k' \
+  gradle/libs.versions.toml build.gradle.kts **/build.gradle.kts
+
+rg -n 'exposed|bluetape4k-exposed|io\.github\.bluetape4k\.exposed|bluetape4k\.exposed' \
+  settings.gradle.kts gradle/libs.versions.toml build.gradle.kts **/build.gradle.kts
+
+curl -s -o /dev/null -w "%{http_code}" \
+  "https://repo.maven.apache.org/maven2/io/github/bluetape4k/bluetape4k-bom/<version>/bluetape4k-bom-<version>.pom"
+
+curl -s -o /dev/null -w "%{http_code}" \
+  "https://repo.maven.apache.org/maven2/io/github/bluetape4k/aws/bluetape4k-aws-bom/<version>/bluetape4k-aws-bom-<version>.pom"
+
+curl -s -o /dev/null -w "%{http_code}" \
+  "https://repo.maven.apache.org/maven2/io/github/bluetape4k/exposed/bluetape4k-exposed-bom/<version>/bluetape4k-exposed-bom-<version>.pom"
+```
+
+Expected:
+
+- `bluetape4k-projects` target version is released and visible before
+  exposed/text/graph/javers, aws, leader, or image references it.
+- If aws references exposed modules and exposed is in the train, release and
+  verify the exposed target version first, then bump aws's exposed reference.
+- If javers references exposed modules, for example a future `javers-exposed`
+  module, release and verify the exposed target version first, then bump
+  javers's exposed reference.
+- If image references aws and aws is in the train, release and verify the aws
+  target version first, then bump image's aws reference.
+- If leader or another repo references exposed artifacts and exposed is in the
+  train, release and verify the exposed target version first.
+- `bluetape4k-dependencies` is not used to shortcut library release order; it
+  is released last after all imported BOMs are visible.
 
 ## Preflight
 
@@ -47,10 +255,16 @@ git switch develop
 git pull --ff-only
 git status --short --branch
 grep -E '^(baseVersion|snapshotVersion)=' gradle.properties
+grep -E '^bluetape4kDependenciesCatalogPath=' gradle.properties || true
 rg 'SNAPSHOT' gradle/libs.versions.toml gradle.properties build.gradle.kts \
   --glob '!gradle.properties' \
   | grep -v 'snapshotVersion\|central-snapshot\|maven-snapshots\|# ' || true
 gh pr list --state open
+gh api "repos/bluetape4k/$(basename "$PWD")/milestones?state=open&per_page=100" \
+  --jq '.[] | [.title,.open_issues,.closed_issues] | @tsv'
+gh issue list --state open --milestone "<target-version>" --limit 100
+rg -n 'bluetape4k(-[a-z]+)? = "|bluetape4k-.*-bom = "|io\.github\.bluetape4k' \
+  gradle/libs.versions.toml build.gradle.kts **/build.gradle.kts
 ```
 
 Expected:
@@ -59,6 +273,20 @@ Expected:
 - local `develop` equals `origin/develop`
 - `baseVersion` equals the tag to publish
 - `snapshotVersion=` is empty
+- GitHub has a milestone whose title exactly matches the target version
+- every open issue in the target milestone is either resolved before release or
+  explicitly deferred out of that milestone
+- non-target open milestones/backlog issues are reviewed so feature work is not
+  silently pulled into a patch release
+- every `bluetape4k-*` version referenced by the local repository build is the
+  intended upstream target release and returns HTTP 200 from Maven Central; if
+  that upstream target is not yet published, stop and wait instead of using the
+  previous release
+- if the repository imports the shared build catalog, it reads
+  `bluetape4k-dependencies/gradle/libs.versions.toml` through
+  `bluetape4kDependenciesCatalogPath` or
+  `BLUETAPE4K_DEPENDENCIES_CATALOG_PATH`, not a Maven-published catalog
+  artifact
 - no unreleased `*-SNAPSHOT` bluetape4k dependency references
 - release-blocking PRs are merged
 
@@ -109,13 +337,78 @@ For `bluetape4k-dependencies`:
 python3 -m unittest tests/test_sync_managed_catalog.py
 scripts/sync-managed-catalog.py --write --check --summary
 ./gradlew generatePomFileForBluetapeDependenciesPublication \
-  generatePomFileForBluetapeVersionCatalogPublication \
   --no-daemon --no-configuration-cache --no-build-cache
 rg -n 'SNAPSHOT|examples|demo|benchmark' \
   build/publications/BluetapeDependencies/pom-default.xml \
-  build/publications/BluetapeVersionCatalog/pom-default.xml \
   gradle/libs.versions.toml build.gradle.kts
 ```
+
+## Snapshot Validation Gate
+
+Run this gate before any real release publish or release tag push when the
+train changes shared catalog aliases, upstream BOM coordinates, or centrally
+governed dependency versions.
+
+Snapshot validation proves catalog mechanics and downstream compatibility. It
+does not allow a downstream release to depend on an upstream `bluetape4k-*`
+version that has not been released yet. For release candidates, internal
+`bluetape4k-*` dependency versions are still governed by repository release
+order, not by the catalog source ref.
+
+1. In `bluetape4k-dependencies`, commit the shared catalog changes and create
+   an immutable source ref for the train:
+
+   ```bash
+   git tag catalog/YYYY-MM-DD-NN
+   ```
+
+2. In each downstream repository, check out `bluetape4k-dependencies` at that
+   ref and point Gradle at the checked-out TOML:
+
+   ```bash
+   export BLUETAPE4K_DEPENDENCIES_CATALOG_PATH="$WORKSPACE/bluetape4k-dependencies/gradle/libs.versions.toml"
+   ```
+
+   GitHub Actions should use a second checkout of `bluetape4k-dependencies`
+   with `ref: catalog/YYYY-MM-DD-NN` and set the same environment variable or
+   pass `-Pbluetape4kDependenciesCatalogPath=...`.
+
+3. Verify each affected repository resolves the checked-out catalog, without
+   `mavenLocal()`:
+
+   ```bash
+   ./gradlew help --refresh-dependencies \
+     --no-daemon --no-configuration-cache --no-build-cache
+   ```
+
+   For a cross-repository smoke check:
+
+   ```bash
+   for repo in \
+     bluetape4k-projects bluetape4k-aws bluetape4k-text bluetape4k-graph \
+     bluetape4k-javers bluetape4k-exposed bluetape4k-leader bluetape4k-image
+   do
+     export BLUETAPE4K_DEPENDENCIES_CATALOG_PATH="$PWD/bluetape4k-dependencies/gradle/libs.versions.toml"
+     (cd "$repo" && ./gradlew help --refresh-dependencies \
+       --no-daemon --no-configuration-cache --no-build-cache)
+   done
+   ```
+
+4. Run targeted compile/tests for repositories whose release content changed.
+   `help` only proves settings/catalog resolution; it does not prove runtime or
+   API compatibility.
+
+   Before accepting a downstream test result as release evidence, verify every
+   internal upstream coordinate it resolved is a public release:
+
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" \
+     "https://repo.maven.apache.org/maven2/io/github/bluetape4k/bluetape4k-bom/<version>/bluetape4k-bom-<version>.pom"
+   ```
+
+Do not push release tags or publish release artifacts while downstream
+repositories still require an unpublished upstream release or an uncaptured
+catalog source change.
 
 ## Release PR
 
@@ -235,6 +528,10 @@ done
 ```
 
 Only tag `bluetape4k-dependencies` after all lines return `200`.
+
+The final `bluetape4k-dependencies` release workflow publishes only the
+`BluetapeDependencies` publication. The internal Gradle catalog is consumed from
+the `bluetape4k-dependencies` git ref and is not a Maven Central publication.
 
 ## Website Documentation Refresh
 

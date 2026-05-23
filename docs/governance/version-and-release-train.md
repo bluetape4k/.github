@@ -44,16 +44,20 @@ Snapshot dispatch uses this default order:
 
 1. `bluetape4k-projects`
 2. `bluetape4k-exposed`
-3. `bluetape4k-aws`
+3. `bluetape4k-text`
 4. `bluetape4k-graph`
-5. `bluetape4k-image`
-6. `bluetape4k-javers`
+5. `bluetape4k-javers`
+6. `bluetape4k-aws`
 7. `bluetape4k-leader`
-8. `bluetape4k-text`
+8. `bluetape4k-image`
 9. `bluetape4k-dependencies`
 
 `bluetape4k-dependencies` is last because it is the ecosystem BOM and should be
-published after the libraries it coordinates.
+published after the libraries it coordinates. The Gradle build catalog is not
+the final BOM and is not a Maven Central publication. Cut an immutable
+`bluetape4k-dependencies` git ref such as `catalog/2026-05-23-00` when
+repositories in the train need updated external dependency aliases or plugin
+versions before the final BOM can exist.
 
 Release dispatch uses the same order, including `bluetape4k-dependencies` as
 the final BOM publication. `bluetape4k-experimental` and `bluetape4k-workshop`
@@ -75,6 +79,11 @@ Before running `Org Snapshot Dispatch` with `dryRun=false`:
 
 - Target repositories are on the intended `develop` state.
 - Version drift is either aligned or documented.
+- Repositories that import the shared Gradle catalog read
+  `bluetape4k-dependencies/gradle/libs.versions.toml` from a checked-out
+  `bluetape4k-dependencies` ref through `bluetape4kDependenciesCatalogPath` or
+  `BLUETAPE4K_DEPENDENCIES_CATALOG_PATH`, or download the raw TOML pinned by
+  `bluetape4kDependenciesCatalogRef` / `BLUETAPE4K_DEPENDENCIES_CATALOG_REF`.
 - Nightly failures are understood or intentionally waived.
 - The caller typed `deploy snapshots` in the confirmation input.
 
@@ -84,6 +93,9 @@ Organization-governed version groups are tracked by
 `scripts/version_drift_report.py`:
 
 - bluetape4k artifacts and bluetape4k-dependencies BOM
+- `bluetape4k-dependencies/gradle/libs.versions.toml` as the
+  build/contributor catalog source, pinned by a date-stamped
+  `catalog/YYYY-MM-DD-NN` git ref when used across repos
 - Kotlin
 - Spring Boot
 - Testcontainers
@@ -119,6 +131,20 @@ not pin individual `io.github.bluetape4k*` artifact versions in
 `gradle/libs.versions.toml`; artifact aliases should be versionless and resolved
 through the BOM. See `docs/governance/dependency-governance.md` for the exact
 consumer catalog shape and forbidden aliases.
+
+For `bluetape4k-*` library repositories, keep build catalog consumption
+separate from BOM consumption:
+
+- Use `bluetape4kDependenciesCatalogPath` or
+  `BLUETAPE4K_DEPENDENCIES_CATALOG_PATH` for the checked-out
+  `bluetape4k-dependencies/gradle/libs.versions.toml`; use
+  `bluetape4kDependenciesCatalogRef` or
+  `BLUETAPE4K_DEPENDENCIES_CATALOG_REF` when resolving the same TOML from a git
+  ref.
+- Use `bluetape4kDependenciesVersion` only when importing
+  `io.github.bluetape4k:bluetape4k-dependencies` as a platform.
+- Do not point a repository in the release train at a final BOM version that
+  cannot exist until that same repository is released.
 
 ## Dependency Update Validation
 
