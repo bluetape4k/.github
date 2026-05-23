@@ -113,6 +113,13 @@ The drift report covers the main bluetape4k libraries plus governed
 workshop/example repositories. `ocean-workshop` and `kotlin-dev-agent` are
 intentionally excluded from this governance scope.
 
+Governed workshop/example/application repositories should consume
+`bluetape4k-dependencies` as their only bluetape4k version source. They should
+not pin individual `io.github.bluetape4k*` artifact versions in
+`gradle/libs.versions.toml`; artifact aliases should be versionless and resolved
+through the BOM. See `docs/governance/dependency-governance.md` for the exact
+consumer catalog shape and forbidden aliases.
+
 ## Dependency Update Validation
 
 Dependabot is the update detector and PR generator. The central drift report is
