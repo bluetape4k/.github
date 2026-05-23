@@ -63,6 +63,29 @@ Release dispatch uses the same order, including `bluetape4k-dependencies` as
 the final BOM publication. `bluetape4k-experimental` and `bluetape4k-workshop`
 are Nightly-only by default.
 
+## Branch Line Policy
+
+Default to sequential development on `develop`. The `develop` branch represents
+the currently active release line, including patch releases. Do not move
+`develop` to the next minor version while an active patch milestone still owns
+the next release, unless that patch milestone is explicitly closed or deferred.
+
+Use maintenance branches only on demand:
+
+- Create `release/X.Y.x` from the last released `X.Y.Z` tag only when a patch
+  hotfix is needed after `develop` has already advanced to the next minor line.
+- Set that maintenance branch to the next patch version, for example
+  `baseVersion=1.9.3` from tag `1.9.2`.
+- Apply only bug fixes, security fixes, and low-risk compatibility fixes to the
+  maintenance branch.
+- Release patch tags such as `1.9.3` from the maintenance branch.
+- Forward-port every maintenance fix to `develop` by cherry-pick or merge.
+- Do not backport next-minor feature/API work from `develop` into maintenance
+  branches.
+
+This keeps normal work simple while preserving the ability to patch a previous
+minor line during the next minor development cycle.
+
 ## Release Preconditions
 
 Before running `Org Release Train` with `dryRun=false`:
