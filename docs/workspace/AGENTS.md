@@ -49,6 +49,13 @@ Use audience-based document language:
 | `bluetape4k-graph/` | Graph DB integrations: Neo4j, Memgraph, AGE, TinkerPop, FalkorDB |
 | `bluetape4k-dependencies/` | BOM for coordinated bluetape4k ecosystem versions |
 
+### Organization infrastructure
+
+| Directory | Purpose |
+|---|---|
+| `.github/` | Organization profile, issue/PR templates, and GitHub community files |
+| `bluetape4k.github.io/` | GitHub Pages site and ecosystem documentation entrypoint |
+
 ### Workshops and examples
 
 | Directory | Purpose |
@@ -56,7 +63,6 @@ Use audience-based document language:
 | `bluetape4k-workshop/` | Backend examples using bluetape4k libraries |
 | `exposed-workshop/` | JetBrains Exposed ORM examples |
 | `exposed-r2dbc-workshop/` | Exposed R2DBC examples |
-| `ocean-workshop/` | Ocean/weather data visualization with Kotlin, Spring Boot 4, bluetape4k |
 | `clinic-appointment/` | Clinic appointment example app |
 | `timefold-workshop/` | Timefold Solver workshop |
 | `kotlin-dev-agent/` | Kotlin development agent experiment |
@@ -67,12 +73,18 @@ Use audience-based document language:
   discussions, plans, specs, lessons, or scattered project documentation, query
   qmd first before filesystem search.
 - Follow the user-scope qmd command selection rules. For routine lookup, prefer
-  `qmdq "<query>" -c <collection>` unless reranking is needed.
-- Use `qmdq "<query>" -c bluetape4k-docs` for workspace documentation and
+  `qmd query "<query>" -c <collection> --no-rerank`.
+- Use `qmd query "<query>" -c bluetape4k-docs --no-rerank` for workspace documentation and
   examples. This collection indexes Markdown under `/Users/debop/work/bluetape4k`
   with `**/*.md`.
-- Use `qmdq "<query>" -c wiki` for personal or cross-project knowledge under
+- Use `qmd query "<query>" -c wiki --no-rerank` for personal or cross-project knowledge under
   `~/.codex/wiki`.
+- In Codex App sessions with context-mode available, use context-mode MCP tools
+  for large reads/searches/log analysis so raw shell output does not flood the
+  model context.
+- Use MinishLab Semble or `~/.cargo/bin/semble_rs` for agent-oriented first-pass
+  code search when natural-language, ranked snippets, or dependency lookup are
+  more useful than raw text matches.
 - Use `rg` first for exact code symbols, filenames, or current implementation
   locations.
 - If qmd is unavailable, stale, or returns weak matches, fall back to `rg` and
@@ -340,14 +352,17 @@ duplicate their detailed checklists here; load the relevant skill and its
 references before implementation.
 
 - `bluetape4k-workflow`: first-stop router for bluetape4k work. It classifies
-  Full Design, Fast Track, Bug Fix, Code Review, and Maintenance work, then
-  selects the lightest safe lane and verification level.
+  Full Design, Fast Track, Bug Fix, Code Review, Maintenance, and Self Improve
+  work, then selects the lightest safe lane and verification level.
 - `bluetape4k-design`: use for new modules, new services/subsystems, broad API
   design, large refactors, new dependencies, or multi-layer changes. It owns the
   spec/plan/advisor-review/DoD workflow and new-module checks.
 - `bluetape4k-patterns`: use for Kotlin implementation or review in this
   ecosystem. Its current references cover testing, Spring Boot auto-config,
   new-module setup, and final checklist/IDE diagnostics.
+- `bluetape4k-self-improve`: use only for explicit benchmark-guided
+  self-improvement requests with a measurable baseline, candidate loop, and stop
+  condition.
 - Add domain skills when the touched area requires them: `ecc-kotlin-patterns`,
   `ecc-kotlin-exposed`, `ecc-springboot-kotlin`, `ecc-kotlin-testing`,
   `kotlin-coroutines-skill`, `kotlin-spring`, or `kotlin-expert`.

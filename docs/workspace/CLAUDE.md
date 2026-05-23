@@ -55,8 +55,15 @@ meaningfully changed public API KDoc must be English.
 | `bluetape4k-leader/` | Distributed leader election APIs: blocking, async, coroutine, virtual-thread; Redis backend |
 | `bluetape4k-text/` | Korean/Japanese tokenizers, language detection, Aho-Corasick search |
 | `bluetape4k-graph/` | Graph DB integrations: Neo4j, Memgraph, AGE, TinkerPop, FalkorDB |
-| `bluetape4k-exposed/` | JetBrains Exposed ORM wrappers and bluetape4k integration extensions |
+| `bluetape4k-exposed/` | JetBrains Exposed extensions: JDBC/R2DBC repositories, cache, serialization, Spring Boot auto-config |
 | `bluetape4k-dependencies/` | BOM for coordinated bluetape4k ecosystem versions |
+
+### Organization infrastructure
+
+| Directory | Purpose |
+|---|---|
+| `.github/` | Organization profile, issue/PR templates, and GitHub community files |
+| `bluetape4k.github.io/` | GitHub Pages site and ecosystem documentation entrypoint |
 
 ### Workshops and examples
 
@@ -65,10 +72,25 @@ meaningfully changed public API KDoc must be English.
 | `bluetape4k-workshop/` | Backend examples using bluetape4k libraries |
 | `exposed-workshop/` | JetBrains Exposed ORM examples |
 | `exposed-r2dbc-workshop/` | Exposed R2DBC examples |
-| `ocean-workshop/` | Ocean/weather data visualization with Kotlin, Spring Boot 4, bluetape4k |
 | `clinic-appointment/` | Clinic appointment example app |
 | `timefold-workshop/` | Timefold Solver workshop |
 | `kotlin-dev-agent/` | Kotlin development agent experiment |
+
+## Knowledge Retrieval
+
+- Query qmd before broad filesystem search for similar implementations,
+  benchmark results, plans, specs, lessons, and scattered project documentation.
+- Prefer `qmd query "<query>" -c bluetape4k-docs --no-rerank` for workspace
+  documentation and examples.
+- Prefer `qmd query "<query>" -c wiki --no-rerank` for personal or cross-project
+  knowledge under `~/.codex/wiki`.
+- In Codex App sessions with context-mode available, use context-mode MCP tools
+  for large reads/searches/log analysis so raw shell output stays bounded.
+- Use MinishLab Semble or `~/.cargo/bin/semble_rs` for agent-oriented first-pass
+  code search when ranked snippets or dependency lookup are more useful than raw
+  text matches.
+- Use `rg` first for exact code symbols, filenames, or current implementation
+  locations.
 
 ## Shared Stack
 
@@ -274,11 +296,16 @@ Use Mermaid diagrams for README architecture. Do not use Vega-Lite for README di
 - Do not use `codex/` for local worktree names or branch names. Use conventional
   prefixes such as `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `build/`, or
   `chore/`.
-- Commit messages pushed to GitHub must be English and should use prefixes such
-  as `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, or `perf:`.
+- Commit messages pushed to GitHub must be English, follow the Lore commit
+  protocol when a commit is created, and commonly use prefixes such as `feat:`,
+  `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, or `perf:`.
 - PR titles/bodies, GitHub issue titles/bodies, CHANGELOG entries, and release
   notes must be English.
-- One issue maps to one PR when practical; use squash-merge.
+- One issue maps to one PR when practical.
+- Prefer rebase merge for PRs. Use squash merge only when commits are mostly
+  fixup/review noise or the PR is one logical change whose final squash message
+  can carry the decision record clearly. Use a merge commit only when the PR
+  boundary itself must remain visible in history.
 
 ## Skill Routing
 
@@ -287,14 +314,17 @@ duplicate their detailed checklists here; load the relevant skill and its
 references before implementation.
 
 - `bluetape4k-workflow`: first-stop router for bluetape4k work. It classifies
-  Full Design, Fast Track, Bug Fix, Code Review, and Maintenance work, then
-  selects the lightest safe lane and verification level.
+  Full Design, Fast Track, Bug Fix, Code Review, Maintenance, and Self Improve
+  work, then selects the lightest safe lane and verification level.
 - `bluetape4k-design`: use for new modules, new services/subsystems, broad API
   design, large refactors, new dependencies, or multi-layer changes. It owns the
   spec/plan/advisor-review/DoD workflow and new-module checks.
 - `bluetape4k-patterns`: use for Kotlin implementation or review in this
   ecosystem. Its current references cover testing, Spring Boot auto-config,
   new-module setup, and final checklist/IDE diagnostics.
+- `bluetape4k-self-improve`: use only for explicit benchmark-guided
+  self-improvement requests with a measurable baseline, candidate loop, and stop
+  condition.
 - Add domain skills when the touched area requires them: `ecc-kotlin-patterns`,
   `ecc-kotlin-exposed`, `ecc-springboot-kotlin`, `ecc-kotlin-testing`,
   `kotlin-coroutines-skill`, `kotlin-spring`, or `kotlin-expert`.
