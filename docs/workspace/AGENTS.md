@@ -67,6 +67,21 @@ Use audience-based document language:
 | `timefold-workshop/` | Timefold Solver workshop |
 | `kotlin-dev-agent/` | Kotlin development agent experiment |
 
+## Dependency Catalog Governance
+
+- All `bluetape4k-*` library repositories must treat
+  `bluetape4k-dependencies` as the source of truth for centrally governed
+  dependency, plugin, and compatibility-line versions.
+- `bluetape4k-*` repositories should import the published Gradle catalog
+  `io.github.bluetape4k:bluetape4k-version-catalog` and read centrally
+  governed aliases from that catalog instead of pinning the same versions in
+  repo-local `gradle/libs.versions.toml`.
+- Local version catalogs may keep repository-local aliases and coordinates, but
+  centrally governed versions should not be duplicated locally unless the
+  exception is temporary, documented, and linked to a release/governance issue.
+- Start shared version changes in `bluetape4k-dependencies` first, then update
+  downstream `bluetape4k-*` repositories to consume the new catalog version.
+
 ## Knowledge Retrieval
 
 - When looking for similar implementations, prior examples, benchmark results,
