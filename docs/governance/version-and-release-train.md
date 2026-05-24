@@ -189,6 +189,9 @@ Before running `Org Snapshot Dispatch` with `dryRun=false`:
   snapshot workflow injects `-PsnapshotVersion=-SNAPSHOT`.
 - Internal `bluetape4k-*` references on development branches use matching
   upstream `-SNAPSHOT` versions until release preparation removes the suffix.
+- Snapshot artifact evidence uses Central snapshot repository metadata
+  (`maven-metadata.xml` under `central.sonatype.com/repository/maven-snapshots`),
+  not release Maven Central POM URLs.
 - Version drift is either aligned or documented.
 - Repositories that import the shared Gradle catalog read
   `bluetape4k-dependencies/gradle/libs.versions.toml` from a checked-out
