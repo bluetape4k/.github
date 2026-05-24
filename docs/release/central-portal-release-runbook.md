@@ -436,6 +436,59 @@ Do not push release tags or publish release artifacts while downstream
 repositories still require an unpublished upstream release or an uncaptured
 catalog source change.
 
+## Post-release Snapshot Publish Train
+
+Run this train after release and post-release reopen PRs have advanced
+`baseVersion` to the next release line. This is the development-line validation
+gate: internal `bluetape4k-*` references should use matching `-SNAPSHOT`
+versions, and checked-in `snapshotVersion` should remain empty.
+
+Use dependency order and stop on the first failure:
+
+1. `bluetape4k-projects`
+2. `bluetape4k-exposed`, `bluetape4k-text`, `bluetape4k-graph`,
+   `bluetape4k-javers`
+3. `bluetape4k-aws`, `bluetape4k-leader`
+4. `bluetape4k-image`
+5. `bluetape4k-dependencies`
+
+For each repository:
+
+```bash
+git switch develop
+git pull --ff-only
+grep -E '^(baseVersion|snapshotVersion)=' gradle.properties
+rg -n 'bluetape4k(-[a-z]+)? = "|bluetape4k-.*-bom = "|io\.github\.bluetape4k' \
+  gradle/libs.versions.toml build.gradle.kts **/build.gradle.kts
+gh workflow run publish-snapshot.yml --ref develop
+gh run list --workflow publish-snapshot.yml --branch develop --limit 1
+```
+
+Do not assume `publish-snapshot.yml` accepts the same inputs in every
+repository. If a repo has no `diagnoseSigning` input, dispatch it without
+`--field diagnoseSigning=false`.
+
+After each successful publish, verify snapshot metadata from the snapshot
+repository, not from release Maven Central POM URLs:
+
+```bash
+curl -fsSL \
+  "https://central.sonatype.com/repository/maven-snapshots/<group-path>/<artifact>/<version>-SNAPSHOT/maven-metadata.xml" \
+  | rg '<lastUpdated>|<timestamp>|<buildNumber>'
+```
+
+For `bluetape4k-dependencies`, its CI and local verification must use snapshot
+metadata checks while the catalog imports `-SNAPSHOT` BOMs:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+scripts/verify-managed-artifacts.py --summary --allow-snapshots
+```
+
+Release-prep branches must switch back to strict release verification: remove
+internal `-SNAPSHOT` references only after every referenced upstream release is
+publicly visible from Maven Central.
+
 ## Release PR
 
 If preflight requires changes, create a PR first. Typical release-prep changes:
@@ -618,6 +671,9 @@ Record:
   development should consume snapshots
 - snapshot workflow run ID after the reopen PR when downstream development needs
   the new snapshot
+- dependency-order snapshot train evidence: PR URLs, publish run IDs, and
+  snapshot `maven-metadata.xml` timestamps for every upstream BOM consumed by a
+  downstream repo
 - `bluetape4k.github.io` PR and GitHub Pages deployment evidence
 - any Central validation failures and recovery PRs
 
@@ -631,4 +687,7 @@ Record:
 | Release workflow succeeds but Maven Central returns 404 | Central Portal accepted, public repository has not propagated | Poll `repo.maven.apache.org` until HTTP 200 |
 | Tag push points to wrong commit after a failed release | fix PR merged after tag was created | Retag with `--force-with-lease=refs/tags/X.Y.Z:<old-tag>` |
 | `zsh: command not found: curl` inside polling loop | loop variable named `path` overwrote zsh `PATH` | Rename loop variable to `artifact_path` |
+| `gh workflow run publish-snapshot.yml --field diagnoseSigning=false` returns HTTP 422 | repository workflow has no `diagnoseSigning` input | Dispatch without the field after checking the workflow inputs |
+| Snapshot artifact verification returns 404 from `repo1.maven.org` or a timestamped POM URL | snapshots are stored under Central snapshot metadata, not release Maven Central POM paths | Check `https://central.sonatype.com/repository/maven-snapshots/.../maven-metadata.xml` |
+| `bluetape4k-dependencies` CI rejects `-SNAPSHOT` managed artifacts after post-release reopen | release artifact verifier is running in strict release mode on a development snapshot line | Use `--allow-snapshots` for develop/normal PRs and keep strict mode for main-target release PRs |
 | GitHub Release fallback notes | no `CHANGELOG.md` section for the tag | Add release section before tagging or edit release notes after creation |

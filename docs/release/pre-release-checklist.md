@@ -216,6 +216,10 @@ grep -A5 "on:" .github/workflows/release.yml | head -15
 
 - [ ] `release.yml` 이 존재하고 태그 패턴(`[0-9]+.[0-9]+.[0-9]+`)에 트리거됨
 - [ ] `Publish Snapshot` 워크플로우와 `Publish Release` 워크플로우가 분리되어 있음
+- [ ] `publish-snapshot.yml` 은 `-PsnapshotVersion=-SNAPSHOT` 을 주입하고,
+      `publish-release.yml` 또는 `release.yml` 은 `baseVersion` 만 사용함
+- [ ] snapshot workflow dispatch 입력은 repo별로 확인했는가?
+      (`diagnoseSigning` 같은 입력은 모든 repo에 공통으로 존재한다고 가정하지 않는다.)
 - [ ] NMCP / Maven Central Portal 자격증명 시크릿이 설정되어 있음 (이전 배포 성공 이력으로 확인)
 
 ---
@@ -244,6 +248,12 @@ bluetape4k-projects
       갱신했는가?
 - [ ] 최종 `bluetape4k-dependencies` BOM은 모든 하위 repo 배포 이후에만
       publish하는가?
+- [ ] post-release reopen 후 development line 검증에서는 위 순서대로
+      `publish-snapshot.yml` 을 실행했고, downstream repo가 참조하는 내부
+      dependency/BOM도 matching `-SNAPSHOT` 인가?
+- [ ] SNAPSHOT artifact 검증은 release POM URL이 아니라
+      `https://central.sonatype.com/repository/maven-snapshots/.../maven-metadata.xml`
+      로 확인했는가?
 
 > ⚠️ **함정**: 버전 번호가 우연히 같아도 groupId가 다르면 별도로 배포해야 한다.
 
