@@ -16,8 +16,9 @@ upstream release is visible from Maven Central.
 
 ## Outcome
 
-The central release runbook, governance note, and pre-release checklist now
-describe the same snapshot/reference policy.
+The central governance document now owns the canonical `Version Management
+Policy`, while the release runbook and pre-release checklist point back to that
+policy.
 
 ## Verification
 

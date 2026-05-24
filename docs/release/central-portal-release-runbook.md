@@ -8,22 +8,17 @@ library repositories. It reflects the 2026-05-17 Central Portal release batch:
 
 ## Release Policy
 
-- Keep `gradle.properties` stable:
-  - `baseVersion=<release version>`
-  - `snapshotVersion=`
-- After a repository is released, advance `baseVersion` on `develop` to the
-  next release version and keep `snapshotVersion=` empty. The checked-in
-  development state identifies the next release line, not the snapshot suffix.
+- Follow `docs/governance/version-and-release-train.md` >
+  `Version Management Policy` as the canonical version policy.
+- Keep `gradle.properties` stable: `baseVersion=<next release version>` and
+  `snapshotVersion=`.
 - Publish snapshots by passing `-PsnapshotVersion=-SNAPSHOT` from
-  `publish-snapshot.yml`; do not edit `gradle.properties` just to publish a
-  snapshot.
-- Publish releases with `baseVersion` only. `release.yml` must not inject
-  `-SNAPSHOT`, and release preflight must fail if `snapshotVersion` is not
-  empty.
-- During ordinary development, repositories that reference other
-  `bluetape4k-*` artifacts must use the matching upstream `-SNAPSHOT` version.
-  Release-prep PRs remove `-SNAPSHOT` only after the referenced upstream release
-  is published and publicly resolvable.
+  `publish-snapshot.yml`.
+- Publish releases with `baseVersion` only; `release.yml` must not inject
+  `-SNAPSHOT`.
+- Development branches reference internal `bluetape4k-*` dependencies with
+  matching upstream `-SNAPSHOT` versions. Release-prep PRs remove the suffix only
+  after the referenced upstream release is visible from Maven Central.
 - Tag push is the release trigger. Tags must match `X.Y.Z`.
 - `experimental`, `workshop`, examples, demos, and benchmarks are not release
   artifacts.

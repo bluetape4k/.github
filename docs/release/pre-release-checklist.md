@@ -7,6 +7,10 @@
 
 ## 1. 의존성 버전 점검
 
+Canonical policy:
+`docs/governance/version-and-release-train.md`의
+`Version Management Policy`를 기준으로 삼는다.
+
 ### 1-0. BOM / catalog 역할 분리
 
 `bluetape4k-dependencies` repo는 사용자용 BOM과 내부 빌드 catalog의
