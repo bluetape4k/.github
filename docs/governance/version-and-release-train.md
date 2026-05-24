@@ -83,6 +83,15 @@ rules.
 - Release artifacts are produced from `baseVersion` only. Release workflows must
   fail if `snapshotVersion` is non-empty or if they inject `-SNAPSHOT`.
 
+State table:
+
+| State | `baseVersion` | `snapshotVersion` | Published artifact version |
+|---|---|---|---|
+| Normal development after release | next release version | empty | none from git alone |
+| Snapshot workflow | next release version | injected as `-SNAPSHOT` | `<baseVersion>-SNAPSHOT` |
+| Release prep and tag | release version | empty | `<baseVersion>` |
+| Maintenance branch | next patch on that line | empty | `<baseVersion>` or `<baseVersion>-SNAPSHOT` only when workflow injects it |
+
 ### Internal bluetape4k References
 
 - During ordinary development, a repository that depends on another
@@ -99,6 +108,15 @@ rules.
 - `bluetape4k-dependencies` is the final consumer BOM and is released after all
   imported bluetape4k BOMs are visible. Do not use the final dependencies BOM as
   the source of internal release versions inside the same train.
+
+Reference transition table:
+
+| Phase | Internal reference example | Rule |
+|---|---|---|
+| Development | `bluetape4k = "1.9.2-SNAPSHOT"` | Consume the matching upstream snapshot line. |
+| Release prep before upstream is public | keep `1.9.2-SNAPSHOT` | Stop; do not release downstream yet. |
+| Release prep after upstream HTTP 200 | `bluetape4k = "1.9.2"` | Remove `-SNAPSHOT` and verify the exact artifact from Maven Central. |
+| Post-release reopen | `bluetape4k = "1.9.3-SNAPSHOT"` or next active upstream snapshot | Return to snapshot consumption for development. |
 
 ### Gradle Catalog vs Consumer BOM
 

@@ -6,6 +6,23 @@ library repositories. It reflects the 2026-05-17 Central Portal release batch:
 `javers 0.1.0`, `exposed 1.8.0`, `leader 0.1.0`, `image 0.1.0`, and
 `dependencies 1.0.0`.
 
+## Release Flow Map
+
+Use this map before choosing a command. Most release mistakes come from doing a
+later phase while an earlier gate is still unresolved.
+
+| Phase | Branch state | Version state | Required evidence | Next action |
+|---|---|---|---|---|
+| Normal development | `develop` | Own `baseVersion` is the next release; `snapshotVersion=`; internal bluetape4k refs use matching `-SNAPSHOT` | CI/Nightly acceptable, drift understood | Continue development or publish snapshots |
+| Snapshot validation | `develop` | Same as normal development; snapshot suffix injected by workflow only | `publish-snapshot.yml` succeeds in dependency order | Start release prep only after required upstream snapshots are proven |
+| Release prep | PR branch from `develop` | Own `baseVersion` equals release tag; `snapshotVersion=`; internal bluetape4k refs use released non-snapshot versions only after upstream HTTP 200 | pre-release checklist PASS, release workflow dry-run or diagnostic clean | Merge release-prep PR |
+| Tag and release | `develop` at release-prep commit | Tag equals `baseVersion`; no checked-in snapshot suffix | GitHub release workflow succeeds, Central Portal accepts publication | Poll Maven Central until HTTP 200 |
+| Post-release reopen | `develop` after release | Advance own `baseVersion` to next release; keep `snapshotVersion=`; restore development internal refs to matching `-SNAPSHOT` where needed | PR CI clean and snapshot train can run | Merge reopen PR, then publish snapshots |
+| Final dependencies BOM | after imported BOMs are public | `bluetape4k-dependencies` imports released BOMs only | every imported BOM returns HTTP 200 from Maven Central | Release `bluetape4k-dependencies` last |
+
+Stop if the current phase cannot satisfy its evidence. Do not compensate by
+changing a downstream repository to an older released upstream version.
+
 ## Release Policy
 
 - Follow `docs/governance/version-and-release-train.md` >
@@ -425,6 +442,9 @@ If preflight requires changes, create a PR first. Typical release-prep changes:
 
 - version catalog references use released versions, not `-SNAPSHOT`; do this
   only after the referenced upstream release is visible from Maven Central
+- `baseVersion` already equals the tag that will be pushed; if this is a
+  post-release reopen PR instead, advance `baseVersion` to the next release
+  version and keep `snapshotVersion=` empty
 - BOM artifact/version keys are consistent, for example `bluetape4k-bom` and
   `bluetape4k-exposed-bom`
 - non-library module filters are present
@@ -592,6 +612,12 @@ Record:
 - release workflow run ID
 - GitHub Release URL
 - Maven Central HTTP 200 evidence for representative artifacts
+- post-release reopen PR when the repository continues on `develop`:
+  `baseVersion` advanced to the next release, `snapshotVersion=` remains empty,
+  and internal bluetape4k references return to matching `-SNAPSHOT` where
+  development should consume snapshots
+- snapshot workflow run ID after the reopen PR when downstream development needs
+  the new snapshot
 - `bluetape4k.github.io` PR and GitHub Pages deployment evidence
 - any Central validation failures and recovery PRs
 

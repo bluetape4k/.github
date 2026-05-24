@@ -3,6 +3,10 @@
 배포 대상 레포지토리에서 순서대로 점검한다.
 각 항목은 PASS / FAIL / N/A 로 표기하고, FAIL 은 해소 후 재점검.
 
+이 체크리스트는 release-prep branch에서 사용한다. 일반 `develop`에서는 내부
+`bluetape4k-*` 참조가 `-SNAPSHOT`인 것이 정상이고, release-prep에서만
+upstream release가 Maven Central HTTP 200으로 확인된 뒤 suffix를 제거한다.
+
 ---
 
 ## 1. 의존성 버전 점검
@@ -267,7 +271,11 @@ curl -s "https://repo1.maven.org/maven2/io/github/bluetape4k/<artifact>/X.Y.Z/<a
 - [ ] BOM/NMCP 집계에서 `examples/`, `*-examples`, `*-demo`,
       `benchmark/`, `*-benchmark` 모듈 제외 확인
 - [ ] `bluetape4k.github.io` 공개 문서 최신화 PR 생성 및 머지
-- [ ] 소스 레포 다음 버전(`X.(Y+1).0-SNAPSHOT`) bump PR 생성
+- [ ] 소스 레포 post-release reopen PR 생성:
+      `baseVersion`은 다음 release version으로 올리고, `snapshotVersion=`은
+      비워 둔다.
+- [ ] post-release reopen PR에서 개발 중 필요한 내부 `bluetape4k-*` 참조는
+      matching upstream `-SNAPSHOT`으로 되돌렸다.
 
 ### 8-1. Central Portal 전파 확인
 
@@ -350,6 +358,7 @@ git worktree list
 | `./gradlew build` 성공인데 배포 후 resolve 실패 | SNAPSHOT 의존성이 Maven Central에 없음 | 의존 레포 먼저 배포 |
 | groupId 달라도 버전 같으면 괜찮다고 가정 | 릴리즈 사이클이 별도임 | Maven Central HTTP 200 직접 확인 |
 | `release.yml` 트리거 안 됨 | `snapshotVersion` 비우지 않음 or tag 형식 불일치 | `baseVersion` = tag, `snapshotVersion=` 확인 |
+| 배포 후 개발 시작 시 어떤 버전으로 열지 헷갈림 | own artifact version과 dependency reference version을 섞음 | own `baseVersion`은 다음 release, `snapshotVersion=`은 empty, 내부 refs는 matching `-SNAPSHOT` |
 | Nightly 1~2회 실패 후 무시 | 플레이크 or 실제 회귀 | 3회 연속 SUCCESS 기준 적용 |
 | 배포 후 Maven Central에서 못 찾음 | 전파 지연 (최대 30분) | 10분 후 재확인 |
 | KDoc 번역 누락 | 에이전트가 파일 목록 없이 디렉토리 단위로 번역 | `rg -l "[가-힣]"` 스캔 후 목록 명시 |
