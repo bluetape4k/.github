@@ -11,8 +11,19 @@ library repositories. It reflects the 2026-05-17 Central Portal release batch:
 - Keep `gradle.properties` stable:
   - `baseVersion=<release version>`
   - `snapshotVersion=`
-- Publish snapshots by passing `-PsnapshotVersion=-SNAPSHOT`; do not edit
-  `gradle.properties` just to publish a snapshot.
+- After a repository is released, advance `baseVersion` on `develop` to the
+  next release version and keep `snapshotVersion=` empty. The checked-in
+  development state identifies the next release line, not the snapshot suffix.
+- Publish snapshots by passing `-PsnapshotVersion=-SNAPSHOT` from
+  `publish-snapshot.yml`; do not edit `gradle.properties` just to publish a
+  snapshot.
+- Publish releases with `baseVersion` only. `release.yml` must not inject
+  `-SNAPSHOT`, and release preflight must fail if `snapshotVersion` is not
+  empty.
+- During ordinary development, repositories that reference other
+  `bluetape4k-*` artifacts must use the matching upstream `-SNAPSHOT` version.
+  Release-prep PRs remove `-SNAPSHOT` only after the referenced upstream release
+  is published and publicly resolvable.
 - Tag push is the release trigger. Tags must match `X.Y.Z`.
 - `experimental`, `workshop`, examples, demos, and benchmarks are not release
   artifacts.
@@ -194,15 +205,17 @@ all imported BOMs returned HTTP 200 from Maven Central.
 ## Internal Reference Preflight
 
 Before preparing each repository in the order above, inspect every
-`io.github.bluetape4k*` version that repository references. The referenced
-version must be the intended upstream release version and must return HTTP 200
-from Maven Central.
+`io.github.bluetape4k*` version that repository references. On `develop`, those
+internal references normally point at the matching upstream `-SNAPSHOT` line.
+In the release-prep branch, remove `-SNAPSHOT` only for upstream repositories
+that have already been released and return HTTP 200 from Maven Central.
 
 If the referenced upstream repository is part of the same release train, wait
 for that upstream target version to be released and publicly resolvable before
 preparing or releasing the downstream repository. Do not fall back to the
 previous public release just because it is the latest version currently
-available.
+available. Before the upstream release is available, downstream development
+branches keep using the matching upstream `-SNAPSHOT` reference.
 
 If the referenced upstream repository is not part of the release train, use the
 latest public upstream release version and verify it from Maven Central.
@@ -233,7 +246,8 @@ curl -s -o /dev/null -w "%{http_code}" \
 Expected:
 
 - `bluetape4k-projects` target version is released and visible before
-  exposed/text/graph/javers, aws, leader, or image references it.
+  exposed/text/graph/javers, aws, leader, or image removes `-SNAPSHOT` from its
+  reference.
 - If aws references exposed modules and exposed is in the train, release and
   verify the exposed target version first, then bump aws's exposed reference.
 - If javers references exposed modules, for example a future `javers-exposed`
@@ -414,7 +428,8 @@ catalog source change.
 
 If preflight requires changes, create a PR first. Typical release-prep changes:
 
-- version catalog references use released versions, not `-SNAPSHOT`
+- version catalog references use released versions, not `-SNAPSHOT`; do this
+  only after the referenced upstream release is visible from Maven Central
 - BOM artifact/version keys are consistent, for example `bluetape4k-bom` and
   `bluetape4k-exposed-bom`
 - non-library module filters are present
