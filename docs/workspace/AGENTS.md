@@ -99,13 +99,21 @@ Use audience-based document language:
 - In Codex App sessions with context-mode available, use context-mode MCP tools
   for large reads/searches/log analysis so raw shell output does not flood the
   model context.
-- Use MinishLab Semble or `~/.cargo/bin/semble_rs` for agent-oriented first-pass
-  code search when natural-language, ranked snippets, or dependency lookup are
-  more useful than raw text matches.
-- Use `rg` first for exact code symbols, filenames, or current implementation
-  locations.
-- If qmd is unavailable, stale, or returns weak matches, fall back to `rg` and
-  mention the indexing gap when it affects the answer.
+- For repo-local code lookup, use CodeGraph first when the question is
+  structural: symbol definition, class/function/object/property location,
+  signature/source, callers, callees, impact radius, or current implementation
+  context. Do not run `rg` for a code symbol until the matching CodeGraph tool
+  has been attempted and its result considered.
+- Before any source-tree `rg` search, perform this guard: if the query names or
+  implies a code symbol or relationship, stop and use CodeGraph first. Use `rg`
+  first only for literal text, comments, log messages, filenames, generated
+  files, build output, or when CodeGraph is unavailable/not initialized.
+- Use MinishLab Semble or `~/.cargo/bin/semble_rs` after CodeGraph when
+  natural-language, ranked snippets, or dependency lookup are more useful than
+  raw text matches.
+- If qmd, CodeGraph, or Semble are unavailable, stale, or return weak matches,
+  fall back to `rg` and mention the indexing/tooling gap when it affects the
+  answer.
 
 ## Shared Stack
 

@@ -95,6 +95,30 @@ meaningfully changed public API KDoc must be English.
 
 ## Knowledge Retrieval
 
+### Code Search Priority
+
+When searching source code, use CodeGraph first for structural questions:
+symbol definitions, class/function/object/property locations, signatures,
+callers, callees, impact radius, and current implementation context.
+
+Before any source-tree `rg`, grep, or file-scanning search, perform this guard:
+if the query names or implies a code symbol or relationship, stop and use
+CodeGraph first. Use native search first only for literal strings, comments, log
+messages, filenames, generated files, build output, or when CodeGraph is
+unavailable/not initialized.
+
+Recommended order:
+
+1. **CodeGraph MCP tools** — pre-indexed knowledge graph for structural lookup:
+   - `codegraph_context` — map relevant code areas around a symbol or concept
+   - `codegraph_explore` — retrieve related source code in one query
+   - `codegraph_search` — find symbol definitions by name
+2. **`semble`** (`~/.cargo/bin/semble_rs`) — semantic/BM25 ranked search when CodeGraph is absent or weak
+3. **`rg`** — exact literal strings or filenames only
+4. **`ast-grep`** — structural pattern search / refactoring
+
+### Documentation Search
+
 - Query qmd before broad filesystem search for similar implementations,
   benchmark results, plans, specs, lessons, and scattered project documentation.
 - Prefer `qmd query "<query>" -c bluetape4k-docs --no-rerank` for workspace
@@ -103,11 +127,6 @@ meaningfully changed public API KDoc must be English.
   knowledge under `~/.codex/wiki`.
 - In Codex App sessions with context-mode available, use context-mode MCP tools
   for large reads/searches/log analysis so raw shell output stays bounded.
-- Use MinishLab Semble or `~/.cargo/bin/semble_rs` for agent-oriented first-pass
-  code search when ranked snippets or dependency lookup are more useful than raw
-  text matches.
-- Use `rg` first for exact code symbols, filenames, or current implementation
-  locations.
 
 ## Shared Stack
 
