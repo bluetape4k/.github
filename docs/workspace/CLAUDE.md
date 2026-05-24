@@ -272,13 +272,20 @@ README files are library-user documentation and remain multilingual.
 
 Recommended module README structure:
 
-1. Architecture, including a Mermaid diagram when useful.
+1. Architecture, including a diagram when useful.
 2. Core features.
 3. Usage examples.
 4. Configuration options.
 5. Dependency instructions.
 
-Use Mermaid diagrams for README architecture. Do not use Vega-Lite for README diagrams.
+Use SVG+PNG image assets for README diagrams following the canonical
+`bluetape4k.github.io/docs/readme-diagram-samples/DIAGRAM_GENERATION_GUIDE.md`.
+Key rules:
+- Generate both `.svg` and `.png` for every diagram.
+- Embed only `.png` in README files; keep the matching `.svg` next to it.
+- Store diagram assets under `docs/images/readme-diagrams/`.
+- Do not use Mermaid or Vega-Lite fences for README diagrams.
+- Do not use ASCII diagram fences as final README content (convert to SVG/PNG).
 
 ## Build and Coverage
 
