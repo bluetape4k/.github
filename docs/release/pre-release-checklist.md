@@ -35,8 +35,9 @@ rg -n 'bluetape4kDependenciesCatalog(Path|Ref)|BLUETAPE4K_DEPENDENCIES_CATALOG_(
 - [ ] release train catalog source ref(`catalog/YYYY-MM-DD-NN`)가 존재하고
       downstream CI/local build가 그 ref를 checkout하도록 되어 있는가?
 - [ ] catalog source ref를 내부 `bluetape4k-*` 의존 release version source로
-      사용하지 않는가? 내부 bluetape4k 참조는 배포 순서에 따라 신규
-      배포된 release version을 명시해야 한다.
+      사용하지 않는가? 내부 bluetape4k 참조는 개발 중에는 matching
+      `-SNAPSHOT`을 사용하고, release prep에서만 배포 순서에 따라 신규
+      배포된 release version으로 suffix를 제거한다.
 - [ ] 같은 release train 안의 repo가 아직 배포되지 않은 최종
       `bluetape4k-dependencies` BOM 버전에 의존하지 않는가?
 
@@ -49,14 +50,15 @@ rg -n 'bluetape4k(-[a-z]+)? = "|bluetape4k-.*-bom = "|io\.github\.bluetape4k' \
 rg -n 'exposed|bluetape4k-exposed|io\.github\.bluetape4k\.exposed|bluetape4k\.exposed' \
   settings.gradle.kts gradle/libs.versions.toml build.gradle.kts **/build.gradle.kts
 
-# SNAPSHOT 참조 전수 확인
+# release prep에서 제거해야 할 내부 SNAPSHOT 참조 전수 확인
 rg "SNAPSHOT" gradle/libs.versions.toml gradle.properties build.gradle.kts \
   --glob "!gradle.properties" | grep -v "snapshotVersion\|central-snapshot\|maven-snapshots\|# "
 ```
 
 - [ ] 참조하는 내부 `bluetape4k-*` repo가 이번 release train 대상이면,
-      그 upstream repo의 목표 버전이 배포되어 Maven Central HTTP 200이
-      될 때까지 대기했는가?
+      개발 branch에서는 matching `-SNAPSHOT`을 참조하고 있는가?
+- [ ] release prep branch에서는 그 upstream repo의 목표 버전이 배포되어
+      Maven Central HTTP 200이 된 뒤에만 `-SNAPSHOT` suffix를 제거했는가?
 - [ ] `javers-exposed` 같은 신규 bridge module이 추가되어 release order가
       바뀌지 않았는가? 특히 `bluetape4k-javers`가
       `bluetape4k-exposed`를 참조하면 `exposed` 목표 버전 배포 후에만
@@ -89,6 +91,10 @@ rg "SNAPSHOT" gradle/libs.versions.toml gradle.properties build.gradle.kts \
 ### 2-0a. 브랜치 라인 정책
 
 - [ ] `develop`의 `baseVersion`이 현재 active release line과 일치하는가?
+- [ ] 배포 직후 `develop`의 `baseVersion`은 다음 release version으로
+      올라가 있고, `snapshotVersion=`은 비어 있는가?
+- [ ] snapshot publish는 workflow에서 `-PsnapshotVersion=-SNAPSHOT`으로만
+      주입하고, release publish는 `baseVersion`만 사용하는가?
 - [ ] open patch milestone이 남아 있는데 `develop`을 다음 minor로 올리지
       않았는가? 단, patch milestone을 명시적으로 close/defer했다면 예외.
 - [ ] `develop`이 이미 다음 minor로 진행된 뒤 이전 minor patch가 필요하면,

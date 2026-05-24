@@ -86,12 +86,22 @@ Use maintenance branches only on demand:
 This keeps normal work simple while preserving the ability to patch a previous
 minor line during the next minor development cycle.
 
+After every successful repository release, advance `develop` to the next release
+version in `baseVersion` and keep `snapshotVersion=` empty. Snapshot artifacts
+are produced by workflow input (`-PsnapshotVersion=-SNAPSHOT`), not by checking
+`-SNAPSHOT` into `gradle.properties`.
+
 ## Release Preconditions
 
 Before running `Org Release Train` with `dryRun=false`:
 
 - Shared version drift report has no unplanned drift.
 - Each target repository has a matching release tag for the requested version.
+- Target repositories have `snapshotVersion=` empty, and release workflows use
+  `baseVersion` without injecting `-SNAPSHOT`.
+- Internal `bluetape4k-*` references in release-prep branches use released
+  upstream versions only; each referenced upstream artifact is publicly visible
+  from Maven Central.
 - Repository-local release workflows have passed in `dryRun` or diagnostic mode.
 - Snapshot train has succeeded for the same dependency state.
 - GitHub Packages publishing and signing secrets are valid in target repos.
@@ -101,6 +111,10 @@ Before running `Org Release Train` with `dryRun=false`:
 Before running `Org Snapshot Dispatch` with `dryRun=false`:
 
 - Target repositories are on the intended `develop` state.
+- Target repositories have `snapshotVersion=` empty in `gradle.properties`; the
+  snapshot workflow injects `-PsnapshotVersion=-SNAPSHOT`.
+- Internal `bluetape4k-*` references on development branches use matching
+  upstream `-SNAPSHOT` versions until release preparation removes the suffix.
 - Version drift is either aligned or documented.
 - Repositories that import the shared Gradle catalog read
   `bluetape4k-dependencies/gradle/libs.versions.toml` from a checked-out
@@ -168,6 +182,9 @@ separate from BOM consumption:
   `io.github.bluetape4k:bluetape4k-dependencies` as a platform.
 - Do not point a repository in the release train at a final BOM version that
   cannot exist until that same repository is released.
+- During development, point internal `bluetape4k-*` references at the matching
+  upstream `-SNAPSHOT` line. During release prep, remove `-SNAPSHOT` only after
+  the upstream release has been published and verified from Maven Central.
 
 ## Dependency Update Validation
 
