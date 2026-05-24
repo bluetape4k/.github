@@ -63,6 +63,64 @@ Release dispatch uses the same order, including `bluetape4k-dependencies` as
 the final BOM publication. `bluetape4k-experimental` and `bluetape4k-workshop`
 are Nightly-only by default.
 
+## Version Management Policy
+
+Use this section as the canonical rule set for `bluetape4k-*` workspace version
+management. Release runbooks and checklists are execution surfaces for these
+rules.
+
+### Repository Artifact Version
+
+- Every publishable repository keeps its own version in `gradle.properties`:
+  `baseVersion=<next release version>` and `snapshotVersion=`.
+- After a repository release is complete, immediately advance `baseVersion` on
+  `develop` to the next release version. Example: after publishing `0.2.1`,
+  set `baseVersion=0.2.2`.
+- Keep `snapshotVersion=` empty in git. Do not check `-SNAPSHOT` into
+  `gradle.properties` to mark development state.
+- Snapshot artifacts are produced only by workflow or command input:
+  `-PsnapshotVersion=-SNAPSHOT`.
+- Release artifacts are produced from `baseVersion` only. Release workflows must
+  fail if `snapshotVersion` is non-empty or if they inject `-SNAPSHOT`.
+
+### Internal bluetape4k References
+
+- During ordinary development, a repository that depends on another
+  `bluetape4k-*` artifact uses the matching upstream `-SNAPSHOT` version.
+  Example: while `bluetape4k-projects` is developing `1.9.2`, downstream
+  libraries reference `bluetape4k-bom = 1.9.2-SNAPSHOT` or the equivalent local
+  version key.
+- During release preparation, remove `-SNAPSHOT` from an internal
+  `bluetape4k-*` reference only after that upstream repository has been released
+  and the target artifact returns HTTP 200 from Maven Central.
+- Do not fall back to the previous public release just because the intended
+  upstream release is not visible yet. Wait for the upstream release, or stay on
+  the matching upstream snapshot on the development branch.
+- `bluetape4k-dependencies` is the final consumer BOM and is released after all
+  imported bluetape4k BOMs are visible. Do not use the final dependencies BOM as
+  the source of internal release versions inside the same train.
+
+### Gradle Catalog vs Consumer BOM
+
+- `bluetape4k-dependencies/gradle/libs.versions.toml` is a build/contributor
+  catalog source for external library and plugin alignment. Pin it by a git ref
+  such as `catalog/YYYY-MM-DD-NN`.
+- `io.github.bluetape4k:bluetape4k-dependencies` is the user-facing consumer
+  BOM and uses semantic versions such as `1.1.3`.
+- Use `bluetape4kDependenciesCatalogPath` or
+  `bluetape4kDependenciesCatalogRef` for the build catalog source. Use
+  `bluetape4kDependenciesVersion` only when importing the consumer BOM as a
+  platform.
+
+### Branch Lines
+
+- `develop` is the active release line. Patch releases normally continue on
+  `develop` until the patch milestone is closed or deferred.
+- Create `release/X.Y.x` only when a previous minor line needs a hotfix after
+  `develop` has advanced to the next minor line.
+- Maintenance branches carry only bug, security, or compatibility fixes; every
+  fix is forward-ported to `develop`.
+
 ## Branch Line Policy
 
 Default to sequential development on `develop`. The `develop` branch represents
@@ -86,10 +144,8 @@ Use maintenance branches only on demand:
 This keeps normal work simple while preserving the ability to patch a previous
 minor line during the next minor development cycle.
 
-After every successful repository release, advance `develop` to the next release
-version in `baseVersion` and keep `snapshotVersion=` empty. Snapshot artifacts
-are produced by workflow input (`-PsnapshotVersion=-SNAPSHOT`), not by checking
-`-SNAPSHOT` into `gradle.properties`.
+Repository version line changes are governed by
+`Version Management Policy > Repository Artifact Version`.
 
 ## Release Preconditions
 
