@@ -279,7 +279,7 @@ Recommended module README structure:
 5. Dependency instructions.
 
 Use SVG+PNG image assets for README diagrams following the canonical
-`bluetape4k.github.io/docs/readme-diagram-samples/DIAGRAM_GENERATION_GUIDE.md`.
+`.github/docs/workspace/DIAGRAM_GENERATION_GUIDE.md`.
 Key rules:
 - Generate both `.svg` and `.png` for every diagram.
 - Embed only `.png` in README files; keep the matching `.svg` next to it.
