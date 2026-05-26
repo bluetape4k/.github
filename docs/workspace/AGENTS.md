@@ -88,14 +88,14 @@ Use audience-based document language:
 
 - When looking for similar implementations, prior examples, benchmark results,
   discussions, plans, specs, lessons, or scattered project documentation, query
-  qmd first before filesystem search.
-- Follow the user-scope qmd command selection rules. For routine lookup, prefer
-  `qmd query "<query>" -c <collection> --no-rerank`.
-- Use `qmd query "<query>" -c bluetape4k-docs --no-rerank` for workspace documentation and
-  examples. This collection indexes Markdown under `/Users/debop/work/bluetape4k`
-  with `**/*.md`.
-- Use `qmd query "<query>" -c wiki --no-rerank` for personal or cross-project knowledge under
-  `~/.codex/wiki`.
+  GNO first before filesystem search.
+- Follow the user-scope GNO command selection rules. For routine lookup, prefer
+  `gno query "<query>" -c <collection> --fast --no-rerank`.
+- Use `gno query "<query>" -c bluetape4k-docs --fast --no-rerank` for workspace
+  documentation and examples. This collection indexes Markdown docs under
+  `/Users/debop/work/bluetape4k` with `**/docs/**/*.md`.
+- Use `gno query "<query>" -c wiki --fast --no-rerank` for personal or cross-project
+  knowledge under `~/.codex/wiki`.
 - In Codex App sessions with context-mode available, use context-mode MCP tools
   for large reads/searches/log analysis so raw shell output does not flood the
   model context.
@@ -111,7 +111,7 @@ Use audience-based document language:
 - Use MinishLab Semble or `~/.cargo/bin/semble_rs` after CodeGraph when
   natural-language, ranked snippets, or dependency lookup are more useful than
   raw text matches.
-- If qmd, CodeGraph, or Semble are unavailable, stale, or return weak matches,
+- If GNO, CodeGraph, or Semble are unavailable, stale, or return weak matches,
   fall back to `rg` and mention the indexing/tooling gap when it affects the
   answer.
 
@@ -408,6 +408,8 @@ assign them to `debop` by default unless the user explicitly says otherwise.
 Use `--assignee debop` with `gh issue create` and `gh pr create`, or the
 equivalent GitHub API `assignees` field. If a repository rejects the assignee,
 report that blocker instead of creating an unassigned issue or PR silently.
+For `bluetape4k-*` repositories, set the issue milestone when creating an
+issue, and set any PR that resolves that issue to the same milestone.
 Add relevant topic labels to GitHub pull requests when the labels exist or can
 be inferred safely from the work scope, such as `examples`, `ktor`,
 `spring-boot`, `r2dbc`, `exposed`, `documentation`, or `testing`.

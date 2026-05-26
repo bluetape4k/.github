@@ -119,11 +119,11 @@ Recommended order:
 
 ### Documentation Search
 
-- Query qmd before broad filesystem search for similar implementations,
+- Query GNO before broad filesystem search for similar implementations,
   benchmark results, plans, specs, lessons, and scattered project documentation.
-- Prefer `qmd query "<query>" -c bluetape4k-docs --no-rerank` for workspace
+- Prefer `gno query "<query>" -c bluetape4k-docs --fast --no-rerank` for workspace
   documentation and examples.
-- Prefer `qmd query "<query>" -c wiki --no-rerank` for personal or cross-project
+- Prefer `gno query "<query>" -c wiki --fast --no-rerank` for personal or cross-project
   knowledge under `~/.codex/wiki`.
 - In Codex App sessions with context-mode available, use context-mode MCP tools
   for large reads/searches/log analysis so raw shell output stays bounded.
