@@ -83,12 +83,20 @@ Use audience-based document language:
 - Start shared version changes in `bluetape4k-dependencies` first, cut a
   release-train catalog ref such as `catalog/YYYY-MM-DD-NN`, then update
   downstream `bluetape4k-*` repositories and CI to read that checked-out ref.
+- Treat `bluetape4k-github` GNO results as governance evidence when the same
+  issue or PR pattern appears across repositories. Repeated merged PRs such as
+  Kover hard-gate removals mean the root rule should be report-only coverage
+  unless a new explicit policy decision says otherwise.
 
 ## Knowledge Retrieval
 
 - When looking for similar implementations, prior examples, benchmark results,
   discussions, plans, specs, lessons, or scattered project documentation, query
   GNO first before filesystem search.
+- For workflow, coverage, release, module-registration, or skill-maintenance
+  changes, query both `bluetape4k-github` and `bluetape4k-docs` before editing:
+  issues/PRs show where the process failed in review, while lessons/specs show
+  the durable rule to promote.
 - Follow the user-scope GNO command selection rules. For routine lookup, prefer
   `gno query "<query>" -c <collection> --fast --no-rerank`.
 - Use `gno query "<query>" -c bluetape4k-docs --fast --no-rerank` for workspace
@@ -326,6 +334,15 @@ Store durable project design/history artifacts in repo-local docs paths:
 - Update `README.md` and existing localized README files when behavior or
   public API changes.
 - Add or update KDoc for new/changed public API.
+- For added, renamed, moved, or removed modules, verify the full registration
+  chain: `settings.gradle.kts`, README locale set, repo-local `AGENTS.md`
+  module list, CI path filters/jobs, Nightly or examples workflow, summary
+  `needs`, coverage artifacts, BOM/catalog constraints, and `./gradlew projects`.
+- Run Testcontainers-backed verification serially across modules, worktrees,
+  and delegated agents. If a workflow or test fails first and passes on retry,
+  investigate lifecycle, container, or timing risk before marking it noise.
+- Keep Kover XML and Codecov visibility, but do not add or restore hard Kover
+  thresholds unless an explicit policy decision exists.
 
 ## Git Workflow
 
