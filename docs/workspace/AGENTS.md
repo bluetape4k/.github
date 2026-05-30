@@ -10,14 +10,19 @@ memory such as `AGENTS.md`, `CLAUDE.md`, `SKILL.md`, `.omx/notepad.md`, and
 `~/.codex/memories/*` in concise English unless a repo-local document explicitly
 requires different wording.
 
-Use audience-based document language:
+Use audience-based document language. This table is the canonical workspace
+policy; repo-local `AGENTS.md` files and skills may narrow it but should not
+silently reverse it.
 
-| Primary reader | Artifacts | Language |
-|---|---|---|
-| End user | README locale set | Multilingual |
-| Contributor (public, human) | KDoc, GitHub PR/issue/commit, CHANGELOG, release notes | English |
-| AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, agent memory, notepad | English |
-| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean OK |
+| Primary reader | Artifacts | Default language | Notes |
+|---|---|---|---|
+| User in chat | Conversation with `debop` | Korean | Use Korean unless the user asks otherwise. |
+| End user | `README.md`, `README.ko.md`, future localized README files | Multilingual | Keep `README.md` English and update existing localized README files together. |
+| Contributor (public, human) | KDoc, CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies, pushed commit messages | English | These are public contributor-facing artifacts. |
+| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean OK | Prefer Korean when it helps the user; English is allowed only when there is a concrete reason. |
+| AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, `.omx/notepad.md`, `~/.codex/memories/*`, agent memory | English | Keep concise English for token efficiency and cross-tool reuse. |
+| Blog/article reader | `bluetape4k.github.io` blog/articles | Locale-specific | Follow the blog skill: Korean-first for Korean posts, English parity when bilingual. |
+| Diagram/image reader | Generated diagram labels and visual assets | English | Share English-label assets across localized README files unless domain terms require localization. |
 
 - Conversations with the user: Korean.
 - Library user documentation: multilingual where applicable. Keep `README.md`
