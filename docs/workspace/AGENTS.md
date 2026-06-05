@@ -367,6 +367,7 @@ drafting the plan are allowed before approval. Do not treat autonomy or
 
 - `develop` is the default integration branch; do not push directly.
 - `main` is release-only and updated through `develop -> main` PRs.
+- Use GitHub rebase merge as the default PR merge strategy unless the user explicitly requests another strategy.
 - Prefer feature branches under `.worktrees/<branch>`.
 - Do not use `codex/` for local worktree names or branch names. Use conventional
   prefixes such as `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `build/`, or
@@ -422,6 +423,11 @@ references before implementation.
 - `bluetape4k-workflow`: first-stop router for bluetape4k work. It classifies
   Full Design, Fast Track, Bug Fix, Code Review, Maintenance, and Self Improve
   work, then selects the lightest safe lane and verification level.
+  For every workflow step, define the step `Action` and expected `DoD` evidence
+  before executing it, then report the step `DoD` with concrete evidence before
+  moving to the next step. If a gate is skipped, reordered, or weakly evidenced,
+  stop downstream work, repair the violated step, report the repair DoD, and
+  continue only after that gate is `PASS`.
 - `bluetape4k-design`: use for new modules, new services/subsystems, broad API
   design, large refactors, new dependencies, or multi-layer changes. It owns the
   spec/plan/advisor-review/DoD workflow and new-module checks.
@@ -449,3 +455,47 @@ issue, and set any PR that resolves that issue to the same milestone.
 Add relevant topic labels to GitHub pull requests when the labels exist or can
 be inferred safely from the work scope, such as `examples`, `ktor`,
 `spring-boot`, `r2dbc`, `exposed`, `documentation`, or `testing`.
+
+
+<!-- headroom:rtk-instructions -->
+# RTK (Rust Token Killer) - Token-Optimized Commands
+
+When running shell commands, **always prefix with `rtk`**. This reduces context
+usage by 60-90% with zero behavior change. If rtk has no filter for a command,
+it passes through unchanged — so it is always safe to use.
+
+## Key Commands
+```bash
+# Git (59-80% savings)
+rtk git status          rtk git diff            rtk git log
+
+# Files & Search (60-75% savings)
+rtk ls <path>           rtk read <file>         rtk grep <pattern>
+rtk find <pattern>      rtk diff <file>
+
+# Test (90-99% savings) — shows failures only
+rtk pytest tests/       rtk cargo test          rtk test <cmd>
+
+# Build & Lint (80-90% savings) — shows errors only
+rtk tsc                 rtk lint                rtk cargo build
+rtk prettier --check    rtk mypy                rtk ruff check
+
+# Analysis (70-90% savings)
+rtk err <cmd>           rtk log <file>          rtk json <file>
+rtk summary <cmd>       rtk deps                rtk env
+
+# GitHub (26-87% savings)
+rtk gh pr view <n>      rtk gh run list         rtk gh issue list
+
+# Infrastructure (85% savings)
+rtk docker ps           rtk kubectl get         rtk docker logs <c>
+
+# Package managers (70-90% savings)
+rtk pip list            rtk pnpm install        rtk npm run <script>
+```
+
+## Rules
+- In command chains, prefix each segment: `rtk git add . && rtk git commit -m "msg"`
+- For debugging, use raw command without rtk prefix
+- `rtk proxy <cmd>` runs command without filtering but tracks usage
+<!-- /headroom:rtk-instructions -->
