@@ -286,19 +286,29 @@ Store durable project design/history artifacts in repo-local docs paths:
 - Lessons Learned / work retrospectives: `docs/lessons/YYYY-MM-DD-{slug}.md`
 - Use lowercase ASCII kebab-case slugs; include `issue-{number}-` when the
   artifact is tied to a GitHub issue.
-- After every completed PR or work item, create or update a concise
-  `docs/lessons/YYYY-MM-DD-{slug}.md` entry automatically. Keep it short for
-  small work, but always include the context, decision, outcome, verification
-  evidence, and what future agents should do differently.
-- At the end of each substantial workday or multi-task session, consolidate new
-  `docs/lessons/` entries: merge duplicates, keep event-specific evidence in the
-  lesson, and promote repeatable rules to `AGENTS.md` or the relevant
-  skill/reference.
+- Create or update `docs/lessons/YYYY-MM-DD-{slug}.md` only when it is useful
+  for durable project learning, required by a selected workflow, or explicitly
+  requested by the user. Keep it short for small work, and include the context,
+  decision, outcome, verification evidence, and what future agents should do
+  differently.
+- Consolidate `docs/lessons/` entries only when explicitly requested or when a
+  selected workflow requires a retrospective cleanup step.
 - Treat `.omx/plans`, `.omx/notepad.md`, chat summaries, and runtime notes as
   transient. Promote durable decisions and lessons into `docs/superpowers/` or
   `docs/lessons/`.
 - Specs, plans, research notes, and lessons are internal working artifacts and
   may be written in Korean.
+
+## Planning Approval
+
+For `bluetape4k-workflow` or any other workflow that has an explicit planning
+phase, stop at the first concrete plan and ask the user to approve it before
+editing source files, creating durable planning artifacts, committing, opening
+PRs, dispatching workflows, merging, publishing, or deleting branches/worktrees.
+
+Read-only discovery, issue/PR metadata inspection, local status checks, and
+drafting the plan are allowed before approval. Do not treat autonomy or
+"continue" language as permission to skip this first plan approval gate.
 
 ## Build and Coverage
 
@@ -312,6 +322,10 @@ Store durable project design/history artifacts in repo-local docs paths:
 - When adding a new module, update the repository's CI and Nightly workflows so
   the module's tests run in the appropriate scope. Container-backed module tests
   should usually be added to Full Nightly rather than the daily smoke path.
+- Treat coordinated central dependency/catalog upgrades as broad-impact
+  maintenance: upgrade `bluetape4k-dependencies` first, then merge/publish
+  prerequisite core repositories before syncing downstream consumer catalogs and
+  PRs.
 
 ## Spring Boot Auto-Configuration
 
