@@ -263,18 +263,36 @@ written in English for new or updated public APIs. Include:
 
 ## README Rules
 
-For bluetape4k modules, keep user-facing README files multilingual where
-localized files exist:
+For bluetape ecosystem repositories, modules, workshops, and examples, keep
+user-facing README files multilingual. New repositories, new modules, rewritten
+root README files, and substantial README refreshes must create or update both:
 
 - `README.md`
 - `README.ko.md`
 
 Additional localized README files such as `README.ja.md` or `README.zh.md` may
-be added over time. Each README should include the language switch directly
-below the title when multiple locales exist. Module README structure should
-cover architecture, core features, usage examples, configuration options, and
-dependency instructions. Mermaid diagrams are preferred for architecture. Do not
-use Vega-Lite for README diagrams.
+be added over time. Each README must include a language switch directly below
+the title using the `English | 한국어` form. Use the current page as plain text
+and the other locale as a relative link, for example `English |
+[한국어](README.ko.md)` in `README.md` and `[English](README.md) | 한국어` in
+`README.ko.md`.
+
+Use `$bluetape4k-blog` for Korean README prose review and localization so
+`README.ko.md` reads like natural Korean technical documentation instead of a
+literal translation. Keep `README.md` English and keep the Korean README
+source-equivalent, not abbreviated.
+
+README and benchmark result documents should include diagrams and charts as
+much as practical when they reduce cognitive load or summarize measured data.
+Use `$bluetape4k-diagram` for README diagrams, benchmark charts, Mermaid/ASCII
+conversion, visual asset placement, PNG/SVG generation, and rendered visual
+validation. Treat Mermaid or ASCII as source sketches, not final README
+artifacts; README files should embed generated PNG assets with matching SVG
+sources, following the diagram skill's output contract.
+
+Module README structure should cover architecture, core features, usage
+examples, configuration options, dependency instructions, and benchmark evidence
+when available.
 
 ## Project Documentation Artifacts
 
@@ -416,9 +434,11 @@ GitHub/CI preference:
 
 ## Skill Routing
 
-Use the installed bluetape4k skills as the project source of truth. Do not
-duplicate their detailed checklists here; load the relevant skill and its
-references before implementation.
+For every bluetape ecosystem repository under this workspace, including
+libraries, workshops, examples, infrastructure, and the GitHub Pages site, use
+the installed bluetape4k skills as the project source of truth. Do not duplicate
+their detailed checklists here; load the relevant skill and its references
+before implementation.
 
 - `bluetape4k-workflow`: first-stop router for bluetape4k work. It classifies
   Full Design, Fast Track, Bug Fix, Code Review, Maintenance, and Self Improve
@@ -437,24 +457,43 @@ references before implementation.
 - `bluetape4k-self-improve`: use only for explicit benchmark-guided
   self-improvement requests with a measurable baseline, candidate loop, and stop
   condition.
+- `bluetape4k-blog`: use for Korean README prose, blog posts, article
+  localization, Korean naturalness review, and bilingual content parity.
+- `bluetape4k-diagram`: use for README diagrams, benchmark result charts,
+  Mermaid/ASCII conversion, visual QA, generated PNG/SVG assets, and any public
+  diagram or chart embedded in README, docs, blog, or website pages.
 - Add domain skills when the touched area requires them: `ecc-kotlin-patterns`,
   `ecc-kotlin-exposed`, `ecc-springboot-kotlin`, `ecc-kotlin-testing`,
   `kotlin-coroutines-skill`, `kotlin-spring`, or `kotlin-expert`.
+- Superpowers skills and artifacts are part of the workflow contract. When a
+  selected bluetape4k workflow references a Superpowers skill, plan, spec,
+  research note, or lesson, load and follow that skill or artifact before
+  editing, reviewing, opening PRs, merging, or publishing.
 - For workflow or skill-maintenance requests, read relevant repo-local
   `docs/lessons/*.md` files before changing durable guidance.
 
 ## GitHub Issue And Pull Request Workflow
 
-When creating GitHub issues or pull requests for bluetape4k repositories,
-assign them to `debop` by default unless the user explicitly says otherwise.
-Use `--assignee debop` with `gh issue create` and `gh pr create`, or the
-equivalent GitHub API `assignees` field. If a repository rejects the assignee,
-report that blocker instead of creating an unassigned issue or PR silently.
-For `bluetape4k-*` repositories, set the issue milestone when creating an
-issue, and set any PR that resolves that issue to the same milestone.
-Add relevant topic labels to GitHub pull requests when the labels exist or can
-be inferred safely from the work scope, such as `examples`, `ktor`,
-`spring-boot`, `r2dbc`, `exposed`, `documentation`, or `testing`.
+These rules apply to every bluetape ecosystem repository under this workspace,
+including `bluetape4k-*`, `bluetape-go*`, `bluetape-rs*`, workshop/example
+repositories, `.github`, and `bluetape4k.github.io`.
+
+- Assign GitHub issues and pull requests to `debop` by default unless the user
+  explicitly says otherwise. Use `--assignee debop` with `gh issue create` and
+  `gh pr create`, or the equivalent GitHub API `assignees` field. If a
+  repository rejects the assignee, report that blocker instead of creating an
+  unassigned issue or PR silently.
+- When creating an issue, set the appropriate milestone and detailed labels.
+  Inspect the repository's existing milestones and labels first; prefer precise
+  topic labels such as `examples`, `workshop`, `ktor`, `spring-boot`, `r2dbc`,
+  `exposed`, `documentation`, `testing`, `performance`, or `maintenance` when
+  they exist or can be inferred safely from the work scope.
+- For any PR that resolves or follows an issue, read the linked issue metadata
+  first and set the PR milestone to the issue milestone. Mirror the issue
+  assignee and relevant labels onto the PR when GitHub supports those fields for
+  the repository.
+- After issue or PR creation, verify the live metadata with `gh issue view` or
+  `gh pr view` before reporting the work complete.
 
 
 <!-- headroom:rtk-instructions -->
