@@ -37,6 +37,25 @@ silently reverse it.
 - Agent memory and agent-facing guidance must be English for token efficiency,
   LLM consistency, and cross-tool reuse.
 
+## Repo-Local AGENTS Overlays
+
+This workspace root `AGENTS.md` is the common operating contract for every
+repository under `/Users/debop/work/bluetape4k`. Repo-local `AGENTS.md` files
+must be thin overlays: they should first direct agents to read and follow this
+workspace guide, then keep only repository-specific layout, commands, module
+maps, domain rules, and local exceptions.
+
+Do not duplicate common workspace rules in child repositories. Keep shared
+language policy, README locale policy, diagram/chart policy, GitHub
+issue/PR metadata policy, workflow/skill routing, Kover/Codecov visibility,
+Testcontainers sequencing, module-registration checklists, and common
+documentation artifact paths here. If a repo-local file needs to narrow one of
+these rules, state only the narrower exception and why it exists.
+
+Nested `AGENTS.md` files must inherit both the workspace root guide and their
+nearest repo-local guide. They should contain only the extra constraints for
+their subdirectory.
+
 ## Repositories
 
 ### bluetape4k libraries
@@ -380,6 +399,25 @@ drafting the plan are allowed before approval. Do not treat autonomy or
   investigate lifecycle, container, or timing risk before marking it noise.
 - Keep Kover XML and Codecov visibility, but do not add or restore hard Kover
   thresholds unless an explicit policy decision exists.
+
+## Cross-Repo Shared Guards
+
+- Before issue, PR, workflow, release, dependency, benchmark, guidance, or
+  module-registration work, query current repository evidence in
+  `bluetape4k-github` and `bluetape4k-docs` when available.
+- Before merging after CI turns green, re-read PR reviews and review threads;
+  unresolved or newer user review comments reopen the merge gate.
+- For module additions, moves, renames, removals, or artifact renames, keep the
+  registration chain synchronized: `settings.gradle.kts`, README locale set,
+  repo-local module lists, CI path filters/jobs, Nightly or examples workflow,
+  summary `needs`, coverage artifacts, BOM/catalog constraints, and
+  `./gradlew projects` or the repo-equivalent project listing.
+- Keep Kover XML and Codecov visibility as the default coverage signal. Do not
+  add or restore hard Kover thresholds unless an explicit policy decision says
+  to do so.
+- Run Testcontainers-backed, real database, native, JNI, emulator, and other
+  heavyweight integration checks sequentially across modules, worktrees, and
+  delegated agents unless a repo-local rule proves parallel execution is safe.
 
 ## Git Workflow
 
