@@ -1,302 +1,589 @@
 # bluetape4k WIP
 
-Snapshot: 2026-05-18 KST
-Scope: GitHub `bluetape4k/*` repositories, issues assigned to `debop`,
-created on or after 2026-01-01.
+Snapshot: 2026-06-27 KST
+Scope: internal bluetape4k library release train that culminates in
+`bluetape4k-dependencies 1.3.0`.
 
-This root queue is the ecosystem-level view. Repo-local details live in each
-project `WIP.md` and should stay aligned with this file.
+## Release Target Rule
 
-## Refresh Notes
+For every publishable repository, the release target is always the next semantic
+version milestone after the latest GitHub release.
 
-Verified with `gh` on 2026-05-18 KST.
+Do not infer a stable release target from the current snapshot catalog or from a
+repository's already-bumped `baseVersion`. Those values can be ahead of the
+release boundary and must be aligned back to the target milestone before
+publishing.
 
-**New issues registered on 2026-05-18 (round 1 — surface scan):**
+## Release Train Checklist Rule
 
-| Issue | Repo | Title | Severity |
-|-------|------|-------|----------|
-| [projects #539](https://github.com/bluetape4k/bluetape4k-projects/issues/539) | projects | chore: remove deprecated BinaryKafkaCodecs (JDK RCE) | P1 |
-| [projects #540](https://github.com/bluetape4k/bluetape4k-projects/issues/540) | projects | test: GrpcServer / AbstractGrpcServer lifecycle tests | P1 |
-| [exposed #161](https://github.com/bluetape4k/bluetape4k-exposed/issues/161) | exposed | bug: R2DBC write-behind finally — data loss on cancellation | P0 |
-| [leader #304](https://github.com/bluetape4k/bluetape4k-leader/issues/304) | leader | fix: runCatching{} swallows CancellationException in ExposedJdbc lock/elector | P1 |
-| [graph #156](https://github.com/bluetape4k/bluetape4k-graph/issues/156) | graph | fix: FalkorDBGraphSuspendOperations.graphExists() swallows CancellationException | P1 |
-| [graph #157](https://github.com/bluetape4k/bluetape4k-graph/issues/157) | graph | fix: FalkorDB/MemgraphGraphSchemaManager overly broad runCatching{} | P2 |
+This section supersedes the older one-repo-at-a-time stable release plan below.
+Use it for the next bluetape4k release train.
 
-**New issues registered on 2026-05-18 (round 2 — deep audit):**
+### Why
 
-| Issue | Repo | Title | Severity |
-|-------|------|-------|----------|
-| [projects #541](https://github.com/bluetape4k/bluetape4k-projects/issues/541) | projects | perf: FutureToCompletableFutureWrapper spawns one virtual thread per object | P2 |
-| [projects #542](https://github.com/bluetape4k/bluetape4k-projects/issues/542) | projects | bug: ResilientNearCacheDecorator.close() silently discards delegate failure | P1 |
-| [exposed #162](https://github.com/bluetape4k/bluetape4k-exposed/issues/162) | exposed | bug: AbstractJdbcCaffeineRepository.findAll() runCatching{} swallows all exceptions | P1 |
-| [exposed #163](https://github.com/bluetape4k/bluetape4k-exposed/issues/163) | exposed | bug: AbstractR2dbcCaffeineRepository.close() cancels scope before write-behind flush | P1 |
-| [leader #305](https://github.com/bluetape4k/bluetape4k-leader/issues/305) | leader | bug: ExposedJdbcLock.tryLock() uses currentTimeMillis() — NTP causes infinite loop | P1 |
-| [leader #306](https://github.com/bluetape4k/bluetape4k-leader/issues/306) | leader | bug: ExposedJdbcGroupLock.tryLock() same currentTimeMillis() deadline bug | P1 |
-| [graph #158](https://github.com/bluetape4k/bluetape4k-graph/issues/158) | graph | bug: Neo4jGraphSuspendOperations.suspendTransaction() runBlocking inside withContext(IO) | P1 |
-| [aws #145](https://github.com/bluetape4k/bluetape4k-aws/issues/145) | aws | feat: S3 listObjectsV2 auto-pagination Flow extension (truncates at 1000) | P2 |
+The 2026-06-27 `bluetape4k-dependencies 1.3.0` run exposed a release-process
+failure: stable publication started before the final issue/artifact checklist
+was explicit. The release workflow published the BOM before the GitHub Release
+job was cancelled. The durable fix is a checklist-gated train, not operator
+memory.
 
-Previous WIP-refresh and merge-wait queues are complete:
+### Required Train Shape
 
-- `aws` PR #56, `graph` PR #103, and `exposed` PR #63 are merged.
-- `aws` PR #54/#55 and `graph` PR #97/#98/#100 are merged.
-- `exposed` dependency PR #58/#59 are merged.
-- `graph #99` is closed.
+1. Build the complete target inventory first:
+   - repo, version, branch/SHA, release class, milestone, release workflow, and
+     expected artifacts;
+   - expected artifacts must distinguish Maven Central publications from
+     git-ref build contracts. `bluetape4k-dependencies` publishes the BOM to
+     Maven Central, while the Gradle version catalog is consumed from a
+     checked-out git ref or catalog tag by ecosystem repositories;
+   - generated POM license must be MIT for bluetape4k ecosystem artifacts unless
+     a written repo-local exception exists.
+2. Close the issue/PR gate before any stable tag:
+   - target milestone open issues are 0;
+   - open PRs for the target branch/version are 0;
+   - open issues without the milestone that mention the target version, release,
+     catalog, BOM, publication, or planned artifact are either closed or
+     explicitly moved out of scope with a comment.
+3. Run the complete snapshot train first:
+   - validate `projects -> exposed/aws/text/graph/leader/javers/image ->
+     dependencies` with snapshot/candidate catalog state before any stable
+     publication;
+   - if a downstream repo exposes a shared-version, catalog, artifact, license,
+     or workflow problem, fix it and rerun the affected snapshot validation;
+   - only proceed when the whole selected topology is green.
+4. Run stable releases after the snapshot train is green:
+   - stable releases may be parallelized for repos whose release DAG edges are
+     already validated and whose stable workflows do not mutate shared catalog
+     state;
+   - keep sequential Maven Central HTTP 200 gates only where a downstream stable
+     release consumes an upstream stable artifact directly.
+5. Hold before irreversible dispatch:
+   - immediately before tag push or workflow dispatch, report the checklist rows
+     for open issues, open PRs, tag absence, release absence, workflow input
+     schema, expected artifact matrix, POM MIT license, missing dependency
+     versions, and `-SNAPSHOT` absence;
+   - if any row is failed, stale, or unknown, stop and repair before dispatch.
+6. Handle partial publication explicitly:
+   - if Maven Central publication succeeds before cancellation, treat that
+     version as consumed; do not retag or republish the same version;
+   - if the artifact matrix is correct and only GitHub Release creation was
+     cancelled, create the GitHub Release manually after Maven Central HTTP 200;
+   - if the artifact matrix is incomplete, publish the smallest patch release
+     that fixes the missing artifact/metadata.
+7. Sync Maven BOM consumers after the final dependencies BOM is visible:
+   - do not update workshops/examples/apps before the target
+     `bluetape4k-dependencies` BOM is Maven Central HTTP 200;
+   - after visibility, update `bluetape4k-workshop`, `exposed-workshop`,
+     `exposed-r2dbc-workshop`, `clinic-appointment`, and `timefold-workshop`
+     to the final dependencies version, or record a repo-specific out-of-scope
+     reason;
+   - verify each consumer with the lightest dependency-resolution/build check
+     that proves the BOM upgrade works.
 
-New work should use the updated `bluetape4k-workflow`,
-`bluetape4k-design`, and `bluetape4k-patterns` skill routing.
+### `dependencies 1.3.0` Incident State
 
-## Reading Guide
+- Tag `1.3.0` was pushed at
+  `67106343402079bf01d7b6304f21aab5afa14d6c`.
+- Release workflow `28299496636` published the Maven Central BOM job before
+  cancellation; GitHub Release creation was cancelled.
+- Issue `bluetape4k-dependencies#126` is closed. The
+  `bluetape4k-exposed-ktor` alias is present in tag `1.3.0`, but the issue was
+  not closed before stable dispatch, which is the process failure this checklist
+  prevents.
+- The current `build.gradle.kts` POM license metadata still says Apache License
+  2.0 and must be changed to MIT in the next patch release.
+- The Gradle version catalog is an ecosystem build-contract source consumed
+  from a checked-out git ref or catalog tag. It is not a Maven Central
+  publication; verify the ref/source state in the next patch release.
+- Workshop/example/app consumers are still on `bluetape4k-dependencies 1.2.0`.
+  Do not promote them to the partial `1.3.0` artifact. Promote them to `1.3.1`
+  after the patch BOM is published and Maven Central-visible.
 
-Priority is assigned from the whole bluetape4k ecosystem view, not from
-single-repo local value.
+## Current Target Matrix
 
-| Priority | Meaning |
+Verified with live GitHub releases, GitHub milestones, local
+`gradle.properties`, `bluetape4k-dependencies/gradle/libs.versions.toml`, and
+Maven Central HTTP checks on 2026-06-27 KST.
+
+| Repo | Latest release | Next milestone | Milestone state | Open issues | Open PRs | Current `baseVersion` | Catalog / BOM line | Maven Central | Readiness |
+|---|---:|---:|---|---:|---:|---:|---:|---:|---|
+| `bluetape4k-projects` | `1.11.0` | released | closed | 0 | 0 | `1.11.0` | `1.11.0` | 200 | Released on 2026-06-27; downstream gates may consume projects `1.11.0` |
+| `bluetape4k-exposed` | `1.11.0` | released | closed | 0 | 0 | `1.11.0` | `1.11.0` | 200 | Released on 2026-06-27; downstream gates may consume exposed `1.11.0` |
+| `bluetape4k-aws` | `0.4.0` | released | closed | 0 | 0 | `0.4.0` | `0.4.0` | 200 | Released on 2026-06-27; downstream image gate may consume AWS `0.4.0` |
+| `bluetape4k-image` | `0.2.0` | `0.3.0` | open | 0 | 0 | `0.3.0` | `0.3.0-SNAPSHOT` | 404 | Release prep: AWS stable artifact is visible; changelog and release gates remain |
+| `bluetape4k-text` | `0.2.1` | released | closed | 0 | 0 | `0.2.1` | `0.2.1` | 200 | Released on 2026-06-27; downstream gates may consume text `0.2.1` |
+| `bluetape4k-graph` | `0.5.1` | released | closed | 0 | 0 | `0.6.0` on `develop`, `0.5.1` on release-only branch | `0.5.1` | 200 | Released on 2026-06-27 from release-only branch; downstream gates may consume graph `0.5.1` |
+| `bluetape4k-leader` | `0.4.0` | released | closed | 0 | 0 | `0.4.0` | `0.4.0` | 200 | Released on 2026-06-27; downstream gates may consume leader `0.4.0` |
+| `bluetape4k-javers` | `0.2.1` | released | closed | 0 | 0 | `0.3.0` on `develop`, `0.2.1` on release-only branch | `0.2.1` | 200 | Released on 2026-06-27 from release-only branch; downstream gates may consume javers `0.2.1` |
+| `bluetape4k-dependencies` | `1.2.0` | `1.3.0` | open | 0 | 0 | `1.3.0` | self | 404 | Final train artifact; blocked by internal BOM releases |
+
+## Immediate Corrections From This Recheck
+
+- `bluetape4k-text` target is `0.2.1`, not `0.3.0`.
+- `bluetape4k-graph` target is `0.5.1`, not `0.6.0`.
+- `bluetape4k-javers` target is `0.2.1`, not `0.3.0`.
+- `bluetape4k-text 0.2.1` is released. Milestone `0.2.1` is closed with 0
+  open issues, GitHub Release `0.2.1` exists, and Maven Central returns HTTP
+  200 for `io.github.bluetape4k.text:bluetape4k-text-bom:0.2.1`.
+- `bluetape4k-projects 1.11.0` is released. Milestone `1.11.0` is closed with
+  0 open issues, GitHub Release `1.11.0` exists, and Maven Central returns HTTP
+  200 for `io.github.bluetape4k:bluetape4k-bom:1.11.0`.
+- `bluetape4k-exposed 1.11.0` is released. Milestone `1.11.0` is closed with
+  0 open issues, GitHub Release `1.11.0` exists, and Maven Central returns HTTP
+  200 for `io.github.bluetape4k.exposed:bluetape4k-exposed-bom:1.11.0`.
+
+## Current CI Evidence
+
+Latest relevant `develop` workflow evidence:
+
+| Repo | Evidence |
 |---|---|
-| P0 | Merge hygiene and branch/rule blockers that keep the queue honest. |
-| P1 | Foundation or correctness work that unlocks multiple downstream issues. |
-| P2 | Valuable feature work after the foundations are stable. |
-| P3 | Examples, docs, benchmarks, and adoption work. |
-| P4 | Explicitly deferred, low leverage, or decision-only work. |
+| `bluetape4k-projects` | PR #932 merged; PR #933 fixed Kafka 4 test ABI. Nightly/full PASS `28291373721`, Publish Snapshot PASS `28291694898`, Release PASS `28291920425`, Maven Central HTTP 200 for `bluetape4k-bom:1.11.0` |
+| `bluetape4k-exposed` | PR #328 and #329 merged. Nightly/full PASS `28292715331`, Publish Snapshot PASS `28292977136`, Release PASS `28293137346`, Maven Central HTTP 200 for `bluetape4k-exposed-bom:1.11.0` |
+| `bluetape4k-aws` | PR #315 merged. Nightly/full PASS `28296169769`, Publish Snapshot PASS `28296360347`, Release PASS `28296483773`, Maven Central HTTP 200 for `bluetape4k-aws-bom:0.4.0` and `bluetape4k-aws-java:0.4.0` |
+| `bluetape4k-image` | Examples and Publish Snapshot PASS on `develop` on 2026-06-26; Code Quality failure exists on `develop` on 2026-06-27 |
+| `bluetape4k-text` | PR #152 merged. Nightly/full PASS `28293689170`, Publish Snapshot PASS `28293791294`, Release PASS `28293879266`, Maven Central HTTP 200 for `bluetape4k-text-bom:0.2.1` |
+| `bluetape4k-graph` | Release-only branch `release/graph-0.5.1-prep` released. Nightly/full PASS `28294573268`, Publish Snapshot PASS `28294814367`, Release PASS `28294931874`, Maven Central HTTP 200 for `bluetape4k-graph-bom:0.5.1` and `bluetape4k-graph-core:0.5.1` |
+| `bluetape4k-leader` | PR #543 merged. Nightly/full PASS `28297066895`, Publish Snapshot PASS `28297329537`, Release PASS `28297441418`, Maven Central HTTP 200 for `bluetape4k-leader-bom:0.4.0` and `bluetape4k-leader-core:0.4.0` |
+| `bluetape4k-javers` | Release-only branch `release/javers-0.2.1-prep` released. Nightly/full PASS `28295424149`, Publish Snapshot PASS `28295579016`, Release PASS `28295671657`, Maven Central HTTP 200 for `bluetape4k-javers-bom:0.2.1` and `javers-core:0.2.1` |
+| `bluetape4k-dependencies` | CI and Automatic Dependency Submission PASS on `develop` on 2026-06-26; final release CI must be rerun on the release-prep SHA |
 
-Issue selection priority:
+Re-run or replace stale Nightly/Snapshot evidence before stable release dispatch.
 
-1. Architecture or API introduction/change with broad future impact.
-2. Blocking prerequisite work that unlocks other high-impact issues.
-3. Independent features, ordered by difficulty and implementation value.
-4. Bugs, tests, CI, and stability work that improves system reliability.
-5. Examples and adoption/usability work that helps users start or migrate.
-6. Documentation-only work with little or no runtime impact.
+## 2026-06-27 Release-Prep Documentation Pass
 
-## Executive Queue
+The issue work is complete, but release documentation and metadata were not
+finished. The active pre-release work is therefore docs/config hygiene, not
+stable publication.
 
-Do these in order unless a production blocker appears.
+Prepared worktrees:
 
-1. **Fix P0 data-loss bug in R2DBC write-behind first.**
-   `exposed #161` — finally block calls suspend `flushBatch()` without
-   `NonCancellable`. Silent data loss under any coroutine cancellation.
+| Repo | Branch | Scope |
+|---|---|---|
+| `bluetape4k-projects` | `release/projects-1.11.0-prep` | Add `CHANGELOG.md` `1.11.0` section. |
+| `bluetape4k-exposed` | `release/exposed-1.11.0-prep` | Add `CHANGELOG.md` `1.11.0`; update README dependency snippets to `1.11.0`. |
+| `bluetape4k-aws` | `release/aws-0.4.0-prep` | Refresh `CHANGELOG.md` `0.4.0` release date/evidence. |
+| `bluetape4k-image` | `release/image-0.3.0-prep` | Add `CHANGELOG.md` `0.3.0`; replace README placeholders with `0.3.0`. |
+| `bluetape4k-text` | `release/text-0.2.1-prep` | Align README quality-gate wording with `0.2.1`. |
+| `bluetape4k-graph` | `release/graph-0.5.1-prep` | Release-only branch from tag `0.5.0`; set `baseVersion=0.5.1`; update changelog and README snippets. |
+| `bluetape4k-leader` | `release/leader-0.4.0-prep` | Add `CHANGELOG.md` `0.4.0`; update README snippets to `0.4.0`. |
+| `bluetape4k-javers` | `release/javers-0.2.1-prep` | Release-only branch from tag `0.2.0`; set `baseVersion=0.2.1`; update changelog and README snippets. |
+| `bluetape4k-dependencies` | `release/dependencies-1.3.0-prep` | Add `CHANGELOG.md` `1.3.0`; update README target matrix only. Do not pin `gradle/libs.versions.toml` to stable until upstream artifacts are Maven Central-visible. |
 
-2. **Fix CancellationException suppression in leader and graph.**
-   `leader #304` (ExposedJdbc lock/elector) and `graph #156` (FalkorDB
-   graphExists) both swallow `CancellationException` via `runCatching{}`.
-   Fix before expanding either module.
+Validation so far:
 
-3. **Use the updated bluetape4k skill routing for all new work.**
-   Start with `bluetape4k-workflow`, then load `bluetape4k-design` for broad
-   design/new-module work or `bluetape4k-patterns` for Kotlin implementation.
+- `git diff --check` passed in all 9 release-prep worktrees.
+- Targeted scans found no accidental `Unreleased after ...` headings or README
+  `<version>` placeholders in release snippets; remaining `SNAPSHOT` and older
+  version references are historical changelog entries, snapshot usage docs, or
+  intentionally retained development catalog values.
 
-4. **AWS API work is newly active.**
-   `aws #59` introduces field-level KMS encryption and should be treated as a
-   broad API/design item before lower-impact examples.
+PR policy:
 
-5. **Graph Neptune needs research before implementation.**
-   Do `graph #113` before `graph #30`; keep examples such as `graph #111` after
-   the backend/testability decision is clear.
+- `bluetape4k-projects` release-prep PR #932 and release-blocker PR #933 are
+  merged. `bluetape4k-projects 1.11.0` is released and Maven Central-visible.
+- `bluetape4k-exposed` release-prep PR #328 and release-blocker PR #329 are
+  merged. `bluetape4k-exposed 1.11.0` is released and Maven Central-visible.
+- `bluetape4k-text` release-prep PR #152 is merged. `bluetape4k-text 0.2.1`
+  is released and Maven Central-visible.
+- `bluetape4k-dependencies` release-prep branch now contains stable
+  `bluetape4k-bom=1.11.0`, `bluetape4k-exposed-bom=1.11.0`, and
+  `bluetape4k-text-bom=0.2.1`, `bluetape4k-graph-bom=0.5.1`,
+  `bluetape4k-javers-bom=0.2.1`, and `bluetape4k-aws-bom=0.4.0`.
+  Published catalog refs:
+  `catalog/2026-06-27-00` after projects `1.11.0`, and
+  `catalog/2026-06-27-01` after exposed `1.11.0`, and
+  `catalog/2026-06-27-02` after text `0.2.1`, and
+  `catalog/2026-06-27-03` after graph `0.5.1`, and
+  `catalog/2026-06-27-04` after javers `0.2.1`, and
+  `catalog/2026-06-27-05` after AWS `0.4.0`, and
+  `catalog/2026-06-27-06` after leader `0.4.0`.
+- Develop-based downstream docs-prep branches were pushed for review context but
+  must stay draft until the publish train reaches that repository:
+  `bluetape4k-image` #221 and `bluetape4k-dependencies` #131.
+- `graph 0.5.1` and `javers 0.2.1` are release-only branches from prior tags.
+  Do not open them as ordinary `develop` PRs because that would mix patch
+  release state with the next development line.
+- `bluetape4k-aws` release-prep PR #315 is merged. `bluetape4k-aws 0.4.0` is
+  released and Maven Central-visible.
+- `bluetape4k-leader` release-prep PR #543 is merged. `bluetape4k-leader
+  0.4.0` is released and Maven Central-visible.
+- Do not merge, mark ready, or publish any remaining downstream PR before the
+  upstream Maven Central HTTP 200 gate required by `$bluetape4k-publish` has
+  passed.
 
-6. **Exposed CockroachDB remains the strongest foundation lane.**
-   Start with `exposed #30`, then continue `#31` and `#32`.
+## Projects-Ready Internal Release Train Plan
 
-7. **AWS Ktor and examples follow foundation/API decisions.**
-   Continue `aws #10/#11` and examples `#13/#14/#16/#17` after the higher-impact
-   API work is either merged or intentionally deferred.
+Use this plan only after `bluetape4k-projects 1.11.0` is genuinely ready:
+milestone open issues are 0, open PRs are 0, reviews and review threads are
+clear, `CHANGELOG.md` has a `1.11.0` section, CI is green on the target SHA,
+Nightly/full has passed on the target SHA or a dated waiver is recorded, and a
+snapshot publish/consume validation exists for the same dependency state.
 
-## Selected Next Work
+### Stable Release Flow
 
-Use this as the immediate working set.
+Primary flow: sequential internal `repo-release` gates, followed by the final
+`dependencies-minor-train` release for `bluetape4k-dependencies 1.3.0`.
 
-| Order | Work | Lane | Status | Stop condition |
-|---:|---|---|---|---|
-| 1 | [exposed #161](https://github.com/bluetape4k/bluetape4k-exposed/issues/161) | R2DBC write-behind finally NonCancellable | Open | `finally` block wraps `flushBatch()` in `withContext(NonCancellable)`; regression test added. |
-| 2 | [exposed #163](https://github.com/bluetape4k/bluetape4k-exposed/issues/163) | R2DBC write-behind close() race | Open | `close()` waits for `writeBehindJob.join()` before `scope.cancel()`; tested with slow flush. |
-| 3 | [projects #542](https://github.com/bluetape4k/bluetape4k-projects/issues/542) | ResilientNearCacheDecorator.close() leak | Open | `runCatching{}` replaced with logged try/catch; resource leak verified absent. |
-| 4 | [leader #304](https://github.com/bluetape4k/bluetape4k-leader/issues/304) | ExposedJdbc CancellationException fix | Open | All 6 `runCatching{}` sites replaced with explicit rethrow; tests pass. |
-| 5 | [leader #305](https://github.com/bluetape4k/bluetape4k-leader/issues/305) / [#306](https://github.com/bluetape4k/bluetape4k-leader/issues/306) | ExposedJdbc[Group]Lock nanoTime fix | Open | All `currentTimeMillis()` deadline sites replaced with `nanoTime()`; lock timeout verified monotonic. |
-| 6 | [graph #158](https://github.com/bluetape4k/bluetape4k-graph/issues/158) | Neo4j suspendTransaction runBlocking | Open | `runBlocking` removed; async Neo4j driver or `withContext` bridge used. |
-| 7 | [graph #156](https://github.com/bluetape4k/bluetape4k-graph/issues/156) | FalkorDB graphExists cancellation fix | Open | `runCatching{}` replaced; suspend function propagates cancellation correctly. |
-| 8 | [exposed #162](https://github.com/bluetape4k/bluetape4k-exposed/issues/162) | AbstractJdbcCaffeineRepository.findAll() | Open | `runCatching{}` replaced with logged catch; cache warming failure visible in logs. |
-| 9 | [aws #59](https://github.com/bluetape4k/bluetape4k-aws/issues/59) | KMS field encryption | Open | Public annotation/property API is designed, implemented, documented, and tested. |
-| 5 | [graph #113](https://github.com/bluetape4k/bluetape4k-graph/issues/113) | Neptune research | Open | Local testability and implementation strategy are recorded before `graph #30`. |
-| 6 | [exposed #30](https://github.com/bluetape4k/bluetape4k-exposed/issues/30) | CockroachDB foundation | Open | Scaffolding and Testcontainers smoke test land. |
-| 7 | [exposed #31](https://github.com/bluetape4k/bluetape4k-exposed/issues/31) | CockroachDB dialect | Open | PostgreSQL compatibility and DDL differences are codified. |
-| 8 | [exposed #32](https://github.com/bluetape4k/bluetape4k-exposed/issues/32) | CockroachDB retries | Open | Serializable transaction retry guidance and regressions land. |
-| 9 | [aws #10](https://github.com/bluetape4k/bluetape4k-aws/issues/10) / [#11](https://github.com/bluetape4k/bluetape4k-aws/issues/11) | AWS Ktor foundation | Open | SQS and DynamoDB Ktor server patterns compile and test. |
-| 10 | [graph #111](https://github.com/bluetape4k/bluetape4k-graph/issues/111) | Graph examples | Open | `graph-io` backed sample dataset loaders are available for domain examples. |
+Execution model:
 
-## Recommended WIP Limits
+1. Release exactly one internal repository at a time.
+2. After each stable repo release, wait for Maven Central HTTP 200 for the BOM
+   POM and at least one representative module POM.
+3. Update `bluetape4k-dependencies` `develop` to consume the newly published
+   stable BOM before moving to the next downstream validation step.
+4. Treat `bluetape4k-dependencies 1.3.0` as the final BOM/catalog artifact, not
+   as the whole release train. Do not publish it until every selected internal
+   BOM is non-SNAPSHOT and Maven Central-visible.
+5. Do not use release workflow test skips unless the exact release SHA already
+   has fresh Nightly/full and snapshot validation evidence recorded in this
+   file or in the repo-local WIP.
 
-| Lane | Limit | Active candidates |
-|---|---:|---|
-| Correctness / bug fix | 3 active items | `exposed #161`+`#163` (P0/P1) first; then `leader #305/#306` + `graph #158` |
-| Resource safety | 1 active item | `projects #542` (close leak) alongside correctness lane |
-| Research/design | 1 active item | `graph #113` before `graph #30`; `aws #59` needs design-level review |
-| New implementation | 1 repo at a time | Prefer `aws #59` or `exposed #30`; do not start both simultaneously |
-| Follow-up implementation | 2 ready items | `exposed #31/#32` only after `#30`; AWS Ktor `#10/#11` after API work |
-| Examples/adoption | 1 ready item | `graph #111` or AWS examples after their foundations are stable |
+### Per-Repository Gate
 
-## Dependency Map
+Before dispatching a stable release workflow for any internal repo:
 
-### AWS
+- Re-read the target repo's `.github/workflows/release.yml` and pass only
+  declared `workflow_dispatch` inputs.
+- Verify `snapshotVersion=` is empty.
+- Verify `baseVersion` equals the target stable version. For repos already
+  bumped ahead of the target, create a release-prep branch that restores the
+  exact target source state before dispatch.
+- Verify target milestone open issues are 0 and open PRs are 0.
+- Re-read PR reviews and review threads for the final release-prep PR.
+- Verify `CHANGELOG.md` has the target dated section.
+- Verify no generated POM, catalog ref, or release artifact metadata contains
+  unintended `-SNAPSHOT`.
+- Run or verify CI, Nightly/full, and snapshot publish/consume validation on
+  the exact target SHA.
 
-```text
-#8 SigV4 (closed by PR #27)
-  -> #9 Ktor S3 (closed by PR #28)
-      -> #15 Ktor S3 example (closed by PR #54)
-      -> #34 aws-ktor KDoc consistency (closed by PR #54)
+Stop immediately if any gate fails, if a target version differs from the root
+matrix, if Maven Central returns non-200 for a required upstream BOM, or if a
+new review/comment appears after the last check.
 
-#1 Spring Boot S3 (closed by PR #29)
-  -> #12 Spring Boot S3 example (closed by PR #54)
-  -> #33 S3CoroutinesTemplate KDoc (closed by PR #54)
+### Internal Release Order After Projects
 
-#2 Spring Boot SQS (closed by PR #30)
-#4 Spring Boot SNS (closed by PR #55)
-  -> #13 Spring Boot SQS/SNS example
+1. `bluetape4k-projects 1.11.0`: release first; it is the upstream foundation
+   for several downstream repos.
+2. `bluetape4k-exposed 1.11.0`: release after projects `1.11.0` is Maven
+   Central-visible.
+3. `bluetape4k-text 0.2.1`: released and Maven Central-visible; development
+   remains on the `0.3.0` line after the patch release.
+4. `bluetape4k-graph 0.5.1`: restore target source alignment from the current
+   `0.6.0` development line, release `0.5.1`, then keep development on the
+   existing `0.6.0` line.
+5. `bluetape4k-javers 0.2.1`: restore target source alignment from the current
+   `0.3.0` development line, release `0.2.1`, then keep development on the
+   existing `0.3.0` line.
+6. `bluetape4k-aws 0.4.0`: released and Maven Central-visible.
+7. `bluetape4k-leader 0.4.0`: released and Maven Central-visible.
+8. `bluetape4k-image 0.3.0`: release after AWS stable artifacts are visible.
+9. `bluetape4k-dependencies 1.3.0`: publish only after all selected internal
+   BOM refs are pinned to stable, Maven Central-visible versions.
 
-#5 KMS support
-  -> #59 @KmsEncrypted field-level encryption
+### Final Dependencies Gate
 
-#3 Spring Boot DynamoDB (closed by PR #31)
-  -> #14 Spring Boot DynamoDB example
-  -> #11 Ktor DynamoDB conventions
-      -> #17 Ktor DynamoDB example
+Before `bluetape4k-dependencies 1.3.0` dispatch:
 
-#10 Ktor SQS
-  -> #16 Ktor SQS example
-```
+- `gradle/libs.versions.toml` internal BOM refs must be exactly:
+  `bluetape4k-bom=1.11.0`, `bluetape4k-exposed-bom=1.11.0`,
+  `bluetape4k-aws-bom=0.4.0`, `bluetape4k-image-bom=0.3.0`,
+  `bluetape4k-text-bom=0.2.1`, `bluetape4k-graph-bom=0.5.1`,
+  `bluetape4k-leader-bom=0.4.0`, and `bluetape4k-javers-bom=0.2.1`.
+- `CHANGELOG.md` must have a `1.3.0` section.
+- `scripts/sync-shared-versions.py --workspace .. --check --summary` must pass.
+- Managed catalog/artifact verification must pass without `--allow-snapshots`.
+- Final CI, dependency-submission, and snapshot validation must pass on the
+  exact release catalog state.
 
-### Graph
+### Plan Validation Evidence
 
-```text
-#13 transaction DSL (closed)
-#32 schema/index API (closed)
-#34 merge/upsert (closed)
-#33 batch insert (closed)
-  -> #30 Neptune backend
-  -> #10 extra examples
+This plan was refreshed on 2026-06-26 KST with:
 
-#96 graph-ktor (closed by PR #100)
-  -> Ktor examples after PR #100 merge
+- GNO GitHub history query for prior dependencies release-train PRs, including
+  dependencies PR #67, #94, #100, and projects PR #689.
+- GNO docs query for dependencies version-management guidance and the
+  `1.3.0` snapshot-train lesson.
+- Live GitHub release checks for every publishable repo; latest stable releases
+  match the current target matrix.
+- Live GitHub milestone checks for every target version; projects `1.11.0`,
+  text `0.2.1`, graph `0.5.1`, and javers `0.2.1` currently have 0 open
+  issues.
+- Maven Central HTTP checks for `1.3.0` candidate BOMs; released BOMs return
+  200 and unreleased BOMs still return 404, which is expected before their
+  stable dispatch.
+- Local `repo-status` checks for all publishable repos; every checked repo is
+  clean on `develop` and aligned with `origin/develop`.
 
-#99 graph-spring-boot module naming (closed)
-  -> should remain separate from graph-ktor
+## Active Release Work
 
-#40 weighted path suspend tests (closed by PR #98)
-  -> #41 weighted path benchmark
+### 1. bluetape4k-projects `1.11.0`
 
-#113 Neptune local testability research
-  -> #30 Neptune backend
+Status:
 
-#156 FalkorDB graphExists() CancellationException fix
-#157 FalkorDB/Memgraph SchemaManager broad runCatching fix
-  -> correctness baseline for graph-falkordb and graph-memgraph
+- Released on 2026-06-27.
+- PR #932 merged the release-prep `CHANGELOG.md` `1.11.0` section.
+- First Nightly/full run `28290549379` failed in `Test / Infra
+  (kafka-resilience)` because Kafka `4.3.1` removed the
+  `KafkaClusterTestKit.clientProperties()` ABI required by
+  `spring-kafka-test 4.1.0`.
+- PR #933 aligned `kafka4` to `4.2.1`; PR CI passed and the PR was merged as
+  `6187173b58e8b4c5c435c145e00e94708f31ef75`.
+- Nightly/full rerun `28291373721` passed on `6187173b`.
+- Publish Snapshot run `28291694898` passed on `6187173b`.
+- Release tag `1.11.0` was pushed at `6187173b`; release workflow
+  `28291920425` passed and created GitHub Release `1.11.0`.
+- Maven Central returned HTTP 200 for
+  `https://repo1.maven.org/maven2/io/github/bluetape4k/bluetape4k-bom/1.11.0/bluetape4k-bom-1.11.0.pom`.
+- Milestone `1.11.0` is closed with 0 open issues.
 
-#158 Neo4jGraphSuspendOperations.suspendTransaction() runBlocking inside withContext(IO) (P1)
-  -> IO thread starvation under concurrent transaction load
-  -> long-term: migrate to async Neo4j driver
-```
+### 2. bluetape4k-text `0.2.1`
 
-### Exposed
+Status:
 
-```text
-#7 QueryLookupStrategy (closed)
-#8 serializer parity (closed by PR #21)
-#6 AuditableR2dbcRepository (closed by PR #22)
-  -> #26 R2DBC @Query parity
-  -> #4 bucket4j
-  -> #5 Spring Modulith integration
+- Released on 2026-06-27.
+- PR #152 merged the release-prep README and catalog-alignment changes.
+- Nightly/full run `28293689170` passed on `2db7671`.
+- Publish Snapshot run `28293791294` passed on `2db7671`.
+- Release tag `0.2.1` was pushed at `2db7671`; release workflow
+  `28293879266` passed and created GitHub Release `0.2.1`.
+- Maven Central returned HTTP 200 for
+  `https://repo1.maven.org/maven2/io/github/bluetape4k/text/bluetape4k-text-bom/0.2.1/bluetape4k-text-bom-0.2.1.pom`.
+- Milestone `0.2.1` is closed with 0 open issues.
+- Dependencies catalog ref `catalog/2026-06-27-02` pins
+  `bluetape4k-text-bom=0.2.1`.
 
-#119 runCatching{} in close() swallows CancellationException
-#161 R2DBC write-behind finally block — data loss on cancellation (P0)
-  -> fix #161 first (NonCancellable in finally)
-  -> then fix #163 (close() waits for job before scope.cancel())
-  -> related: #120 non-atomic cache miss handling
+### 3. bluetape4k-graph `0.5.1`
 
-#162 AbstractJdbcCaffeineRepository.findAll() runCatching{} swallows cache errors (P1)
-  -> independent of #161; fix in same PR or separately
+Status:
 
-#163 AbstractR2dbcCaffeineRepository.close() race — scope cancelled before flush (P1)
-  -> depends on #161 being fixed first
+- Released on 2026-06-27 from release-only branch
+  `release/graph-0.5.1-prep`.
+- Release branch pins `baseVersion=0.5.1`, `snapshotVersion=`,
+  `bluetape4k=1.11.0`, and `catalog/2026-06-27-02`.
+- Nightly/full run `28294573268` passed on `3e0fa7c`.
+- Publish Snapshot run `28294814367` passed on `3e0fa7c`.
+- Release tag `0.5.1` was pushed at `3e0fa7c`; release workflow
+  `28294931874` passed and created GitHub Release `0.5.1`.
+- Maven Central returned HTTP 200 for
+  `https://repo1.maven.org/maven2/io/github/bluetape4k/graph/bluetape4k-graph-bom/0.5.1/bluetape4k-graph-bom-0.5.1.pom`
+  and for representative module `bluetape4k-graph-core:0.5.1`.
+- Milestone `0.5.1` is closed with 0 open issues.
+- Dependencies catalog ref `catalog/2026-06-27-03` pins
+  `bluetape4k-graph-bom=0.5.1`.
+- `develop` remains on the `0.6.0` development line.
 
-#24 CockroachDB epic
-  -> #30 scaffolding and smoke test
-  -> #31 PostgreSQL compatibility and DDL differences
-  -> #32 serializable transaction retry guidance
+### 4. bluetape4k-javers `0.2.1`
 
-#25 Trino Phase 2 epic
-  -> #27 DataSource connection
-  -> #28 streaming/paged query API
-  -> #29 batch insert/write path
-```
+Status:
 
-### Leader
+- Released on 2026-06-27 from release-only branch
+  `release/javers-0.2.1-prep`.
+- Release branch pins `baseVersion=0.2.1`, `snapshotVersion=`,
+  `bluetape4k=1.11.0`, and `catalog/2026-06-27-03`.
+- Nightly/full run `28295424149` passed on `bffe194`.
+- Publish Snapshot run `28295579016` passed on `bffe194`.
+- Release tag `0.2.1` was pushed at `bffe194`; release workflow
+  `28295671657` passed and created GitHub Release `0.2.1`.
+- Maven Central returned HTTP 200 for
+  `https://repo1.maven.org/maven2/io/github/bluetape4k/javers/bluetape4k-javers-bom/0.2.1/bluetape4k-javers-bom-0.2.1.pom`
+  and for representative module `javers-core:0.2.1`.
+- Milestone `0.2.1` is closed with 0 open issues.
+- Dependencies catalog ref `catalog/2026-06-27-04` pins
+  `bluetape4k-javers-bom=0.2.1` and omits the later
+  `javers-spring-boot4-autoconfigure` alias because that artifact is not
+  published in `0.2.1`.
+- `develop` remains on the `0.3.0` development line.
 
-```text
-#304 runCatching{} CancellationException suppression in ExposedJdbc lock/elector (P1)
-  -> fix before expanding leader-exposed-jdbc
-  -> related: #271 runBlocking bridges removal
+### 5. bluetape4k-aws `0.4.0`
 
-#305 ExposedJdbcLock.tryLock() currentTimeMillis() → nanoTime() (P1)
-#306 ExposedJdbcGroupLock.tryLock() same deadline bug (P1)
-  -> fix #305 and #306 together in one PR
-  -> monotonic clock required for reliable lock timeout in cloud environments
+Status:
 
-#269 remove @Deprecated APIs after 0.1.0 GA
-#270 promote StringTruncateSupport
-#271 replace runBlocking bridges with suspend interface
-  -> unblocked after #304
+- Released on 2026-06-27.
+- PR #315 merged the release-prep documentation and catalog-alignment changes.
+- Release branch pins `baseVersion=0.4.0`, `snapshotVersion=`,
+  `bluetape4k=1.11.0`, `bluetape4k-exposed=1.11.0`, and
+  `catalog/2026-06-27-04`.
+- Nightly/full run `28296169769` passed on `be4e6dae`.
+- Publish Snapshot run `28296360347` passed on `be4e6dae`.
+- Release tag `0.4.0` was pushed at `be4e6dae`; release workflow
+  `28296483773` passed and created GitHub Release `0.4.0`.
+- Maven Central returned HTTP 200 for
+  `https://repo1.maven.org/maven2/io/github/bluetape4k/aws/bluetape4k-aws-bom/0.4.0/bluetape4k-aws-bom-0.4.0.pom`
+  and for representative module `bluetape4k-aws-java:0.4.0`.
+- Milestone `0.4.0` is closed with 0 open issues.
+- Dependencies catalog ref `catalog/2026-06-27-05` pins
+  `bluetape4k-aws-bom=0.4.0`.
 
-#228 leader-dynamodb DynamoDB backend
-#229 k8s operator leader pattern example
-#231 K3sServer + Lease-based integration example
-```
+### 6. bluetape4k-leader `0.4.0`
 
-### Projects
+Status:
 
-```text
-#475 remove !! operator (86 sites in production code)
-  -> ongoing; do not start new modules using !!
+- Released on 2026-06-27.
+- PR #543 merged the release-prep documentation and catalog-alignment changes.
+- Release branch pins `baseVersion=0.4.0`, `snapshotVersion=`,
+  `bluetape4k=1.11.0`, `bluetape4k-exposed=1.11.0`, and
+  `catalog/2026-06-27-05`.
+- Nightly/full run `28297066895` passed on `17ab7f87`.
+- Publish Snapshot run `28297329537` passed on `17ab7f87`.
+- Release tag `0.4.0` was pushed at `17ab7f87`; release workflow
+  `28297441418` passed and created GitHub Release `0.4.0`.
+- Maven Central returned HTTP 200 for
+  `https://repo1.maven.org/maven2/io/github/bluetape4k/leader/bluetape4k-leader-bom/0.4.0/bluetape4k-leader-bom-0.4.0.pom`
+  and for representative module `bluetape4k-leader-core:0.4.0`.
+- Milestone `0.4.0` is closed with 0 open issues.
+- Dependencies catalog ref `catalog/2026-06-27-06` pins
+  `bluetape4k-leader-bom=0.4.0`.
 
-#491 PropsMapper nullable numeric bug
-#539 remove deprecated BinaryKafkaCodecs — JDK RCE (P1)
-  -> audit usages -> escalate to ERROR -> remove
-  -> related: #492 serialization trust profiles
+## Release-Prep Repositories
 
-#540 GrpcServer / AbstractGrpcServer lifecycle tests (P1)
-  -> core infrastructure; zero test coverage currently
+These repositories have the correct next milestone by the latest-release rule
+and no open target milestone issues, but still need normal release-prep gates.
 
-#541 FutureToCompletableFutureWrapper virtual thread per object (P2)
-  -> replace with shared Executors.newVirtualThreadPerTaskExecutor()
+### bluetape4k-exposed `1.11.0`
 
-#542 ResilientNearCacheDecorator.close() swallows exception silently (P1)
-  -> replace runCatching{} with logged try/catch
-  -> check ResilientSuspendNearCacheDecorator for same pattern
-```
+- Released on 2026-06-27.
+- Milestone `1.11.0`: closed, 0 open issues.
+- Current `baseVersion=1.11.0`.
+- Catalog points `bluetape4k-exposed-bom` to `1.11.0` on
+  `catalog/2026-06-27-01`.
+- Release-prep branch has `CHANGELOG.md` `1.11.0` and README snippets aligned
+  to `1.11.0`.
+- Release workflow `28293137346` passed and Maven Central returned HTTP 200 for
+  `bluetape4k-exposed-bom:1.11.0`.
 
-### AWS
+### bluetape4k-aws `0.4.0`
 
-```text
-#8 SigV4 (closed by PR #27)
-  -> #9 Ktor S3 (closed by PR #28)
-      -> #15 Ktor S3 example (closed by PR #54)
-      -> #34 aws-ktor KDoc consistency (closed by PR #54)
+- Released on 2026-06-27.
+- Milestone `0.4.0`: closed, 0 open issues.
+- Current `baseVersion=0.4.0`.
+- Catalog points `bluetape4k-aws-bom` to `0.4.0` on
+  `catalog/2026-06-27-05`.
+- `CHANGELOG.md` has a `0.4.0` section.
+- Release workflow `28296483773` passed and Maven Central returned HTTP 200 for
+  `bluetape4k-aws-bom:0.4.0` and `bluetape4k-aws-java:0.4.0`.
 
-#1 Spring Boot S3 (closed by PR #29)
-  -> #12 Spring Boot S3 example (closed by PR #54)
-  -> #33 S3CoroutinesTemplate KDoc (closed by PR #54)
+### bluetape4k-image `0.3.0`
 
-#2 Spring Boot SQS (closed by PR #30)
-#4 Spring Boot SNS (closed by PR #55)
-  -> #13 Spring Boot SQS/SNS example
+- Milestone `0.3.0`: open, 0 open issues.
+- Current `baseVersion=0.3.0`.
+- Catalog points `bluetape4k-image-bom` to `0.3.0-SNAPSHOT`.
+- Release-prep branch has `CHANGELOG.md` `0.3.0` and README snippets aligned
+  to `0.3.0`.
+- Release after required AWS artifact is Maven Central visible.
 
-#5 KMS support
-  -> #59 @KmsEncrypted field-level encryption
-      -> #145 S3 listObjectsV2 auto-pagination Flow extension (P2)
-           -> implement listAllObjects() using SDK v2 paginator
-           -> after #59 KMS work; both are aws-coroutine API additions
+### bluetape4k-leader `0.4.0`
 
-#3 Spring Boot DynamoDB (closed by PR #31)
-  -> #14 Spring Boot DynamoDB example
-  -> #11 Ktor DynamoDB conventions
-      -> #17 Ktor DynamoDB example
+- Released on 2026-06-27.
+- Milestone `0.4.0`: closed, 0 open issues.
+- Current `baseVersion=0.4.0`.
+- Catalog points `bluetape4k-leader-bom` to `0.4.0` on
+  `catalog/2026-06-27-06`.
+- Release-prep branch has `CHANGELOG.md` `0.4.0` and README snippets aligned
+  to `0.4.0`.
+- Release workflow `28297441418` passed and Maven Central returned HTTP 200 for
+  `bluetape4k-leader-bom:0.4.0` and `bluetape4k-leader-core:0.4.0`.
 
-#10 Ktor SQS
-  -> #16 Ktor SQS example
+## bluetape4k-dependencies `1.3.0`
+
+`bluetape4k-dependencies` is the final train artifact.
+
+Blockers:
+
+- Final release CI must be rerun on the exact release-prep SHA.
+- Release-prep branch has `CHANGELOG.md` `1.3.0` and README target matrix
+  aligned to the intended internal BOM versions.
+- Unreleased internal BOM refs still point at snapshots.
+- `bluetape4k-image-bom` still points at a snapshot until its own release gate
+  passes.
+- `scripts/sync-shared-versions.py --workspace .. --check --summary` now passes
+  on the release-prep branch after projects, exposed, text, graph, javers, and
+  AWS, and leader catalog promotions.
+
+Before release:
+
+1. Publish or intentionally align every internal BOM to the next milestone after
+   its latest release.
+2. Replace all internal `*-SNAPSHOT` BOM refs with Maven Central-visible stable
+   versions.
+3. Resolve shared-version drift.
+4. Keep the `CHANGELOG.md` `1.3.0` section and README target matrix current.
+5. Verify generated artifacts have no `-SNAPSHOT` and no missing dependency
+   versions.
+6. Run final CI, Nightly/full equivalent, and snapshot validation for the exact
+   final catalog state.
+
+## Next Patch Train: bluetape4k-dependencies `1.3.1`
+
+Plan `1.3.1` as a selective patch train after `1.3.0` is released and Maven
+Central visible.
+
+Scope:
+
+- Promote only `bluetape4k-javers` from `0.2.1` to `0.3.0`.
+- Promote only `bluetape4k-text` from `0.2.1` to `0.3.0`.
+- Promote only `bluetape4k-graph` from `0.5.1` to `0.6.0`.
+- Retain all other bluetape4k BOM versions exactly as published in
+  `dependencies 1.3.0`, unless the user explicitly changes the scope.
+
+Preconditions:
+
+- `bluetape4k-dependencies 1.3.0` is released and Maven Central returns HTTP
+  200.
+- `bluetape4k-javers 0.3.0`, `bluetape4k-text 0.3.0`, and
+  `bluetape4k-graph 0.6.0` have closed target milestones, clean release
+  preflight, and Maven Central-visible stable BOM artifacts.
+- No unrelated internal BOM or external dependency version is changed in the
+  `1.3.1` release prep PR.
+
+Validation focus:
+
+- Diff `gradle/libs.versions.toml` and generated managed catalog artifacts to
+  confirm only the three planned BOM lines changed.
+- Run `scripts/sync-shared-versions.py --workspace .. --check --summary` after
+  the three downstream repos are aligned.
+- Run `scripts/verify-managed-artifacts.py --summary` without
+  `--allow-snapshots`.
+- Verify final `1.3.1` CI and snapshot validation on the exact release catalog
+  state before stable release dispatch.
+
+## Recommended Execution Order
+
+1. Done: `bluetape4k-projects 1.11.0` release-prep gates, Nightly/full, and
+   snapshot validation passed on the final SHA.
+2. Done: `bluetape4k-projects 1.11.0` is released and Maven Central returns
+   HTTP 200 for the BOM POM.
+3. Done: `bluetape4k-exposed 1.11.0` is released and Maven Central returns
+   HTTP 200 for the BOM POM.
+4. Done: `bluetape4k-text 0.2.1` is released and Maven Central returns HTTP
+   200 for the BOM POM.
+5. Done: `bluetape4k-graph 0.5.1` is released and Maven Central returns HTTP
+   200 for the BOM and representative module POM.
+6. Done: `bluetape4k-javers 0.2.1` is released and Maven Central returns HTTP
+   200 for the BOM and representative module POM.
+7. Done: `bluetape4k-aws 0.4.0` is released and Maven Central returns HTTP
+   200 for the BOM and representative module POM.
+8. Done: `bluetape4k-leader 0.4.0` is released and Maven Central returns HTTP
+   200 for the BOM and representative module POM.
+9. Next: prepare and release `bluetape4k-image 0.3.0`.
+10. Sync `bluetape4k-dependencies` shared versions and managed catalog to the
+    Maven Central-visible stable BOM versions.
+11. Release `bluetape4k-dependencies 1.3.0`.
+12. Start `bluetape4k-dependencies 1.3.1` only for
+    `javers 0.3.0`, `text 0.3.0`, and `graph 0.6.0`.
+
+## Verification Handles
+
+Use these checks before changing this root queue again:
+
+```bash
+cd ~/work/bluetape4k
+for repo in bluetape4k-projects bluetape4k-exposed bluetape4k-aws bluetape4k-image bluetape4k-text bluetape4k-graph bluetape4k-leader bluetape4k-javers bluetape4k-dependencies; do
+  gh release list --repo "bluetape4k/$repo" --limit 1
+  gh api "repos/bluetape4k/$repo/milestones?state=all&per_page=100" --jq '.[] | [.title,.state,.open_issues,.closed_issues,.number] | @tsv'
+done
+
+cd ~/work/bluetape4k/bluetape4k-dependencies
+grep -E '^(baseVersion|snapshotVersion)=' gradle.properties
+grep -E '^(bluetape4k-(bom|exposed-bom|aws-bom|image-bom|text-bom|graph-bom|leader-bom|javers-bom))[[:space:]]*=' gradle/libs.versions.toml
 ```
