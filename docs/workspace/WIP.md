@@ -95,9 +95,16 @@ memory.
 - The Gradle version catalog is an ecosystem build-contract source consumed
   from a checked-out git ref or catalog tag. It is not a Maven Central
   publication; verify the ref/source state in the next patch release.
-- Workshop/example/app consumers are still on `bluetape4k-dependencies 1.2.0`.
-  Do not promote them to the partial `1.3.0` artifact. Promote them to `1.3.1`
-  after the patch BOM is published and Maven Central-visible.
+- Workshop/example/app consumers were promoted from
+  `bluetape4k-dependencies 1.2.0` to `1.3.1` after the patch BOM became Maven
+  Central-visible. Do not substitute a later patch version for example repos
+  unless the user explicitly changes the consumer-sync target.
+- Consumer sync PRs merged on 2026-06-28 KST:
+  `bluetape4k-workshop` #315, `exposed-workshop` #136,
+  `exposed-r2dbc-workshop` #111, `clinic-appointment` #155, and
+  `timefold-workshop` #42. Each repo was locally verified with
+  `./gradlew test --no-daemon --no-configuration-cache --no-build-cache`
+  before PR creation, and GitHub checks passed before merge.
 
 ## Current Target Matrix
 
