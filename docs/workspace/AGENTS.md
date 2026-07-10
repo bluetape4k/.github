@@ -478,20 +478,28 @@ the installed bluetape4k skills as the project source of truth. Do not duplicate
 their detailed checklists here; load the relevant skill and its references
 before implementation.
 
-- `bluetape4k-workflow`: first-stop router for bluetape4k work. It classifies
-  Full Design, Fast Track, Bug Fix, Code Review, Maintenance, and Self Improve
-  work, then selects the lightest safe lane and verification level.
-  For every workflow step, define the step `Action` and expected `DoD` evidence
-  before executing it, then report the step `DoD` with concrete evidence before
-  moving to the next step. If a gate is skipped, reordered, or weakly evidenced,
-  stop downstream work, repair the violated step, report the repair DoD, and
-  continue only after that gate is `PASS`.
-- `bluetape4k-design`: use for new modules, new services/subsystems, broad API
-  design, large refactors, new dependencies, or multi-layer changes. It owns the
-  spec/plan/advisor-review/DoD workflow and new-module checks.
-- `bluetape4k-patterns`: use for Kotlin implementation or review in this
-  ecosystem. Its current references cover testing, Spring Boot auto-config,
-  new-module setup, and final checklist/IDE diagnostics.
+- `bluetape4k-workflow`: first-stop router. Classify work as Type A Full
+  Feature, B Fast Track, C Bug Fix, D Code Review, E Maintenance, P Publish, or
+  F Self Improve, then load the canonical leaf skill.
+- Canonical leaf skills are `bluetape4k-full-feature`,
+  `bluetape4k-fast-track`, `bluetape4k-bugfix`, `code-review`,
+  `bluetape4k-maintenance`, `bluetape4k-publish` or
+  `bluetape4k-publish-go`, and `bluetape4k-self-improve`.
+- Every executable workflow row is a checkbox with `Action`, `Evidence`, and
+  `Failure`. An unchecked row blocks dependents; missing, stale, or `UNKNOWN`
+  evidence is FAIL; `SKIPPED` is forbidden; `N/A` requires concrete scope
+  evidence. Report `Required checks: X/Y; N/A: N; Blocked: N`.
+- `bluetape4k-full-feature`: use for new modules, services/subsystems, broad
+  APIs, large refactors, new dependencies, or multi-layer changes. It owns the
+  spec/plan/review/DoD workflow and new-module checks.
+- `bluetape4k-code-patterns`: use for Kotlin implementation or review. Its
+  references cover testing, Spring Boot auto-configuration, new-module setup,
+  and final checklist/IDE diagnostics.
+- Historical specs, plans, and lessons may name `bluetape4k-design`,
+  `bluetape4k-patterns`, `bluetape4k-bugfix-workflow`, or `bugfix-workflow`.
+  Interpret them as `bluetape4k-full-feature`, `bluetape4k-code-patterns`, and
+  `bluetape4k-bugfix`; do not skip the workflow or recreate an alias merely
+  because a historical artifact uses an old name.
 - `bluetape4k-self-improve`: use only for explicit benchmark-guided
   self-improvement requests with a measurable baseline, candidate loop, and stop
   condition.
