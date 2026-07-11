@@ -296,14 +296,14 @@ and the other locale as a relative link, for example `English |
 [한국어](README.ko.md)` in `README.md` and `[English](README.md) | 한국어` in
 `README.ko.md`.
 
-Use `$bluetape4k-blog` for Korean README prose review and localization so
+Use `$bluetape-writer` for Korean README prose review and localization so
 `README.ko.md` reads like natural Korean technical documentation instead of a
 literal translation. Keep `README.md` English and keep the Korean README
 source-equivalent, not abbreviated.
 
 README and benchmark result documents should include diagrams and charts as
 much as practical when they reduce cognitive load or summarize measured data.
-Use `$bluetape4k-diagram` for README diagrams, benchmark charts, Mermaid/ASCII
+Use `$bluetape-diagram` for README diagrams, benchmark charts, Mermaid/ASCII
 conversion, visual asset placement, PNG/SVG generation, and rendered visual
 validation. Treat Mermaid or ASCII as source sketches, not final README
 artifacts; README files should embed generated PNG assets with matching SVG
@@ -338,7 +338,7 @@ Store durable project design/history artifacts in repo-local docs paths:
 
 ## Planning Approval
 
-For `bluetape4k-workflow` or any other workflow that has an explicit planning
+For `bluetape-workflow` or any other workflow that has an explicit planning
 phase, stop at the first concrete plan and ask the user to approve it before
 editing source files, creating durable planning artifacts, committing, opening
 PRs, dispatching workflows, merging, publishing, or deleting branches/worktrees.
@@ -478,34 +478,34 @@ the installed bluetape4k skills as the project source of truth. Do not duplicate
 their detailed checklists here; load the relevant skill and its references
 before implementation.
 
-- `bluetape4k-workflow`: first-stop router. Classify work as Type A Full
+- `bluetape-workflow`: first-stop router. Classify work as Type A Full
   Feature, B Fast Track, C Bug Fix, D Code Review, E Maintenance, P Publish, or
   F Self Improve, then load the canonical leaf skill.
-- Canonical leaf skills are `bluetape4k-full-feature`,
-  `bluetape4k-fast-track`, `bluetape4k-bugfix`, `code-review`,
-  `bluetape4k-maintenance`, `bluetape4k-publish` or
-  `bluetape4k-publish-go`, and `bluetape4k-self-improve`.
+- Canonical leaf skills are `bluetape-full-feature`,
+  `bluetape-fast-track`, `bluetape-bugfix`, `code-review`,
+  `bluetape-maintenance`, `bluetape-publish-kotlin` or
+  `bluetape-publish-go`, and `bluetape-self-improve`.
 - Every executable workflow row is a checkbox with `Action`, `Evidence`, and
   `Failure`. An unchecked row blocks dependents; missing, stale, or `UNKNOWN`
   evidence is FAIL; `SKIPPED` is forbidden; `N/A` requires concrete scope
   evidence. Report `Required checks: X/Y; N/A: N; Blocked: N`.
-- `bluetape4k-full-feature`: use for new modules, services/subsystems, broad
+- `bluetape-full-feature`: use for new modules, services/subsystems, broad
   APIs, large refactors, new dependencies, or multi-layer changes. It owns the
   spec/plan/review/DoD workflow and new-module checks.
-- `bluetape4k-code-patterns`: use for Kotlin implementation or review. Its
+- `bluetape-kotlin-patterns`: use for Kotlin implementation or review. Its
   references cover testing, Spring Boot auto-configuration, new-module setup,
   and final checklist/IDE diagnostics.
 - Historical specs, plans, and lessons may name `bluetape4k-design`,
-  `bluetape4k-patterns`, `bluetape4k-bugfix-workflow`, or `bugfix-workflow`.
-  Interpret them as `bluetape4k-full-feature`, `bluetape4k-code-patterns`, and
-  `bluetape4k-bugfix`; do not skip the workflow or recreate an alias merely
+  `bluetape4k-patterns`, `bluetape-bugfix-workflow`, or `bugfix-workflow`.
+  Interpret them as `bluetape-full-feature`, `bluetape-kotlin-patterns`, and
+  `bluetape-bugfix`; do not skip the workflow or recreate an alias merely
   because a historical artifact uses an old name.
-- `bluetape4k-self-improve`: use only for explicit benchmark-guided
+- `bluetape-self-improve`: use only for explicit benchmark-guided
   self-improvement requests with a measurable baseline, candidate loop, and stop
   condition.
-- `bluetape4k-blog`: use for Korean README prose, blog posts, article
+- `bluetape-writer`: use for Korean README prose, blog posts, article
   localization, Korean naturalness review, and bilingual content parity.
-- `bluetape4k-diagram`: use for README diagrams, benchmark result charts,
+- `bluetape-diagram`: use for README diagrams, benchmark result charts,
   Mermaid/ASCII conversion, visual QA, generated PNG/SVG assets, and any public
   diagram or chart embedded in README, docs, blog, or website pages.
 - Add domain skills when the touched area requires them: `ecc-kotlin-patterns`,
