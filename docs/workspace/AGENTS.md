@@ -58,7 +58,7 @@ their subdirectory.
 
 ## Repositories
 
-### bluetape4k libraries
+### Kotlin/JVM libraries
 
 | Directory | Purpose |
 |---|---|
@@ -73,11 +73,21 @@ their subdirectory.
 | `bluetape4k-graph/` | Graph DB integrations: Neo4j, Memgraph, AGE, TinkerPop, FalkorDB |
 | `bluetape4k-dependencies/` | BOM for coordinated bluetape4k ecosystem versions |
 
+### Go, Rust, and Python libraries
+
+| Directory | Purpose |
+|---|---|
+| `bluetape-go/` | Go backend utilities and distributed infrastructure packages |
+| `bluetape-rs/` | Rust backend primitives for the bluetape ecosystem |
+| `bluetape-py/` | Python backend, testing, logging, and operations libraries |
+
 ### Organization infrastructure
 
 | Directory | Purpose |
 |---|---|
 | `.github/` | Organization profile, issue/PR templates, and GitHub community files |
+| `bluetape-skills/` | Canonical installable Codex skills and shared workflow references |
+| `bluetape4k-wiki/` | Private shared source for bluetape4k engineering knowledge |
 | `bluetape4k.github.io/` | GitHub Pages site and ecosystem documentation entrypoint |
 
 ### Workshops and examples
@@ -85,13 +95,14 @@ their subdirectory.
 | Directory | Purpose |
 |---|---|
 | `bluetape4k-workshop/` | Backend examples using bluetape4k libraries |
+| `bluetape-go-workshop/` | Runnable web application examples using bluetape-go |
+| `bluetape-rs-workshop/` | Runnable backend examples using bluetape-rs |
 | `exposed-workshop/` | JetBrains Exposed ORM examples |
 | `exposed-r2dbc-workshop/` | Exposed R2DBC examples |
 | `clinic-appointment/` | Clinic appointment example app |
 | `timefold-workshop/` | Timefold Solver workshop |
-| `kotlin-dev-agent/` | Kotlin development agent experiment |
 
-## Dependency Catalog Governance
+## Kotlin Dependency Catalog Governance
 
 - All `bluetape4k-*` library repositories must treat
   `bluetape4k-dependencies` as the source of truth for centrally governed
@@ -147,7 +158,9 @@ their subdirectory.
   fall back to `rg` and mention the indexing/tooling gap when it affects the
   answer.
 
-## Shared Stack
+## Language Stacks
+
+### Kotlin/JVM
 
 - Kotlin 2.3+.
 - Java 21 for core repos; Java 25 for experimental and several newer repos.
@@ -157,6 +170,32 @@ their subdirectory.
 - Tests: JUnit 5, MockK, bluetape4k-assertions, Testcontainers singleton launchers.
 - Common compiler flags: `-Xjsr305=strict`, `-jvm-default=enable`,
   `-Xinline-classes`, `-Xcontext-parameters`.
+
+### Go
+
+- Use standard Go modules and the repository Makefile or task runner as the
+  command authority.
+- Run targeted package tests first, then repository tests, race detection, and
+  lint when the change touches concurrency or shared infrastructure.
+- Follow `bluetape-go-patterns` for implementation, review, testing, packaging,
+  and release conventions.
+
+### Rust
+
+- Use Cargo workspace commands and repository-local feature definitions as the
+  build authority.
+- Run targeted tests first, then workspace tests, Clippy, and formatting checks.
+- Follow `bluetape-rs-patterns` for implementation, review, testing, packaging,
+  and release conventions.
+
+### Python
+
+- Use the repository's `pyproject.toml` and lockfile as dependency and tooling
+  authorities.
+- Run targeted tests first, then the repository's configured lint, type, and
+  packaging checks.
+- Follow `bluetape-py-patterns` for implementation, review, testing, packaging,
+  and release conventions.
 
 ## Mandatory Kotlin Workflow
 
@@ -495,6 +534,9 @@ before implementation.
 - `bluetape-kotlin-patterns`: use for Kotlin implementation or review. Its
   references cover testing, Spring Boot auto-configuration, new-module setup,
   and final checklist/IDE diagnostics.
+- `bluetape-go-patterns`, `bluetape-rs-patterns`, and
+  `bluetape-py-patterns`: use for implementation, review, testing, packaging,
+  and release work in the matching language ecosystem.
 - Historical specs, plans, and lessons may name `bluetape4k-design`,
   `bluetape4k-patterns`, `bluetape-bugfix-workflow`, or `bugfix-workflow`.
   Interpret them as `bluetape-full-feature`, `bluetape-kotlin-patterns`, and
@@ -521,8 +563,9 @@ before implementation.
 ## GitHub Issue And Pull Request Workflow
 
 These rules apply to every bluetape ecosystem repository under this workspace,
-including `bluetape4k-*`, `bluetape-go*`, `bluetape-rs*`, workshop/example
-repositories, `.github`, and `bluetape4k.github.io`.
+including `bluetape4k-*`, `bluetape-go*`, `bluetape-rs*`, `bluetape-py*`,
+`bluetape-skills`, workshop/example repositories, `.github`, and
+`bluetape4k.github.io`.
 
 - Assign GitHub issues and pull requests to `debop` by default unless the user
   explicitly says otherwise. Use `--assignee debop` with `gh issue create` and
@@ -540,47 +583,3 @@ repositories, `.github`, and `bluetape4k.github.io`.
   the repository.
 - After issue or PR creation, verify the live metadata with `gh issue view` or
   `gh pr view` before reporting the work complete.
-
-
-<!-- headroom:rtk-instructions -->
-# RTK (Rust Token Killer) - Token-Optimized Commands
-
-When running shell commands, **always prefix with `rtk`**. This reduces context
-usage by 60-90% with zero behavior change. If rtk has no filter for a command,
-it passes through unchanged — so it is always safe to use.
-
-## Key Commands
-```bash
-# Git (59-80% savings)
-rtk git status          rtk git diff            rtk git log
-
-# Files & Search (60-75% savings)
-rtk ls <path>           rtk read <file>         rtk grep <pattern>
-rtk find <pattern>      rtk diff <file>
-
-# Test (90-99% savings) — shows failures only
-rtk pytest tests/       rtk cargo test          rtk test <cmd>
-
-# Build & Lint (80-90% savings) — shows errors only
-rtk tsc                 rtk lint                rtk cargo build
-rtk prettier --check    rtk mypy                rtk ruff check
-
-# Analysis (70-90% savings)
-rtk err <cmd>           rtk log <file>          rtk json <file>
-rtk summary <cmd>       rtk deps                rtk env
-
-# GitHub (26-87% savings)
-rtk gh pr view <n>      rtk gh run list         rtk gh issue list
-
-# Infrastructure (85% savings)
-rtk docker ps           rtk kubectl get         rtk docker logs <c>
-
-# Package managers (70-90% savings)
-rtk pip list            rtk pnpm install        rtk npm run <script>
-```
-
-## Rules
-- In command chains, prefix each segment: `rtk git add . && rtk git commit -m "msg"`
-- For debugging, use raw command without rtk prefix
-- `rtk proxy <cmd>` runs command without filtering but tracks usage
-<!-- /headroom:rtk-instructions -->
