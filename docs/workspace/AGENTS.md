@@ -491,6 +491,10 @@ Per-repo helper commands may be available on `PATH`: `repo-status`,
 `repo-diff`, `repo-test-summary`, `clean-branches`, `worktree-new`,
 `worktree-list`, `ci-status`.
 
+RTK is retired in this workspace. Do not invoke it, recommend it, or
+reintroduce command wrappers or rewrite hooks for it. Use raw commands or the
+explicit repository helpers above.
+
 GitHub/CI preference:
 
 - Use `ci-status --limit N` for the current repo's latest GitHub Actions runs.
@@ -522,7 +526,7 @@ before implementation.
   F Self Improve, then load the canonical leaf skill.
 - Canonical leaf skills are `bluetape-full-feature`,
   `bluetape-fast-track`, `bluetape-bugfix`, `code-review`,
-  `bluetape-maintenance`, `bluetape-publish-kotlin` or
+  `bluetape-maintenance`, `bluetape-publish-jvm` or
   `bluetape-publish-go`, and `bluetape-self-improve`.
 - Every executable workflow row is a checkbox with `Action`, `Evidence`, and
   `Failure`. An unchecked row blocks dependents; missing, stale, or `UNKNOWN`
