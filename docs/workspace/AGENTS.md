@@ -17,23 +17,35 @@ silently reverse it.
 | Primary reader | Artifacts | Default language | Notes |
 |---|---|---|---|
 | User in chat | Conversation with `debop` | Korean | Use Korean unless the user asks otherwise. |
-| End user | `README.md`, `README.ko.md`, future localized README files | Multilingual | Keep `README.md` English and update existing localized README files together. |
-| Contributor (public, human) | KDoc, CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies, pushed commit messages | English | These are public contributor-facing artifacts. |
-| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean OK | Prefer Korean when it helps the user; English is allowed only when there is a concrete reason. |
+| End user | Library `README.md`, `README.ko.md`, future localized README files | Multilingual | Keep library `README.md` English and update existing localized README files together. |
+| Example learner | README files, work documents, KDoc, and diagrams in repositories listed under **Workshops and examples** | README and diagrams bilingual; work docs and KDoc Korean | Keep English/Korean pairs source-equivalent; preserve technical identifiers. |
+| Contributor (public, human) | Library KDoc, CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies, pushed commit messages | English | Example-repository KDoc follows the Korean exception above; delivery metadata remains English. |
+| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Repository category | Use English by default in library and infrastructure repositories; repositories listed under **Workshops and examples** require Korean. |
 | AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, `.omx/notepad.md`, `~/.codex/memories/*`, agent memory | English | Keep concise English for token efficiency and cross-tool reuse. |
 | Blog/article reader | `bluetape4k.github.io` blog/articles | Locale-specific | Follow the blog skill: Korean-first for Korean posts, English parity when bilingual. |
-| Diagram/image reader | Generated diagram labels and visual assets | English | Share English-label assets across localized README files unless domain terms require localization. |
+| Diagram/image reader | Generated diagram labels and visual assets | English by default | Repositories under **Workshops and examples** require source-equivalent English and Korean diagram assets when reader-facing text is present. |
 
 - Conversations with the user: Korean.
-- Library user documentation: multilingual where applicable. Keep `README.md`
-  in English and preserve/update existing localized README files such as
-  `README.ko.md`; additional locales such as Japanese or Chinese may be added
-  over time.
-- Public API KDoc and contributor/developer-facing public artifacts: English.
-  This includes KDoc, CHANGELOG entries, release notes, GitHub issues, GitHub
-  PR titles/bodies, and commit messages that will be pushed to GitHub.
-- Internal human-readable artifacts may be Korean. This includes specs, plans,
-  research notes, and lessons learned.
+- Library user documentation: multilingual where applicable. Keep library
+  `README.md` in English and preserve/update existing localized README files
+  such as `README.ko.md`; additional locales such as Japanese or Chinese may be
+  added over time.
+- Workshop and example documentation: bilingual README and diagrams plus
+  Korean work documents and KDoc. In repositories listed under **Workshops and
+  examples**, provide `README.md` in English and `README.ko.md` in Korean with
+  equivalent content. Write work documents such as specs, plans, research
+  notes, lessons, and KDoc in Korean. For diagrams with reader-facing text,
+  provide source-equivalent English and Korean SVG/PNG assets; text-free
+  diagrams may be shared. Keep code, identifiers, commands, API names, URLs,
+  and exact error text in their original form.
+- Public API KDoc in library repositories and contributor/developer-facing
+  public artifacts: English. Example-repository KDoc uses Korean. CHANGELOG
+  entries, release notes, GitHub issues, GitHub PR titles/bodies, and pushed
+  commit messages remain English unless the user explicitly requests otherwise.
+- Internal human-readable work documents follow the repository category. Use
+  English by default for specs, plans, research notes, and lessons in library
+  and infrastructure repositories. Repositories listed under **Workshops and
+  examples** require Korean for these artifacts.
 - Agent memory and agent-facing guidance must be English for token efficiency,
   LLM consistency, and cross-tool reuse.
 
@@ -101,6 +113,14 @@ their subdirectory.
 | `exposed-r2dbc-workshop/` | Exposed R2DBC examples |
 | `clinic-appointment/` | Clinic appointment example app |
 | `timefold-workshop/` | Timefold Solver workshop |
+
+Every repository listed in this section targets Korean developers. Korean is
+the required language for its work documents and KDoc. README files remain
+bilingual: `README.md` in English and `README.ko.md` in Korean, with
+source-equivalent content. Diagrams with reader-facing text also require
+source-equivalent English and Korean SVG/PNG assets. This category-level
+exception overrides the English KDoc default, but it does not change the
+English policy for agent-facing guidance or public GitHub delivery metadata.
 
 ## Kotlin Dependency Catalog Governance
 
@@ -312,8 +332,8 @@ abstract class AbstractRedisTest {
 ## Public API Documentation
 
 Public classes, interfaces, objects, and extension functions need KDoc in the
-style already used by the repo. KDoc is public-facing documentation and must be
-written in English for new or updated public APIs. Include:
+style already used by the repo. Write KDoc in English for library repositories
+and in Korean for repositories listed under **Workshops and examples**. Include:
 
 - One-line summary.
 - Contract/behavior section.
@@ -321,12 +341,17 @@ written in English for new or updated public APIs. Include:
 
 ## README Rules
 
-For bluetape ecosystem repositories, modules, workshops, and examples, keep
-user-facing README files multilingual. New repositories, new modules, rewritten
-root README files, and substantial README refreshes must create or update both:
+For library and infrastructure repositories and their modules, keep user-facing
+README files multilingual. New repositories, new modules, rewritten root
+README files, and substantial README refreshes must create or update both:
 
 - `README.md`
 - `README.ko.md`
+
+Repositories listed under **Workshops and examples** also follow this bilingual
+README requirement: `README.md` is English and `README.ko.md` is Korean, with
+source-equivalent content. Their work documents and KDoc must be written in
+Korean.
 
 Additional localized README files such as `README.ja.md` or `README.zh.md` may
 be added over time. Each README must include a language switch directly below
@@ -335,9 +360,8 @@ and the other locale as a relative link, for example `English |
 [한국어](README.ko.md)` in `README.md` and `[English](README.md) | 한국어` in
 `README.ko.md`.
 
-Use `$bluetape-writer` for Korean README prose review and localization so
-`README.ko.md` reads like natural Korean technical documentation instead of a
-literal translation. Keep `README.md` English and keep the Korean README
+Use `$bluetape-writer` for Korean README prose review and localization. In
+multilingual repositories, keep `README.md` English and keep `README.ko.md`
 source-equivalent, not abbreviated.
 
 README and benchmark result documents should include diagrams and charts as
@@ -346,7 +370,10 @@ Use `$bluetape-diagram` for README diagrams, benchmark charts, Mermaid/ASCII
 conversion, visual asset placement, PNG/SVG generation, and rendered visual
 validation. Treat Mermaid or ASCII as source sketches, not final README
 artifacts; README files should embed generated PNG assets with matching SVG
-sources, following the diagram skill's output contract.
+sources, following the diagram skill's output contract. In repositories listed
+under **Workshops and examples**, diagrams containing reader-facing text must
+provide source-equivalent English and Korean SVG/PNG assets; text-free diagrams
+may be shared.
 
 Module README structure should cover architecture, core features, usage
 examples, configuration options, dependency instructions, and benchmark evidence
@@ -426,9 +453,10 @@ drafting the plan are allowed before approval. Do not treat autonomy or
 
 - IDE diagnostics: zero errors and no unresolved deprecations in touched code.
 - Compile and test affected modules.
-- Update `README.md` and existing localized README files when behavior or
-  public API changes.
-- Add or update KDoc for new/changed public API.
+- Update `README.md` and any required localized README files according to the
+  repository's governing language policy when behavior or public API changes.
+- Add or update KDoc for new/changed public API in the language required by the
+  repository's governing policy.
 - For added, renamed, moved, or removed modules, verify the full registration
   chain: `settings.gradle.kts`, README locale set, repo-local `AGENTS.md`
   module list, CI path filters/jobs, Nightly or examples workflow, summary
