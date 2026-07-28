@@ -19,7 +19,8 @@ silently reverse it.
 | User in chat | Conversation with `debop` | Korean | Use Korean unless the user asks otherwise. |
 | End user | Library `README.md`, `README.ko.md`, future localized README files | Multilingual | Keep library `README.md` English and update existing localized README files together. |
 | Example learner | README files, work documents, KDoc, and diagrams in repositories listed under **Workshops and examples** | README and diagrams bilingual; work docs and KDoc Korean | Keep English/Korean pairs source-equivalent; preserve technical identifiers. |
-| Contributor (public, human) | Library KDoc, CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies, pushed commit messages | English | Example-repository KDoc follows the Korean exception above; delivery metadata remains English. |
+| Kotlin API reader | Library and internal KDoc | Korean | Preserve code identifiers, API names, commands, URLs, and exact error text. |
+| Contributor (public, human) | CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies, pushed commit messages | English | Delivery metadata remains English. |
 | Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Repository category | Use English by default in library and infrastructure repositories; repositories listed under **Workshops and examples** require Korean. |
 | AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, `.omx/notepad.md`, `~/.codex/memories/*`, agent memory | English | Keep concise English for token efficiency and cross-tool reuse. |
 | Blog/article reader | `bluetape4k.github.io` blog/articles | Locale-specific | Follow the blog skill: Korean-first for Korean posts, English parity when bilingual. |
@@ -38,10 +39,11 @@ silently reverse it.
   provide source-equivalent English and Korean SVG/PNG assets; text-free
   diagrams may be shared. Keep code, identifiers, commands, API names, URLs,
   and exact error text in their original form.
-- Public API KDoc in library repositories and contributor/developer-facing
-  public artifacts: English. Example-repository KDoc uses Korean. CHANGELOG
-  entries, release notes, GitHub issues, GitHub PR titles/bodies, and pushed
-  commit messages remain English unless the user explicitly requests otherwise.
+- Public and internal Kotlin KDoc in bluetape4k repositories: Korean. Keep code
+  identifiers, API names, commands, URLs, and exact error text unchanged.
+  CHANGELOG entries, release notes, GitHub issues, GitHub PR titles/bodies, and
+  pushed commit messages remain English unless the user explicitly requests
+  otherwise.
 - Internal human-readable work documents follow the repository category. Use
   English by default for specs, plans, research notes, and lessons in library
   and infrastructure repositories. Repositories listed under **Workshops and
@@ -119,7 +121,7 @@ the required language for its work documents and KDoc. README files remain
 bilingual: `README.md` in English and `README.ko.md` in Korean, with
 source-equivalent content. Diagrams with reader-facing text also require
 source-equivalent English and Korean SVG/PNG assets. This category-level
-exception overrides the English KDoc default, but it does not change the
+rule matches the workspace Korean KDoc default, but it does not change the
 English policy for agent-facing guidance or public GitHub delivery metadata.
 
 ## Kotlin Dependency Catalog Governance
@@ -332,8 +334,10 @@ abstract class AbstractRedisTest {
 ## Public API Documentation
 
 Public classes, interfaces, objects, and extension functions need KDoc in the
-style already used by the repo. Write KDoc in English for library repositories
-and in Korean for repositories listed under **Workshops and examples**. Include:
+style already used by the repo. Write new or meaningfully updated Kotlin KDoc in
+Korean across bluetape4k repositories, including internal classes and data-class
+constructor properties when those properties encode contracts or non-obvious
+state. Include:
 
 - One-line summary.
 - Contract/behavior section.
