@@ -39,11 +39,13 @@ silently reverse it.
   provide source-equivalent English and Korean SVG/PNG assets; text-free
   diagrams may be shared. Keep code, identifiers, commands, API names, URLs,
   and exact error text in their original form.
-- Public and internal Kotlin KDoc in bluetape4k repositories: Korean. Keep code
-  identifiers, API names, commands, URLs, and exact error text unchanged.
-  CHANGELOG entries, release notes, GitHub issues, GitHub PR titles/bodies, and
-  pushed commit messages remain English unless the user explicitly requests
-  otherwise.
+- KDoc is Korean-first across the workspace, including public and internal
+   declarations in library, infrastructure, workshop, and example repositories.
+   Write every new or meaningfully updated KDoc in Korean while preserving code,
+   identifiers, commands, API names, URLs, and exact error text. Do not translate
+   untouched legacy KDoc solely to satisfy this forward-applying rule. CHANGELOG
+   entries, release notes, GitHub issues, GitHub PR titles/bodies, and pushed
+   commit messages remain English unless the user explicitly requests otherwise.
 - Internal human-readable work documents follow the repository category. Use
   English by default for specs, plans, research notes, and lessons in library
   and infrastructure repositories. Repositories listed under **Workshops and
@@ -334,10 +336,10 @@ abstract class AbstractRedisTest {
 ## Public API Documentation
 
 Public classes, interfaces, objects, and extension functions need KDoc in the
-style already used by the repo. Write new or meaningfully updated Kotlin KDoc in
-Korean across bluetape4k repositories, including internal classes and data-class
-constructor properties when those properties encode contracts or non-obvious
-state. Include:
+style already used by the repo. Write every new or meaningfully updated KDoc in
+Korean across library, infrastructure, workshop, and example repositories.
+Internal classes and data-class constructor properties should also have Korean
+KDoc when they encode contracts or non-obvious state. Include:
 
 - One-line summary.
 - Contract/behavior section.
@@ -459,8 +461,8 @@ drafting the plan are allowed before approval. Do not treat autonomy or
 - Compile and test affected modules.
 - Update `README.md` and any required localized README files according to the
   repository's governing language policy when behavior or public API changes.
-- Add or update KDoc for new/changed public API in the language required by the
-  repository's governing policy.
+- Add or update Korean KDoc for new/changed public API and non-obvious internal
+  contracts.
 - For added, renamed, moved, or removed modules, verify the full registration
   chain: `settings.gradle.kts`, README locale set, repo-local `AGENTS.md`
   module list, CI path filters/jobs, Nightly or examples workflow, summary
