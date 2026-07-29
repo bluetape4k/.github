@@ -14,6 +14,55 @@ repository's already-bumped `baseVersion`. Those values can be ahead of the
 release boundary and must be aligned back to the target milestone before
 publishing.
 
+## bluetape-rs Workshop Planning
+
+Added on 2026-06-11 KST.
+
+Create `bluetape-rs-workshop` as the runnable example repository for
+[`bluetape-rs`](https://github.com/bluetape4k/bluetape-rs). Use
+`bluetape-go-workshop` as the primary structure reference and
+`bluetape4k-workshop` as the catalog/reference-doc style reference.
+
+Recommended bootstrap plan:
+
+| Milestone | Workshop lane | Initial examples | Stop condition |
+|---|---|---|---|
+| `0.1.0` | Foundation | `foundation-order-cleanup`, `request-tracing-log-capture`, `temp-resource-test-harness` | Validation, structured logging, and reusable test helpers are shown with bilingual docs and tests. |
+| `0.2.0` | Collections + async | `catalog-enrichment-fanout`, `batched-order-windowing`, `shutdown-aware-worker` | Bounded Tokio fan-out, grouping/paging helpers, cancellation/timeout paths, and tests are runnable. |
+| `0.3.0` | Codec | `invitation-codecs`, `support-reference-encoding`, `text-boundary-ingest` | Hex/Base64/Base58/Base62/UTF-8 application flows have success/error tests and bilingual docs. |
+| `0.4.0` | Compression | `cache-payload-compression`, `compression-algorithm-selection`, `safe-decompression-guard` | Opt-in algorithm features, safe decompression limits, registry-style selection, and tradeoff docs are demonstrated. |
+
+Integration rule: examples become more integrated as milestone numbers
+increase. `0.1.0` may stay foundation-focused; `0.2.0` examples should reuse
+foundation validation/logging/test patterns; `0.3.0` examples should combine
+codec boundaries with earlier validation, grouping, or async flows; `0.4.0`
+examples should look like cache/message payload workflows that validate, encode
+metadata, batch or process payloads, select compression, and enforce safe
+decompression boundaries.
+
+Created tracking issues in `bluetape4k/bluetape-rs-workshop`:
+
+| Milestone | Epic | Example issues |
+|---|---|---|
+| `0.1.0` | [#1](https://github.com/bluetape4k/bluetape-rs-workshop/issues/1) | [#2](https://github.com/bluetape4k/bluetape-rs-workshop/issues/2), [#3](https://github.com/bluetape4k/bluetape-rs-workshop/issues/3), [#4](https://github.com/bluetape4k/bluetape-rs-workshop/issues/4) |
+| `0.2.0` | [#5](https://github.com/bluetape4k/bluetape-rs-workshop/issues/5) | [#6](https://github.com/bluetape4k/bluetape-rs-workshop/issues/6), [#7](https://github.com/bluetape4k/bluetape-rs-workshop/issues/7), [#8](https://github.com/bluetape4k/bluetape-rs-workshop/issues/8) |
+| `0.3.0` | [#9](https://github.com/bluetape4k/bluetape-rs-workshop/issues/9) | [#10](https://github.com/bluetape4k/bluetape-rs-workshop/issues/10), [#11](https://github.com/bluetape4k/bluetape-rs-workshop/issues/11), [#12](https://github.com/bluetape4k/bluetape-rs-workshop/issues/12) |
+| `0.4.0` | [#13](https://github.com/bluetape4k/bluetape-rs-workshop/issues/13) | [#14](https://github.com/bluetape4k/bluetape-rs-workshop/issues/14), [#15](https://github.com/bluetape4k/bluetape-rs-workshop/issues/15), [#16](https://github.com/bluetape4k/bluetape-rs-workshop/issues/16) |
+
+Repository shape:
+
+- Root Rust 2024 Cargo workspace with one small crate per example.
+- Root `README.md` / `README.ko.md` keep a milestone example map and run
+  commands.
+- Each example has `README.md` / `README.ko.md`, focused Rust source, and tests.
+- `Makefile` exposes `fmt`, `fmt-check`, `test`, `clippy`, and `ci`.
+- GitHub Actions starts with `cargo fmt --all --check`,
+  `cargo check --workspace --all-targets --all-features --locked`,
+  `cargo test --workspace --all-features --locked`, and
+  `cargo clippy --workspace --all-targets --all-features --locked -- -D warnings`.
+- GitHub repository exists at
+  [`bluetape4k/bluetape-rs-workshop`](https://github.com/bluetape4k/bluetape-rs-workshop).
+
 ## Release Train Checklist Rule
 
 This section supersedes the older one-repo-at-a-time stable release plan below.
