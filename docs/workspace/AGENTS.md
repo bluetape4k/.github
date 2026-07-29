@@ -159,8 +159,9 @@ English policy for agent-facing guidance or public GitHub delivery metadata.
 - Follow the user-scope GNO command selection rules. For routine lookup, prefer
   `gno query "<query>" -c <collection> --fast --no-rerank`.
 - Use `gno query "<query>" -c bluetape4k-docs --fast --no-rerank` for workspace
-  documentation and examples. This collection indexes Markdown docs under
-  `/Users/debop/work/bluetape4k` with `**/docs/**/*.md`.
+  documentation and examples. This collection indexes all Markdown files under
+  `/Users/debop/work/bluetape4k` with `**/*.md`, including repository README
+  and CHANGELOG files, subject to its configured exclusions.
 - Use `gno query "<query>" -c wiki --fast --no-rerank` for personal or cross-project
   knowledge under `~/.codex/wiki`.
 - In Codex App sessions with context-mode available, use context-mode MCP tools
