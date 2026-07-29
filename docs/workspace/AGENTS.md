@@ -396,11 +396,16 @@ Store durable project design/history artifacts in repo-local docs paths:
 - Lessons Learned / work retrospectives: `docs/lessons/YYYY-MM-DD-{slug}.md`
 - Use lowercase ASCII kebab-case slugs; include `issue-{number}-` when the
   artifact is tied to a GitHub issue.
-- Create or update `docs/lessons/YYYY-MM-DD-{slug}.md` only when it is useful
-  for durable project learning, required by a selected workflow, or explicitly
-  requested by the user. Keep it short for small work, and include the context,
-  decision, outcome, verification evidence, and what future agents should do
-  differently.
+- Evaluate the lesson gate for every task before declaring a PR merge-ready.
+  Create or update `docs/lessons/YYYY-MM-DD-{slug}.md` when it is useful for
+  durable project learning, required by a selected workflow, or explicitly
+  requested by the user. Type A work requires a committed lesson file; when no
+  reusable learning genuinely exists, that file may record an evidence-backed
+  `N/A` instead of filler prose. Substantial Type F work requires a durable
+  lesson containing its reusable learning. Other tasks may record `N/A` only
+  with concrete evidence that no reusable learning exists. Keep lessons short
+  for small work, and include the context, decision, outcome, verification
+  evidence, and what future agents should do differently.
 - Consolidate `docs/lessons/` entries only when explicitly requested or when a
   selected workflow requires a retrospective cleanup step.
 - Treat `.omx/plans`, `.omx/notepad.md`, chat summaries, and runtime notes as
@@ -419,6 +424,14 @@ PRs, dispatching workflows, merging, publishing, or deleting branches/worktrees.
 Read-only discovery, issue/PR metadata inspection, local status checks, and
 drafting the plan are allowed before approval. Do not treat autonomy or
 "continue" language as permission to skip this first plan approval gate.
+After that first approval explicitly names PR creation plus the target
+repository, base branch, and head branch, opening the PR does not require a
+second approval. Every merge is a separate gate: after CI, current
+reviews and threads, applicable visual/diagram review, the lesson gate, and
+other human-review artifacts are complete, stop at merge-ready and obtain a
+fresh explicit user approval. Earlier plan approval, an initial request to
+create and merge a PR, standing workflow scope, or PR-creation permission never
+counts as merge approval. Do not enable or execute auto-merge.
 
 ## Build and Coverage
 
@@ -481,6 +494,9 @@ drafting the plan are allowed before approval. Do not treat autonomy or
   `bluetape4k-github` and `bluetape4k-docs` when available.
 - Before merging after CI turns green, re-read PR reviews and review threads;
   unresolved or newer user review comments reopen the merge gate.
+- Before every merge, complete applicable diagram/visual and lesson review,
+  report merge-ready evidence, then obtain a fresh explicit user approval. PR
+  creation itself needs no additional approval after the approved delivery plan.
 - For module additions, moves, renames, removals, or artifact renames, keep the
   registration chain synchronized: `settings.gradle.kts`, README locale set,
   repo-local module lists, CI path filters/jobs, Nightly or examples workflow,
@@ -498,6 +514,9 @@ drafting the plan are allowed before approval. Do not treat autonomy or
 - `develop` is the default integration branch; do not push directly.
 - `main` is release-only and updated through `develop -> main` PRs.
 - Use GitHub rebase merge as the default PR merge strategy unless the user explicitly requests another strategy.
+- Never merge or enable auto-merge from an earlier plan approval, standing
+  workflow scope, PR-creation permission, or initial create-and-merge request.
+  Obtain fresh explicit user approval only after reporting the PR merge-ready.
 - Prefer feature branches under `.worktrees/<branch>`.
 - Do not use `codex/` for local worktree names or branch names. Use conventional
   prefixes such as `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `build/`, or
