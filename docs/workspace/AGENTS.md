@@ -126,12 +126,31 @@ English policy for agent-facing guidance or public GitHub delivery metadata.
 
 ## Knowledge Retrieval
 
+- For every non-trivial bluetape ecosystem task, start with a focused GNO
+  query before planning or editing. Search `bluetape4k-github` for historical
+  issues, PRs, reviews, release trains, CI incidents, and recurring decisions;
+  search `bluetape4k-docs` for repository docs, specs, plans, research, and
+  lessons; additionally search `bluetape4k-wiki` when a durable cross-project
+  decision, research note, or operating procedure may apply. Query with the
+  repository name plus the task's domain terms and action (for example,
+  `bluetape4k-exposed R2DBC release workflow`), then retrieve the few relevant
+  hits. Expect GNO to surface prior rationale, affected repositories, known
+  failure modes, validation commands, and linked issue/PR identifiers; use it
+  to avoid repeating work or missing an established delivery rule.
+- Treat GNO as historical and semantic discovery, not live GitHub authority:
+  verify current issue/PR state, CI, releases, labels, and branch protection
+  with `gh` or the GitHub API before acting. If GNO has no relevant hit, record
+  that fact briefly and continue with repository and live GitHub evidence.
+- Use `context-mode` as the secondary path when GNO is sparse, stale, or cannot
+  provide enough large-session context. Keep GNO as the default for indexed
+  bluetape knowledge, and do not restore optional `context-mode` hooks solely
+  for this fallback.
 - Query `bluetape4k-github` and `bluetape4k-docs` before workflow, release,
   coverage, module-registration, or skill-maintenance changes. Use `wiki` for
   personal or cross-project knowledge.
-- Use context-mode for large historical reads. For code structure and symbol
-  relationships, try CodeGraph before text search; use Semble for ranked
-  semantic snippets and `rg` for literal text or as fallback.
+- Use GNO for large historical or cross-repository reads. For code structure
+  and symbol relationships, try CodeGraph before text search; use Semble for
+  ranked semantic snippets and `rg` for literal text or as fallback.
 - If an index is stale, unavailable, or weak, fall back to direct repository
   evidence and report the gap only when it affects confidence.
 
