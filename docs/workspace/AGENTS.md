@@ -26,32 +26,9 @@ silently reverse it.
 | Blog/article reader | `bluetape4k.github.io` blog/articles | Locale-specific | Follow the blog skill: Korean-first for Korean posts, English parity when bilingual. |
 | Diagram/image reader | Generated diagram labels and visual assets | English by default | Repositories under **Workshops and examples** require source-equivalent English and Korean diagram assets when reader-facing text is present. |
 
-- Conversations with the user: Korean.
-- Library user documentation: multilingual where applicable. Keep library
-  `README.md` in English and preserve/update existing localized README files
-  such as `README.ko.md`; additional locales such as Japanese or Chinese may be
-  added over time.
-- Workshop and example documentation: bilingual README and diagrams plus
-  Korean work documents and KDoc. In repositories listed under **Workshops and
-  examples**, provide `README.md` in English and `README.ko.md` in Korean with
-  equivalent content. Write work documents such as specs, plans, research
-  notes, lessons, and KDoc in Korean. For diagrams with reader-facing text,
-  provide source-equivalent English and Korean SVG/PNG assets; text-free
-  diagrams may be shared. Keep code, identifiers, commands, API names, URLs,
-  and exact error text in their original form.
-- KDoc is Korean-first across the workspace, including public and internal
-   declarations in library, infrastructure, workshop, and example repositories.
-   Write every new or meaningfully updated KDoc in Korean while preserving code,
-   identifiers, commands, API names, URLs, and exact error text. Do not translate
-   untouched legacy KDoc solely to satisfy this forward-applying rule. CHANGELOG
-   entries, release notes, GitHub issues, GitHub PR titles/bodies, and pushed
-   commit messages remain English unless the user explicitly requests otherwise.
-- Internal human-readable work documents follow the repository category. Use
-  English by default for specs, plans, research notes, and lessons in library
-  and infrastructure repositories. Repositories listed under **Workshops and
-  examples** require Korean for these artifacts.
-- Agent memory and agent-facing guidance must be English for token efficiency,
-  LLM consistency, and cross-tool reuse.
+The table is normative. Preserve code, identifiers, commands, API names, URLs,
+and exact error text. Apply the KDoc rule only to new or meaningfully changed
+documentation; do not translate untouched legacy KDoc solely for compliance.
 
 ## Repo-Local AGENTS Overlays
 
@@ -149,39 +126,14 @@ English policy for agent-facing guidance or public GitHub delivery metadata.
 
 ## Knowledge Retrieval
 
-- When looking for similar implementations, prior examples, benchmark results,
-  discussions, plans, specs, lessons, or scattered project documentation, query
-  GNO first before filesystem search.
-- For workflow, coverage, release, module-registration, or skill-maintenance
-  changes, query both `bluetape4k-github` and `bluetape4k-docs` before editing:
-  issues/PRs show where the process failed in review, while lessons/specs show
-  the durable rule to promote.
-- Follow the user-scope GNO command selection rules. For routine lookup, prefer
-  `gno query "<query>" -c <collection> --fast --no-rerank`.
-- Use `gno query "<query>" -c bluetape4k-docs --fast --no-rerank` for workspace
-  documentation and examples. This collection indexes all Markdown files under
-  `/Users/debop/work/bluetape4k` with `**/*.md`, including repository README
-  and CHANGELOG files, subject to its configured exclusions.
-- Use `gno query "<query>" -c wiki --fast --no-rerank` for personal or cross-project
-  knowledge under `~/.codex/wiki`.
-- In Codex App sessions with context-mode available, use context-mode MCP tools
-  for large reads/searches/log analysis so raw shell output does not flood the
-  model context.
-- For repo-local code lookup, use CodeGraph first when the question is
-  structural: symbol definition, class/function/object/property location,
-  signature/source, callers, callees, impact radius, or current implementation
-  context. Do not run `rg` for a code symbol until the matching CodeGraph tool
-  has been attempted and its result considered.
-- Before any source-tree `rg` search, perform this guard: if the query names or
-  implies a code symbol or relationship, stop and use CodeGraph first. Use `rg`
-  first only for literal text, comments, log messages, filenames, generated
-  files, build output, or when CodeGraph is unavailable/not initialized.
-- Use MinishLab Semble or `~/.cargo/bin/semble_rs` after CodeGraph when
-  natural-language, ranked snippets, or dependency lookup are more useful than
-  raw text matches.
-- If GNO, CodeGraph, or Semble are unavailable, stale, or return weak matches,
-  fall back to `rg` and mention the indexing/tooling gap when it affects the
-  answer.
+- Query `bluetape4k-github` and `bluetape4k-docs` before workflow, release,
+  coverage, module-registration, or skill-maintenance changes. Use `wiki` for
+  personal or cross-project knowledge.
+- Use context-mode for large historical reads. For code structure and symbol
+  relationships, try CodeGraph before text search; use Semble for ranked
+  semantic snippets and `rg` for literal text or as fallback.
+- If an index is stale, unavailable, or weak, fall back to direct repository
+  evidence and report the gap only when it affects confidence.
 
 ## Language Stacks
 
@@ -481,42 +433,19 @@ counts as merge approval. Do not enable or execute auto-merge.
   chain: `settings.gradle.kts`, README locale set, repo-local `AGENTS.md`
   module list, CI path filters/jobs, Nightly or examples workflow, summary
   `needs`, coverage artifacts, BOM/catalog constraints, and `./gradlew projects`.
-- Run Testcontainers-backed verification serially across modules, worktrees,
-  and delegated agents. If a workflow or test fails first and passes on retry,
-  investigate lifecycle, container, or timing risk before marking it noise.
+- Run Testcontainers-backed, real database, native, JNI, emulator, and other
+  heavyweight checks sequentially across modules, worktrees, and agents unless
+  a repo-local rule proves parallel execution safe. Investigate fail-then-pass
+  results before treating them as noise.
 - Keep Kover XML and Codecov visibility, but do not add or restore hard Kover
   thresholds unless an explicit policy decision exists.
-
-## Cross-Repo Shared Guards
-
-- Before issue, PR, workflow, release, dependency, benchmark, guidance, or
-  module-registration work, query current repository evidence in
-  `bluetape4k-github` and `bluetape4k-docs` when available.
-- Before merging after CI turns green, re-read PR reviews and review threads;
-  unresolved or newer user review comments reopen the merge gate.
-- Before every merge, complete applicable diagram/visual and lesson review,
-  report merge-ready evidence, then obtain a fresh explicit user approval. PR
-  creation itself needs no additional approval after the approved delivery plan.
-- For module additions, moves, renames, removals, or artifact renames, keep the
-  registration chain synchronized: `settings.gradle.kts`, README locale set,
-  repo-local module lists, CI path filters/jobs, Nightly or examples workflow,
-  summary `needs`, coverage artifacts, BOM/catalog constraints, and
-  `./gradlew projects` or the repo-equivalent project listing.
-- Keep Kover XML and Codecov visibility as the default coverage signal. Do not
-  add or restore hard Kover thresholds unless an explicit policy decision says
-  to do so.
-- Run Testcontainers-backed, real database, native, JNI, emulator, and other
-  heavyweight integration checks sequentially across modules, worktrees, and
-  delegated agents unless a repo-local rule proves parallel execution is safe.
 
 ## Git Workflow
 
 - `develop` is the default integration branch; do not push directly.
 - `main` is release-only and updated through `develop -> main` PRs.
 - Use GitHub rebase merge as the default PR merge strategy unless the user explicitly requests another strategy.
-- Never merge or enable auto-merge from an earlier plan approval, standing
-  workflow scope, PR-creation permission, or initial create-and-merge request.
-  Obtain fresh explicit user approval only after reporting the PR merge-ready.
+- Follow the separate merge gate in **Planning Approval**.
 - Prefer feature branches under `.worktrees/<branch>`.
 - Do not use `codex/` for local worktree names or branch names. Use conventional
   prefixes such as `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `build/`, or
@@ -528,37 +457,10 @@ counts as merge approval. Do not enable or execute auto-merge.
 
 ## Workspace Scripts
 
-Prefer the helper scripts in `~/.local/bin` for GitHub, CI, status, diff, log,
-and worktree operations before falling back to raw `git`/`gh` commands. They are
-designed to keep output compact for agent sessions.
-
-Workspace-level scripts may also live under `bin/`:
-
-| Script | Purpose |
-|---|---|
-| `all-status` | Cross-repo git status summary |
-| `all-pull` | Cross-repo `git pull --rebase`, skipping repos without upstream |
-| `all-clean-branches` | Remove gone branches and stale worktrees |
-| `all-ci-status` | Latest CI status summary for library repos |
-
-Per-repo helper commands may be available on `PATH`: `repo-status`,
-`repo-diff`, `repo-test-summary`, `clean-branches`, `worktree-new`,
-`worktree-list`, `ci-status`.
-
-RTK is retired in this workspace. Do not invoke it, recommend it, or
-reintroduce command wrappers or rewrite hooks for it. Use raw commands or the
-explicit repository helpers above.
-
-GitHub/CI preference:
-
-- Use `ci-status --limit N` for the current repo's latest GitHub Actions runs.
-- Use `ci-status --watch` when asked to monitor an in-progress run.
-- Use `all-ci-status` for cross-repo library CI summaries.
-- Use `repo-status`, `repo-diff`, and `repo-log` for compact repository context.
-- Use `worktree-new` and `worktree-list` for normal worktree operations.
+- Prefer task-specific helpers from `~/.local/bin` or `bin/` for compact
+  repository, CI, and worktree evidence; fall back to raw `git`/`gh`.
 - Use `clean-branches` and `all-clean-branches` only when branch/worktree
-  cleanup is explicitly requested, because they delete local branches and remove
-  associated worktrees.
+  cleanup is explicitly requested.
 - For documentation-only PRs, do not wait for heavyweight CI unless branch
   protection explicitly requires it. Verify locally with content review plus
   `git diff --check`; run repository-specific documentation builds only when
@@ -566,6 +468,7 @@ GitHub/CI preference:
 - Treat GitHub `Automatic Dependency Submission` / `submit-gradle` checks as
   non-blocking for documentation-only PRs unless GitHub branch protection marks
   them required.
+- RTK is retired. Do not invoke or reintroduce it.
 
 ## Skill Routing
 
@@ -578,17 +481,10 @@ before implementation.
 - `bluetape-workflow`: first-stop router. Classify work as Type A Full
   Feature, B Fast Track, C Bug Fix, D Code Review, E Maintenance, P Publish, or
   F Self Improve, then load the canonical leaf skill.
-- Canonical leaf skills are `bluetape-full-feature`,
-  `bluetape-fast-track`, `bluetape-bugfix`, `code-review`,
-  `bluetape-maintenance`, `bluetape-publish-jvm` or
-  `bluetape-publish-go`, and `bluetape-self-improve`.
-- Every executable workflow row is a checkbox with `Action`, `Evidence`, and
-  `Failure`. An unchecked row blocks dependents; missing, stale, or `UNKNOWN`
-  evidence is FAIL; `SKIPPED` is forbidden; `N/A` requires concrete scope
-  evidence. Report `Required checks: X/Y; N/A: N; Blocked: N`.
-- `bluetape-full-feature`: use for new modules, services/subsystems, broad
-  APIs, large refactors, new dependencies, or multi-layer changes. It owns the
-  spec/plan/review/DoD workflow and new-module checks.
+- Shared checklist and evidence semantics belong to `bluetape-workflow`
+  references. Leaf skills own only type- or language-specific deltas.
+- `bluetape-full-feature` owns new modules, services/subsystems, broad APIs,
+  large refactors, dependencies, multi-layer changes, and their spec/plan/DoD.
 - `bluetape-kotlin-patterns`: use for Kotlin implementation or review. Its
   references cover testing, Spring Boot auto-configuration, new-module setup,
   and final checklist/IDE diagnostics.
@@ -608,9 +504,7 @@ before implementation.
 - `bluetape-diagram`: use for README diagrams, benchmark result charts,
   Mermaid/ASCII conversion, visual QA, generated PNG/SVG assets, and any public
   diagram or chart embedded in README, docs, blog, or website pages.
-- Add domain skills when the touched area requires them: `ecc-kotlin-patterns`,
-  `ecc-kotlin-exposed`, `ecc-springboot-kotlin`, `ecc-kotlin-testing`,
-  `kotlin-coroutines-skill`, `kotlin-spring`, or `kotlin-expert`.
+- Add installed domain skills only when the touched area requires them.
 - Superpowers skills and artifacts are part of the workflow contract. When a
   selected bluetape4k workflow references a Superpowers skill, plan, spec,
   research note, or lesson, load and follow that skill or artifact before
