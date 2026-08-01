@@ -7,6 +7,18 @@ organization-profile, workflow-template, and workspace-guide rules.
 This repository owns shared GitHub community files, organization profile
 content, reusable guidance documents, and workspace-level agent instructions.
 
+## Mandatory Workflow Gate
+
+For every task under `/Users/debop/work/bluetape4k`, the first action is to
+invoke and complete `$bluetape-workflow`. It is mandatory for classification,
+planning approval, execution gates, verification, and DoD reporting; no work
+may bypass it.
+
+For implementation or code review, load and follow the matching language
+pattern skill before touching code: `$bluetape-kotlin-patterns`,
+`$bluetape-go-patterns`, `$bluetape-py-patterns`, or `$bluetape-rs-patterns`.
+Repo-local guidance may add narrower rules, but it must not weaken this gate.
+
 ## Layout
 
 - `docs/workspace/AGENTS.md` is the source file for the workspace root

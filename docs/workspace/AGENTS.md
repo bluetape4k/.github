@@ -5,6 +5,18 @@ Each child directory is an independent Git repository. This file applies to all
 repositories below this directory; repo-local `AGENTS.md` files add narrower
 rules and take precedence inside their own repo.
 
+## Mandatory Workflow Gate
+
+For every task under `/Users/debop/work/bluetape4k`, the first action is to
+invoke and complete `$bluetape-workflow`. It is mandatory for classification,
+planning approval, execution gates, verification, and DoD reporting; no work
+may bypass it.
+
+For implementation or code review, load and follow the matching language
+pattern skill before touching code: `$bluetape-kotlin-patterns`,
+`$bluetape-go-patterns`, `$bluetape-py-patterns`, or `$bluetape-rs-patterns`.
+Repo-local guidance may add narrower rules, but it must not weaken this gate.
+
 Keep conversations with the user in Korean. Keep agent-facing guidance and
 memory such as `AGENTS.md`, `CLAUDE.md`, `SKILL.md`, `.omx/notepad.md`, and
 `~/.codex/memories/*` in concise English unless a repo-local document explicitly
