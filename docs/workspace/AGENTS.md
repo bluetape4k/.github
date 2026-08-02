@@ -33,7 +33,7 @@ silently reverse it.
 | Example learner | README files, work documents, KDoc, and diagrams in repositories listed under **Workshops and examples** | README and diagrams bilingual; work docs and KDoc Korean | Keep English/Korean pairs source-equivalent; preserve technical identifiers. |
 | Kotlin API reader | Library and internal KDoc | Korean | Preserve code identifiers, API names, commands, URLs, and exact error text. |
 | Contributor (public, human) | CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies, pushed commit messages | English | Delivery metadata remains English. |
-| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Repository category | Use English by default in library and infrastructure repositories; repositories listed under **Workshops and examples** require Korean. |
+| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean | All repositories must write these project documentation artifacts in Korean. |
 | AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, `.omx/notepad.md`, `~/.codex/memories/*`, agent memory | English | Keep concise English for token efficiency and cross-tool reuse. |
 | Blog/article reader | `bluetape4k.github.io` blog/articles | Locale-specific | Follow the blog skill: Korean-first for Korean posts, English parity when bilingual. |
 | Diagram/image reader | Generated diagram labels and visual assets | English by default | Repositories under **Workshops and examples** require source-equivalent English and Korean diagram assets when reader-facing text is present. |
@@ -395,7 +395,7 @@ Store durable project design/history artifacts in repo-local docs paths:
   transient. Promote durable decisions and lessons into `docs/superpowers/` or
   `docs/lessons/`.
 - Specs, plans, research notes, and lessons are internal working artifacts and
-  may be written in Korean.
+  must be written in Korean.
 
 ## Planning Approval
 
