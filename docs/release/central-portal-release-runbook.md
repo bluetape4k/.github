@@ -54,8 +54,9 @@ changing a downstream repository to an older released upstream version.
     repositories. Pin it by checking out the `bluetape4k-dependencies` repo at
     the release-train tag or commit; do not publish it as a Maven Central
     artifact.
-- Public release artifacts, PRs, issues, changelog entries, and commit messages
-  are written in English.
+- Public release artifacts, PRs, issues, changelog entries, release notes, and
+  commit messages are written in Korean. Preserve code identifiers, URLs, exact
+  errors, and machine-required tokens.
 
 ## BOM vs Catalog Roles
 

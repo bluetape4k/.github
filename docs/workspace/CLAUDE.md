@@ -12,9 +12,9 @@ Choose the language by primary audience:
 | Primary reader | Artifacts | Language |
 |---|---|---|
 | End user | README locale set | Multilingual |
-| Contributor (public, human) | KDoc, GitHub PR/issue/commit, CHANGELOG, release notes | English |
+| Contributor (public, human) | KDoc, Rustdoc and equivalent code comments, `WIP.md`, GitHub PR/issue/comment, commit, CHANGELOG, release notes | Korean |
 | AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, agent memory, notepad | English |
-| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean OK |
+| Engineer (internal human-readable) | `WIP.md`, user-facing/project `docs/**/*.md`, `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean |
 
 Rules:
 
@@ -24,22 +24,25 @@ Rules:
   allow future locales such as `README.ja.md` or `README.zh.md`.
 - README files are not subject to an English-only policy. Do not delete Korean,
   Japanese, Chinese, or other localized README files for policy reasons.
-- Public contributor-facing artifacts are English: KDoc, CHANGELOG entries,
-  release notes, GitHub issue titles/bodies, GitHub PR titles/bodies, and commit
-  messages pushed to GitHub.
+- Public contributor-facing artifacts are Korean: KDoc, Rustdoc and equivalent
+  code comments, `WIP.md`, CHANGELOG entries, release notes, GitHub issue and PR
+  titles/bodies/comments, and commit messages pushed to GitHub. Preserve code,
+  identifiers, commands, API names, URLs, exact errors, and machine-required
+  tokens. Translate reader-facing CHANGELOG/release-note headings such as
+  `Added`, `Changed`, `Fixed`, and `Removed` to `추가`, `변경`, `버그 수정`, and
+  `제거` unless an external parser requires the original token.
 - Agent-facing guidance and memory are English: `CLAUDE.md`, `AGENTS.md`,
   `**/SKILL.md`, `~/.claude/projects/**/memory/*.md`,
   `~/.codex/memories/*`, `.omx/notepad.md`, and similar instruction/memory
   surfaces primarily read by AI tools.
 - Internal human-readable project artifacts may be Korean:
-  `docs/superpowers/specs/`, `docs/superpowers/plans/`,
-  `docs/superpowers/research/`, and `docs/lessons/`.
-- Historical Korean KDoc or Korean agent-facing docs do not need a bulk rewrite.
-  Apply this policy when creating new content or meaningfully editing existing
-  content.
-
-The old rule "public API KDoc is Korean by default" is superseded. New or
-meaningfully changed public API KDoc must be English.
+  `WIP.md`, user-facing/project `docs/**/*.md`, `docs/superpowers/specs/`,
+  `docs/superpowers/plans/`, `docs/superpowers/research/`, and
+  `docs/lessons/`. Agent-facing guidance and bilingual README/diagram locale
+  assets remain governed by their own language contracts.
+- Historical content does not need a bulk rewrite. Apply this policy to new
+  content and meaningfully edited or touched blocks; use a separate migration
+  scope for a full legacy translation.
 
 ## Repositories
 
@@ -251,15 +254,17 @@ abstract class AbstractRedisTest {
 }
 ```
 
-## KDoc
+## Code Documentation Comments
 
-Public classes, interfaces, objects, and extension functions need English KDoc:
+Public classes, interfaces, objects, and extension functions need Korean KDoc:
 
 - One-line summary.
 - `## Behavior / Contract` section for contracts and edge cases.
 - Kotlin usage example when useful.
 
-Convert existing Korean KDoc to English when the API is meaningfully edited or refactored.
+Rustdoc, Go doc comments, Python docstrings, and equivalent reader-facing code
+comments follow the same Korean rule. Complete a touched documentation block in
+Korean instead of extending mixed-language prose.
 
 ## README
 
@@ -319,16 +324,17 @@ Key rules:
 - [ ] IDE diagnostics: zero errors and no unresolved deprecations in touched code.
 - [ ] Compile and test affected modules.
 - [ ] Update `README.md` plus existing localized README files when behavior or public API changes.
-- [ ] Add or update English KDoc for new/changed public API.
+- [ ] Add or update Korean KDoc and equivalent code comments for new/changed
+  public API.
 
 ## Before Creating A PR (MANDATORY)
 
 - [ ] Module tests passed; report the command, pass count when available, and elapsed time.
 - [ ] Run `oh-my-claudecode:code-reviewer`; resolve HIGH/CRITICAL findings before push.
-- [ ] PR title/body are English.
+- [ ] PR title/body/comments are Korean.
 - [ ] PR body includes test results, rationale, and verification commands.
 - [ ] `README.md` plus existing localized README files are updated when needed.
-- [ ] English KDoc is complete for new/changed public API.
+- [ ] Korean KDoc is complete for new/changed public API.
 - [ ] Work happened in a worktree such as `.worktrees/<branch>/` when code changed.
 
 ## Git Workflow
@@ -339,11 +345,11 @@ Key rules:
 - Do not use `codex/` for local worktree names or branch names. Use conventional
   prefixes such as `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `build/`, or
   `chore/`.
-- Commit messages pushed to GitHub must be English, follow the Lore commit
+- Commit messages pushed to GitHub must be Korean, follow the Lore commit
   protocol when a commit is created, and commonly use prefixes such as `feat:`,
   `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, or `perf:`.
-- PR titles/bodies, GitHub issue titles/bodies, CHANGELOG entries, and release
-  notes must be English.
+- PR titles/bodies/comments, GitHub issue titles/bodies/comments, CHANGELOG
+  entries, and release notes must be Korean.
 - One issue maps to one PR when practical.
 - Prefer rebase merge for PRs. Use squash merge only when commits are mostly
   fixup/review noise or the PR is one logical change whose final squash message

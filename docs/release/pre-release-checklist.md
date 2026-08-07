@@ -150,7 +150,7 @@ gh pr list --state open
 
 ### 2-3. KDoc / 문서
 
-- [ ] 신규 또는 변경된 공개 API에 English KDoc 작성 완료
+- [ ] 신규 또는 변경된 공개 API에 Korean KDoc 작성 완료
 - [ ] `README.md` 및 로케일 README(`README.ko.md` 등) 업데이트 완료
 
 ---
@@ -163,7 +163,7 @@ head -30 CHANGELOG.md
 
 - [ ] `## [X.Y.Z] — Unreleased` → `## [X.Y.Z] — YYYY-MM-DD` 날짜 스탬프 완료
 - [ ] `## [Unreleased]` 섹션이 비어있거나 다음 버전 항목으로 분리되어 있음
-- [ ] 이번 배포에 포함된 주요 변경사항이 기록되어 있음 (Added / Changed / Fixed / Removed)
+- [ ] 이번 배포에 포함된 주요 변경사항이 기록되어 있음 (추가 / 변경 / 버그 수정 / 제거)
 
 ---
 
