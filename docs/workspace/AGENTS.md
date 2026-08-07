@@ -30,17 +30,27 @@ silently reverse it.
 |---|---|---|---|
 | User in chat | Conversation with `debop` | Korean | Use Korean unless the user asks otherwise. |
 | End user | Library `README.md`, `README.ko.md`, future localized README files | Multilingual | Keep library `README.md` English and update existing localized README files together. |
-| Example learner | README files, work documents, KDoc, and diagrams in repositories listed under **Workshops and examples** | README and diagrams bilingual; work docs and KDoc Korean | Keep English/Korean pairs source-equivalent; preserve technical identifiers. |
+| Example learner | README files, work documents, `WIP.md`, code documentation comments, and diagrams in repositories listed under **Workshops and examples** | README and diagrams bilingual; work docs, `WIP.md`, and code comments Korean | Keep English/Korean pairs source-equivalent; preserve technical identifiers. |
+| Code documentation reader | KDoc, Rustdoc, Go doc comments, Python docstrings, and equivalent reader-facing source comments | Korean | Apply the rule to new or meaningfully changed comments first; preserve code identifiers, API names, commands, URLs, and exact error text. |
 | Kotlin API reader | Library and internal KDoc | Korean | Preserve code identifiers, API names, commands, URLs, and exact error text. |
-| Contributor (public, human) | CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies, pushed commit messages | English | Delivery metadata remains English. |
-| Engineer (internal human-readable) | `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean | All repositories must write these project documentation artifacts in Korean. |
+| Contributor (public, human) | CHANGELOG, release notes, GitHub issues, GitHub PR titles/bodies/comments, pushed commit messages | Korean | Preserve technical identifiers, links, exact error text, and machine-readable tokens where required. |
+| Engineer (internal human-readable) | `WIP.md`, user-facing/project `docs/**/*.md`, `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/superpowers/research/`, `docs/lessons/` | Korean | Exclude agent-facing guidance and bilingual README/diagram locale assets; all other project documentation is Korean. |
 | AI agent | `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, `.omx/notepad.md`, `~/.codex/memories/*`, agent memory | English | Keep concise English for token efficiency and cross-tool reuse. |
 | Blog/article reader | `bluetape4k.github.io` blog/articles | Locale-specific | Follow the blog skill: Korean-first for Korean posts, English parity when bilingual. |
 | Diagram/image reader | Generated diagram labels and visual assets | English by default | Repositories under **Workshops and examples** require source-equivalent English and Korean diagram assets when reader-facing text is present. |
 
 The table is normative. Preserve code, identifiers, commands, API names, URLs,
-and exact error text. Apply the KDoc rule only to new or meaningfully changed
-documentation; do not translate untouched legacy KDoc solely for compliance.
+and exact error text. Reader-facing code documentation comments (KDoc,
+Rustdoc, Go doc comments, Python docstrings, and equivalents) and public or
+internal project artifacts (`WIP.md`, user-facing/project `docs/**/*.md`,
+`CHANGELOG.md`, and release notes) are Korean by default. Exclude agent-facing
+guidance and bilingual README/diagram locale assets. New or meaningfully
+changed comments and artifacts must follow this rule; do not bulk-translate
+untouched legacy content without a separate migration scope.
+In Korean CHANGELOG and release-note output, translate reader-facing headings
+and categories such as `Added`, `Changed`, `Fixed`, and `Removed` to Korean
+(`추가`, `변경`, `버그 수정`, `제거`) unless a parser or external contract
+requires the original token.
 
 ## Repo-Local AGENTS Overlays
 
@@ -108,12 +118,12 @@ their subdirectory.
 | `timefold-workshop/` | Timefold Solver workshop |
 
 Every repository listed in this section targets Korean developers. Korean is
-the required language for its work documents and KDoc. README files remain
-bilingual: `README.md` in English and `README.ko.md` in Korean, with
-source-equivalent content. Diagrams with reader-facing text also require
-source-equivalent English and Korean SVG/PNG assets. This category-level
-rule matches the workspace Korean KDoc default, but it does not change the
-English policy for agent-facing guidance or public GitHub delivery metadata.
+the required language for its work documents, `WIP.md`, and code documentation
+comments. README files remain bilingual: `README.md` in English and
+`README.ko.md` in Korean, with source-equivalent content. Diagrams with
+reader-facing text also require source-equivalent English and Korean SVG/PNG
+assets. This category-level rule does not change the English policy for
+agent-facing guidance or the bilingual README/diagram asset contract.
 
 ## Kotlin Dependency Catalog Governance
 
@@ -320,8 +330,10 @@ abstract class AbstractRedisTest {
 ## Public API Documentation
 
 Public classes, interfaces, objects, and extension functions need KDoc in the
-style already used by the repo. Write every new or meaningfully updated KDoc in
-Korean across library, infrastructure, workshop, and example repositories.
+style already used by the repo. Write KDoc in Korean across library,
+infrastructure, workshop, and example repositories. New or meaningfully
+updated KDoc must be Korean, and touched documentation blocks should be
+completed in Korean rather than extending a mixed-language block.
 Internal classes and data-class constructor properties should also have Korean
 KDoc when they encode contracts or non-obvious state. Include:
 
@@ -340,8 +352,8 @@ README files, and substantial README refreshes must create or update both:
 
 Repositories listed under **Workshops and examples** also follow this bilingual
 README requirement: `README.md` is English and `README.ko.md` is Korean, with
-source-equivalent content. Their work documents and KDoc must be written in
-Korean.
+source-equivalent content. Their work documents, `WIP.md`, KDoc, and other code
+documentation comments must be written in Korean.
 
 Additional localized README files such as `README.ja.md` or `README.zh.md` may
 be added over time. Each README must include a language switch directly below
@@ -377,6 +389,7 @@ Store durable project design/history artifacts in repo-local docs paths:
 - Plans: `docs/superpowers/plans/YYYY-MM-DD-{slug}-plan.md`
 - Research notes, when needed: `docs/superpowers/research/YYYY-MM-DD-{slug}-research.md`
 - Lessons Learned / work retrospectives: `docs/lessons/YYYY-MM-DD-{slug}.md`
+- Work-in-progress snapshots: `WIP.md`
 - Use lowercase ASCII kebab-case slugs; include `issue-{number}-` when the
   artifact is tied to a GitHub issue.
 - Evaluate the lesson gate for every task before declaring a PR merge-ready.
@@ -458,8 +471,8 @@ counts as merge approval. Do not enable or execute auto-merge.
 - Compile and test affected modules.
 - Update `README.md` and any required localized README files according to the
   repository's governing language policy when behavior or public API changes.
-- Add or update Korean KDoc for new/changed public API and non-obvious internal
-  contracts.
+- Add or update Korean KDoc and equivalent Korean code documentation comments
+  for new/changed public API and non-obvious internal contracts.
 - For added, renamed, moved, or removed modules, verify the full registration
   chain: `settings.gradle.kts`, README locale set, repo-local `AGENTS.md`
   module list, CI path filters/jobs, Nightly or examples workflow, summary
@@ -483,8 +496,8 @@ counts as merge approval. Do not enable or execute auto-merge.
   `chore/`.
 - Commits commonly use prefixes such as `feat:`, `fix:`, `refactor:`, `build:`,
   `docs:`, `chore:`, `test:`, `perf:`.
-- Commit text that will be pushed to GitHub must be English. Keep the intent
-  line concise.
+- Commit text that will be pushed to GitHub must be Korean. Keep the intent line
+  concise while preserving required Lore trailer names and technical tokens.
 
 ## Workspace Scripts
 
@@ -549,6 +562,11 @@ These rules apply to every bluetape ecosystem repository under this workspace,
 including `bluetape4k-*`, `bluetape-go*`, `bluetape-rs*`, `bluetape-py*`,
 `bluetape-skills`, workshop/example repositories, `.github`, and
 `bluetape4k.github.io`.
+
+- Write GitHub issue and pull-request titles, bodies, and comments in Korean.
+  Write `CHANGELOG.md` entries, release notes, and pushed commit messages in
+  Korean as well. Preserve code tokens, URLs, exact errors, and any
+  machine-required labels or headings.
 
 - Assign GitHub issues and pull requests to `debop` by default unless the user
   explicitly says otherwise. Use `--assignee debop` with `gh issue create` and
