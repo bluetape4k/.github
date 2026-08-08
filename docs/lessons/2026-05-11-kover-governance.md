@@ -1,32 +1,23 @@
-# Kover Governance Needs Baselines Before Gates
+# Kover 거버넌스는 게이트 전에 기준선이 필요하다
 
-## Context
+## 맥락
 
-Issue #1 reviewed Kover coverage across bluetape4k repositories. Most
-repositories already generate Kover reports, but only selected modules enforce
-verification bounds.
+Issue #1에서 bluetape4k 저장소 전체의 Kover 커버리지를 검토했습니다. 대부분
+저장소가 이미 Kover 보고서를 만들지만, 일부 모듈만 검증 임계치를 강제합니다.
 
-## Decision or Finding
+## 결정 또는 발견
 
-Do not enable broad failing coverage gates without measured baselines. Use
-repo-local policy files to document whether a module is enforced, report-only,
-or intentionally excluded.
+측정된 기준선 없이 광범위한 실패 커버리지 게이트를 활성화하지 않습니다.
+저장소별 정책 문서로 모듈이 강제 대상인지, report-only인지, 의도적으로
+제외되었는지를 기록합니다.
 
-## Outcome
+## 결과
 
-The organization policy now separates core library targets, integration-heavy
-targets, report-only transitions, and workshop/demo exceptions.
+조직 정책은 core library, 통합 중심 대상, report-only 전환, workshop/demo
+예외를 분리합니다.
 
-## Verification
+## 검증
 
-- Central repository inventory created in
-  `docs/governance/kover-coverage-governance.md`.
-- Repo-local coverage policy files were added for each issue-scope repository.
-- Existing `leader` Kover bounds are now run from Nightly.
-
-## Future Guidance
-
-- Prefer module-level `koverVerify` gates over one blunt repository threshold.
-- Measure current line coverage before setting a failing bound.
-- Keep integration-heavy exceptions explicit and time-boxed with a follow-up
-  threshold plan.
+- 중앙 inventory를 `docs/governance/kover-coverage-governance.md`에 만들었습니다.
+- Issue 범위의 각 저장소에 저장소별 커버리지 정책을 추가했습니다.
+- 기존 `leader` Kover bounds는 이제 Nightly에서 실행됩니다.

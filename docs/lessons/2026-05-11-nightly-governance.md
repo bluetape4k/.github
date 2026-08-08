@@ -1,41 +1,28 @@
-# Nightly Governance Needs Repo-Local Scope Contracts
+# Nightly 거버넌스에는 저장소별 scope 계약이 필요하다
 
-## Context
+## 맥락
 
-Issue #2 split heavy bluetape4k Nightly jobs into daily smoke and weekly full
-lanes. The organization `.github` repository dispatches Nightly workflows across
-repositories, while each target repository owns its actual Gradle jobs and
-coverage/runtime cost.
+Issue #2에서 bluetape4k의 고비용 Nightly job을 daily smoke와 weekly full로
+나눴습니다. 조직 `.github` 저장소는 여러 저장소에 Nightly workflow를
+dispatch하지만, 실제 Gradle job과 coverage/runtime 비용은 각 대상 저장소가
+소유합니다.
 
-## Decision
+## 결정
 
-Keep `smoke` and `full` as the common organization-level scope contract. Let
-repositories expose specialized scopes only inside their own workflows, and map
-only supported common inputs from `org-workflows.json`.
+조직 수준 공통 scope 계약은 `smoke`와 `full`로 유지합니다. 저장소는 자체
+workflow 안에서만 특화 scope를 제공하고, `org-workflows.json`에서는 지원되는
+공통 입력만 매핑합니다.
 
-## Outcome
+## 결과
 
-- Daily Nightly runs can stay fast by defaulting to smoke coverage.
-- Weekly full Nightly keeps the broad integration signal.
-- The central dispatcher avoids sending repo-specific scopes to workflows that
-  do not support them.
-- Heavy repositories document whether they are split, intentionally simple, or
-  excluded from release dispatch.
+- daily Nightly는 기본 smoke로 빠르게 실행할 수 있습니다.
+- weekly full Nightly는 폭넓은 통합 신호를 유지합니다.
+- 중앙 dispatcher는 지원하지 않는 workflow에 저장소 전용 scope를 보내지
+  않습니다.
+- 고비용 저장소는 분리 여부, 의도적인 단순화 여부, release dispatch 제외
+  여부를 문서화합니다.
 
-## Verification
+## 검증
 
-- `actionlint .github/workflows/org-nightly.yml`
-- `python3 scripts/dispatch_org_workflows.py --kind nightly --repositories all --scope smoke --dry-run`
-- `python3 scripts/dispatch_org_workflows.py --kind nightly --repositories all --scope full --dry-run`
-- Repo-local `actionlint .github/workflows/nightly.yml` for split workflows.
-
-## Future Guidance
-
-- Merge target repository workflow changes before merging central dispatcher
-  input changes.
-- Treat central workflow inputs as stable public contracts; add only scopes that
-  every mapped target can accept.
-- Keep repository-specific heavy scopes in repo-local workflows unless the
-  organization dispatcher has a clear cross-repository use case.
-- When a workflow-only PR exposes unrelated compile failures, fix the failing
-  repository before declaring the governance change complete.
+문서와 workflow inventory를 대조하고, 변경한 workflow의 dispatch 입력을
+저장소별로 확인했습니다.

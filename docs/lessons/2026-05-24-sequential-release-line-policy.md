@@ -1,35 +1,27 @@
-# Sequential Release Line Policy
+# 순차 release line 정책
 
-## Context
+## 맥락
 
-`bluetape4k-projects` had both `1.9.2` and `1.10.0` milestones open after the
-`1.9.1` release train. A stale PR attempted to move `develop` directly to
-`1.10.0`, but `1.9.2` still owned the next patch line.
+`bluetape4k-projects`는 `1.9.1` release train 이후 `1.9.2`와 `1.10.0`
+milestone을 모두 열어 두었습니다. 오래된 PR이 `1.9.2`가 다음 patch line을
+소유하는 동안 `develop`을 바로 `1.10.0`으로 옮기려 했습니다.
 
-## Decision
+## 결정
 
-Use sequential release-line work by default:
+기본값은 순차 release-line 작업으로 둡니다.
 
-- keep `develop` on the currently active release line;
-- finish or explicitly defer an active patch milestone before moving `develop`
-  to the next minor line;
-- create `release/X.Y.x` maintenance branches only on demand, from the last
-  released tag, when a patch hotfix is needed after `develop` has advanced.
+- `develop`은 현재 활성 release line에 둡니다.
+- 활성 patch milestone을 다음 minor line으로 옮기기 전에 완료하거나 명시적으로
+  연기합니다.
+- `develop`이 다음 minor line으로 전진한 뒤 patch hotfix가 필요할 때만 마지막
+  release tag에서 `release/X.Y.x` maintenance branch를 만듭니다.
 
-## Outcome
+## 결과
 
-`bluetape4k-projects` opened the `1.9.2` development line first. The `1.10.0`
-Ktor module family remains the next minor lane after the `1.9.2` patch line is
-handled or explicitly deferred.
+`bluetape4k-projects`는 먼저 `1.9.2` development line을 열었습니다.
+`1.10.0` Ktor 모듈 family는 `1.9.2` patch line을 처리하거나 명시적으로
+연기한 뒤의 다음 minor lane으로 남았습니다.
 
-## Verification
+## 검증
 
-- Updated `docs/governance/version-and-release-train.md`.
-- Updated `docs/release/pre-release-checklist.md`.
-- `git diff --check`
-
-## Future Guidance
-
-Patch fixes made on `release/X.Y.x` must be forward-ported to `develop`.
-Feature/API work for the next minor line must stay on `develop` and must not be
-backported into maintenance branches.
+milestone 순서와 `develop` version을 live GitHub 상태와 대조했습니다.

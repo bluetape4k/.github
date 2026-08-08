@@ -1,28 +1,25 @@
-# Organization README Belongs in the Profile Repository
+# 조직 README는 profile 저장소에 둔다
 
-## Context
+## 맥락
 
-The bluetape4k organization profile README was created through the special
-`.github` repository.
+bluetape4k 조직 profile README를 특수 `.github` 저장소를 통해 만들었습니다.
 
-## Decision or Finding
+## 결정 또는 발견
 
-Keep organization-facing documentation in `.github/profile/README.md` and keep
-project-specific documentation in each target repository.
+조직을 대상으로 하는 문서는 `.github/profile/README.md`에 두고 프로젝트별
+문서는 각 대상 저장소에 둡니다.
 
-## Outcome
+## 결과
 
-The organization profile can introduce bluetape4k libraries, workshops, and
-example projects without duplicating every repository README.
+조직 profile은 모든 저장소 README를 복제하지 않고 bluetape4k library,
+workshop, example 프로젝트를 소개할 수 있습니다.
 
-## Verification
+## 검증
 
-- The `.github` repository owns the organization profile surface.
-- Project repositories keep their own README and module documentation.
+- `.github` 저장소가 조직 profile 표면을 소유합니다.
+- 프로젝트 저장소는 자체 build, 모듈, 사용법 README를 유지합니다.
 
-## Future Guidance
+## 다음 지침
 
-- Use the organization README for ecosystem orientation.
-- Use repo README files for build, module, and usage details.
-- Do not include organization profile images in the README when the GitHub
-  organization profile image is already configured separately.
+- 생태계 방향 설명은 조직 README에 둡니다.
+- build, 모듈, 사용법 상세는 각 저장소 README에 둡니다.

@@ -1,46 +1,46 @@
-# Lessons Capture and Consolidation
+# Lesson 수집과 통합
 
-## Purpose
+## 목적
 
-Lessons are durable operational memory for the bluetape4k organization. They
-capture what changed, what failed, what evidence resolved it, and what future
-work should do differently.
+Lesson은 bluetape4k 조직의 지속 가능한 운영 지식입니다. 무엇이 바뀌었는지,
+무엇이 실패했는지, 어떤 증거로 해결했는지, 다음 작업이 무엇을 다르게 해야
+하는지를 기록합니다.
 
-Runtime notes, chat summaries, and `.omx` state are transient. Promote only
-stable, reusable findings into repository documentation.
+Runtime note, 대화 요약, `.omx` 상태는 일시적입니다. 안정적이고 재사용할 수
+있는 발견만 저장소 문서로 승격합니다.
 
-## Repository Contract
+## 저장소 계약
 
-Every active bluetape4k repository should keep a tracked `docs/lessons/`
-directory. If a repository does not maintain lessons, document the reason in
-the central inventory and revisit it when the repository becomes active.
+활성 bluetape4k 저장소는 추적되는 `docs/lessons/` 디렉터리를 유지해야
+합니다. lesson을 관리하지 않는 저장소는 중앙 inventory에 이유를 적고
+활성화될 때 다시 검토합니다.
 
-Each repository should include:
+각 저장소에는 다음이 있어야 합니다.
 
-- `docs/lessons/README.md` with repo-local lesson rules.
-- One lesson file per significant event, named `YYYY-MM-DD-{slug}.md`.
-- Links from central issues or PRs when a lesson explains governance decisions.
+- 저장소별 lesson 규칙을 설명하는 `docs/lessons/README.md`
+- 중요한 사건마다 하나의 lesson 파일. 이름은 `YYYY-MM-DD-{slug}.md`
+- 거버넌스 결정을 설명하는 lesson에서 중앙 Issue 또는 PR로 연결하는 링크
 
-## Workspace Guidance Contract
+## Workspace guidance 계약
 
-Workspace-root guidance files live outside a normal Git repository, so the
-organization `.github` repository owns canonical copies under `docs/workspace/`.
+Workspace 루트 guidance 파일은 일반 Git 저장소 밖에 있으므로 조직
+`.github` 저장소가 `docs/workspace/` 아래의 canonical 사본을 소유합니다.
 
-Tracked workspace files:
+추적하는 workspace 파일은 다음과 같습니다.
 
 - `AGENTS.md`
 - `CLAUDE.md`
 - `WIP.md`
 
-Use `scripts/sync_workspace_docs.py --check` to detect drift and
-`scripts/sync_workspace_docs.py --sync` to refresh the active workspace-root
-copies.
+`scripts/sync_workspace_docs.py --check`로 drift를 확인하고,
+`scripts/sync_workspace_docs.py --sync`로 활성 workspace 루트 사본을
+갱신합니다.
 
-## Lesson Template
+## Lesson 템플릿
 
-Use `docs/templates/lesson.md` as the reusable template.
+재사용할 템플릿은 `docs/templates/lesson.md`를 사용합니다.
 
-Required sections:
+필수 섹션은 다음과 같습니다.
 
 - Context
 - Decision or Finding
@@ -48,39 +48,39 @@ Required sections:
 - Verification
 - Future Guidance
 
-Keep lessons concise. Store evidence such as commands, PR links, issue links,
-or workflow runs, but do not paste long logs.
+Lesson은 간결하게 유지합니다. 명령, PR 링크, Issue 링크 또는 workflow
+실행 같은 증거는 저장하되 긴 로그를 붙여 넣지 않습니다.
 
-## Daily or Session Consolidation
+## 일일 또는 세션 통합
 
-At the end of substantial work:
+중요한 작업이 끝나면 다음을 수행합니다.
 
-1. Scan new repo-local lessons and recent PRs.
-2. Merge duplicate lessons or link related entries.
-3. Promote repeatable rules into `AGENTS.md`, workflow docs, or skills.
-4. Keep event-specific evidence in the lesson file.
-5. Update central issue comments when the lesson closes a governance item.
+1. 새 저장소별 lesson과 최근 PR을 확인합니다.
+2. 중복 lesson을 합치거나 관련 항목을 서로 연결합니다.
+3. 반복 가능한 규칙을 `AGENTS.md`, workflow 문서 또는 skill로 승격합니다.
+4. 사건에 종속된 증거는 lesson 파일에 남깁니다.
+5. lesson이 거버넌스 항목을 닫으면 중앙 Issue 댓글을 갱신합니다.
 
-## Current Inventory
+## 현재 inventory
 
-| Repository | Lessons status | Notes |
+| 저장소 | Lesson 상태 | 비고 |
 |---|---|---|
-| `bluetape4k-aws` | Active | Assertion migration lesson exists; README normalized. |
-| `bluetape4k-dependencies` | Ready | README added for future release/BOM lessons. |
-| `bluetape4k-experimental` | Ready | README added; keep experimental runtime findings here. |
-| `bluetape4k-exposed` | Active | Document storage lesson exists; README normalized. |
-| `bluetape4k-graph` | Ready | README added for graph/runtime lessons. |
-| `bluetape4k-image` | Ready | README added for image processing and native dependency lessons. |
-| `bluetape4k-javers` | Ready | README added for audit/diff integration lessons. |
-| `bluetape4k-leader` | Active | Rich lesson history exists; README normalized. |
-| `bluetape4k-projects` | Active | Existing virtual-thread lesson plus Kover aggregation backfill. |
-| `bluetape4k-text` | Ready | README added for tokenizer/language detection lessons. |
-| `bluetape4k-workshop` | Active | Nightly dependency lesson backfilled. |
+| `bluetape4k-aws` | 활성 | Assertion migration lesson이 있고 README를 정규화함 |
+| `bluetape4k-dependencies` | 준비됨 | 향후 release/BOM lesson을 위한 README가 있음 |
+| `bluetape4k-experimental` | 준비됨 | 실험 runtime 발견 사항을 여기에 기록 |
+| `bluetape4k-exposed` | 활성 | 문서 저장소 lesson이 있고 README를 정규화함 |
+| `bluetape4k-graph` | 준비됨 | graph/runtime lesson용 README가 있음 |
+| `bluetape4k-image` | 준비됨 | image processing과 native dependency lesson용 README가 있음 |
+| `bluetape4k-javers` | 준비됨 | audit/diff 통합 lesson용 README가 있음 |
+| `bluetape4k-leader` | 활성 | 풍부한 lesson 이력이 있고 README를 정규화함 |
+| `bluetape4k-projects` | 활성 | virtual-thread lesson과 Kover aggregation 보강이 있음 |
+| `bluetape4k-text` | 준비됨 | tokenizer/language detection lesson용 README가 있음 |
+| `bluetape4k-workshop` | 활성 | Nightly dependency lesson을 보강함 |
 
-## Promotion Rules
+## 승격 규칙
 
-- A one-time failure stays in `docs/lessons/`.
-- A repeated failure becomes checklist guidance.
-- A rule that changes implementation behavior belongs in repo-local
-  `AGENTS.md` or a narrow skill.
-- Organization-wide workflow behavior belongs in `.github/docs/governance/`.
+- 일회성 실패는 `docs/lessons/`에 남깁니다.
+- 반복되는 실패는 checklist guidance가 됩니다.
+- 구현 동작을 바꾸는 규칙은 저장소별 `AGENTS.md` 또는 좁은 범위의 skill에
+  둡니다.
+- 조직 전체 workflow 동작은 `.github/docs/governance/`에 둡니다.
