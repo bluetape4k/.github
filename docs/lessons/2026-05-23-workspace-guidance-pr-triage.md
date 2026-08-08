@@ -1,30 +1,28 @@
-# Workspace Guidance PR Triage
+# Workspace guidance PR triage
 
-## Context
+## 맥락
 
-The local `.github` worktree still had an open WIP branch from a 2026-05-18
-audit snapshot plus newer uncommitted workspace guidance edits.
+로컬 `.github` worktree에는 2026-05-18 audit snapshot을 담은 오래된 WIP
+브랜치와 이후의 미커밋 workspace guidance 변경이 함께 있었습니다.
 
-## Decision or Finding
+## 결정 또는 발견
 
-Do not merge stale `WIP.md` snapshots after a release train has materially
-changed the ecosystem state. Salvage durable workspace guidance changes into a
-fresh PR based on current `main`, and close the stale WIP PR.
+release train이 생태계 상태를 크게 바꾼 뒤에는 오래된 `WIP.md` snapshot을
+병합하지 않습니다. 현재 `main`에서 새 PR을 만들어 지속적인 workspace
+guidance 변경만 옮기고 오래된 WIP PR은 닫습니다.
 
-## Outcome
+## 결과
 
-The workspace guidance sync was separated from the old WIP snapshot so the
-canonical `docs/workspace/AGENTS.md` and `docs/workspace/CLAUDE.md` can be
-reviewed without carrying obsolete queue state.
+workspace guidance sync를 이전 WIP snapshot에서 분리해 canonical
+`docs/workspace/AGENTS.md`와 `docs/workspace/CLAUDE.md`를 오래된 queue 상태
+없이 검토할 수 있게 했습니다.
 
-## Verification
+## 검증
 
-- Compared the open WIP PR against `origin/main`.
-- Confirmed the untracked `.omc/state/last-tool-error.json` was a local tool
-  error cache and not repository content.
+- 열린 WIP PR을 `origin/main`과 비교했습니다.
+- 추적되지 않은 `.omc/state/last-tool-error.json`이 저장소 내용이 아니라
+  로컬 도구 오류 cache임을 확인했습니다.
 
-## Future Guidance
+## 다음 지침
 
-Treat `WIP.md` as a short-lived snapshot. If it is more than a few days old or
-the release state has moved on, close the WIP PR and create a narrower guidance
-or process-documentation PR for reusable changes.
+WIP snapshot과 지속적인 guidance 변경을 하나의 PR에 섞지 않습니다.

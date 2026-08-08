@@ -1,48 +1,30 @@
-# Org Release Orchestration Needs Dry-Run Gates
+# 조직 release orchestration에는 dry-run 게이트가 필요하다
 
-## Context
+## 맥락
 
-The bluetape4k organization is preparing for an official release at the end of
-May 2026. Version drift, full Nightly dispatch, snapshot publishing, and release
-dispatch need an organization-level operating surface.
+bluetape4k 조직은 2026년 5월 말 공식 release를 준비했습니다. version drift,
+Full Nightly dispatch, snapshot publish, release dispatch에는 조직 수준 운영
+표면이 필요했습니다.
 
-## Decision
+## 결정
 
-Keep the central orchestration in the organization `.github` repository, but do
-not let it publish by default. Cross-repository snapshot and release workflows
-must default to `dryRun=true` and require an explicit confirmation phrase before
-dispatching real publishing workflows.
+중앙 orchestration은 조직 `.github` 저장소에 두되 기본값으로 publish하지
+않습니다. 저장소 간 snapshot/release workflow는 `dryRun=true`를 기본으로
+하고 실제 publish dispatch에는 명시적인 확인 문구가 필요합니다.
 
-## Outcome
+## 결과
 
-The central `.github` repository now owns:
+중앙 `.github` 저장소가 다음을 소유합니다.
 
-- Shared version drift reporting.
-- Organization Nightly dispatch planning.
-- Snapshot dispatch planning and execution.
-- Release train dispatch planning and execution.
+- 공유 version drift 보고
+- 조직 Nightly dispatch 계획
+- snapshot dispatch 계획과 실행
+- release train dispatch 계획과 실행
 
-Target repositories remain responsible for their own publishing credentials,
-signing keys, package permissions, and release workflow behavior.
+대상 저장소는 자체 publish credential, signing key, package permission,
+release workflow 동작을 계속 책임집니다.
 
-## Verification
+## 검증
 
-- `python3 -m py_compile scripts/version_drift_report.py scripts/dispatch_org_workflows.py`
-- `python3 scripts/version_drift_report.py --workspace ..`
-- `python3 scripts/dispatch_org_workflows.py --kind nightly --scope full --dry-run`
-- `python3 scripts/dispatch_org_workflows.py --kind snapshot --dry-run`
-- `python3 scripts/dispatch_org_workflows.py --kind release --version 0.0.0 --dry-run`
-- `actionlint .github/workflows/*.yml`
-
-## Future Guidance
-
-- Use `ORG_WORKFLOW_TOKEN` from a GitHub App installation token or fine-grained
-  PAT with cross-repository Actions write access.
-- Keep organization workflows as dispatchers only; avoid duplicating publish
-  logic in the central repo.
-- Add repo-local release workflows before including a repository in the release
-  train; the central train should dispatch existing workflows, not invent target
-  repository release behavior.
-- Run snapshot train successfully before real release train dispatch.
-- Treat drift report failures as release-freeze blockers unless the exception is
-  documented in the release notes or a linked issue.
+dry-run dispatch에서 대상과 순서를 확인하고, 실제 publish 입력에는 확인
+문구가 없으면 거부되는지 검증했습니다.

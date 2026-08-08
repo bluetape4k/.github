@@ -1,31 +1,29 @@
-# Release Documentation Clarity
+# Release 문서의 명확성
 
-## Context
+## 맥락
 
-The May 2026 release train required several follow-up edits because release
-prep, snapshot publication, post-release reopen, and internal bluetape4k version
-references were easy to mix up.
+2026년 5월 release train에서 release 준비, snapshot publish, release 후
+reopen, 내부 bluetape4k version reference를 혼동해 여러 후속 편집이
+필요했습니다.
 
-## Decision
+## 결정
 
-Keep `Version Management Policy` as the canonical policy, then make the release
-runbook explain execution phases with required evidence. The checklist should
-state which branch phase it applies to instead of treating all SNAPSHOT
-references as equally wrong.
+`Version Management Policy`를 canonical policy로 유지하고 release runbook은
+필수 증거가 있는 실행 단계로 설명합니다. Checklist는 모든 SNAPSHOT
+reference를 동일하게 잘못된 것으로 보지 말고 적용되는 branch phase를
+명시해야 합니다.
 
-## Outcome
+## 결과
 
-The release runbook now starts with a flow map, the governance policy includes
-version/reference state tables, and the pre-release checklist distinguishes
-development snapshot references from release-prep non-snapshot references.
+Release runbook은 flow map으로 시작하고 governance policy는
+version/reference state table을 포함합니다. Pre-release checklist는 개발
+snapshot reference와 release-prep non-snapshot reference를 구분합니다.
 
-## Verification
+## 검증
 
 - `git diff --check`
 
-## Future Guard
+## 다음 guard
 
-When a release mistake happens, classify it by phase first: normal development,
-snapshot validation, release prep, tag/release, post-release reopen, or final
-dependencies BOM. Then update the phase gate instead of adding another isolated
-warning.
+문서에서 version을 바꿀 때 현재 phase, artifact visibility, upstream HTTP 200
+증거를 함께 기록합니다.

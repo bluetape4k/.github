@@ -1,31 +1,24 @@
-# Snapshot Reference Policy
+# Snapshot reference 정책
 
-## Context
+## 맥락
 
-Release runbooks needed to distinguish checked-in development versions from
-workflow-injected snapshot publication versions.
+Release runbook에서 check-in된 개발 version과 workflow가 주입하는 snapshot
+publish version을 구분해야 했습니다.
 
-## Decision
+## 결정
 
-`baseVersion` is advanced to the next release version after every release, while
-`snapshotVersion=` stays empty in `gradle.properties`. Snapshot publishing
-injects `-PsnapshotVersion=-SNAPSHOT`; release publishing uses `baseVersion`
-only. Internal `bluetape4k-*` references stay on matching `-SNAPSHOT` versions
-during development and remove the suffix only in release-prep branches after the
-upstream release is visible from Maven Central.
+모든 release 뒤 `baseVersion`을 다음 release version으로 올리고
+`snapshotVersion=`은 비워 둡니다. Snapshot publish는
+`-PsnapshotVersion=-SNAPSHOT`을 주입하고 release publish는 `baseVersion`만
+사용합니다. 개발 중 내부 `bluetape4k-*` reference는 일치하는 `-SNAPSHOT`을
+사용하고, release-prep branch에서는 upstream release가 Maven Central에
+공개된 뒤에만 suffix를 제거합니다.
 
-## Outcome
+## 결과
 
-The central governance document now owns the canonical `Version Management
-Policy`, while the release runbook and pre-release checklist point back to that
-policy.
+중앙 governance 문서가 canonical `Version Management Policy`를 소유하고
+release runbook과 pre-release checklist는 이를 참조합니다.
 
-## Verification
+## 검증
 
 - `git diff --check`
-
-## Future Guard
-
-Do not check `-SNAPSHOT` into `snapshotVersion`. If a development branch needs a
-snapshot artifact, change the internal dependency reference, not the repository's
-own checked-in snapshot suffix.

@@ -1,35 +1,25 @@
-# Spring Boot 4 Only README Policy
+# Spring Boot 4 전용 README 정책
 
-## Context
+## 맥락
 
-The organization profile README still described bluetape4k as supporting
-Spring Boot 3/4. The current policy is that supported Spring integrations are
-Spring Boot 4.x only.
+조직 profile README가 여전히 bluetape4k를 Spring Boot 3/4 지원으로
+설명했습니다. 현재 정책은 지원하는 Spring integration을 Spring Boot 4.x
+전용으로 두는 것입니다.
 
-## Decision or Finding
+## 결정 또는 발견
 
-README support statements must describe Spring Boot 4.x as the only supported
-Spring Boot line. Spring Boot 3 may still appear in historical migration notes,
-comparison tables, removed-support notices, or legacy-helper warnings, but not
-as a current support claim.
+README의 지원 문구는 Spring Boot 4.x만 지원한다고 설명해야 합니다. Spring
+Boot 3은 역사적 migration note, 비교표, 지원 제거 공지 또는 legacy helper
+경고에는 남길 수 있지만 현재 지원 주장으로 사용하지 않습니다.
 
-## Outcome
+## 결과
 
-- Updated the organization profile README pair to remove Spring Boot 3/4
-  compatibility language.
-- Updated stale `bluetape4k-workshop` README headings/descriptions that still
-  called Boot 4 examples "Spring Boot 3".
-- Updated `bluetape4k-projects` OpenTelemetry README pair so the old WebFlux
-  helper is framed as legacy/migration reference, not current Boot 3 support.
+- 조직 profile README 쌍에서 Spring Boot 3/4 호환성 문구를 제거했습니다.
+- 오래된 `bluetape4k-workshop` README heading/설명에서 Boot 4 example을
+  "Spring Boot 3"이라고 부르던 부분을 고쳤습니다.
+- `bluetape4k-projects` OpenTelemetry README 쌍에서 오래된 WebFlux helper를
+  현재 Boot 3 지원이 아니라 legacy/migration reference로 표현했습니다.
 
-## Verification
+## 검증
 
-- `rg --hidden -n -i "Spring Boot 3/4|Spring Boot 3\\.x/4\\.x|Spring Boot 3 and 4" /Users/debop/work/bluetape4k --glob 'README*.md' --glob '!**/.worktrees/**' --glob '!**/build/**'`
-  returned no matches.
-- Follow-up README searches found only removed-support statements, migration
-  comparisons, legacy helper warnings, or external article references.
-
-## Future Guidance
-
-When README files mention Spring Boot support, use "Spring Boot 4.x only" for
-current support. Do not restore generic Spring Boot 3/4 compatibility language.
+현재 지원 문구와 legacy 문구를 README 쌍에서 대조했습니다.

@@ -1,29 +1,27 @@
-# Website Release Documentation Refresh
+# Website release 문서 갱신
 
-## Context
+## 맥락
 
-The 2026-05-23 release train published updated `bluetape4k-dependencies` and
-library BOM versions, then required a separate `bluetape4k.github.io` update so
-public setup examples and version governance pages matched Maven Central.
+2026-05-23 release train에서 `bluetape4k-dependencies`와 library BOM version을
+갱신한 뒤, 공개 setup 예제와 version governance 페이지가 Maven Central과
+일치하도록 `bluetape4k.github.io`를 별도로 갱신해야 했습니다.
 
-## Decision or Finding
+## 결정 또는 발견
 
-The Central Portal release runbook must include a mandatory website
-documentation refresh after the final BOM release is visible from Maven
-Central. The release is not operationally complete until the public website
-shows the current coordinates.
+최종 BOM이 Maven Central에 보이면 Central Portal release runbook에 website
+문서 갱신을 필수 단계로 포함해야 합니다. 공개 website에 현재 coordinate가
+표시되기 전에는 release가 운영상 완료된 것이 아닙니다.
 
-## Outcome
+## 결과
 
-The shared release runbook now names the website pages to update, the local
-website build checks to run, and the GitHub Pages/live-page evidence to record.
-The pre-release checklist also treats the website update as a post-release
-check.
+공유 release runbook에 갱신할 website 페이지, 로컬 website build 검사,
+GitHub Pages/live-page 증거를 기록했습니다. Pre-release checklist도 이를
+release 후 점검 항목으로 취급합니다.
 
-For the 2026-05-23 release train, `bluetape4k.github.io` PR #11 updated the
-public coordinates after `bluetape4k-dependencies 1.1.3` returned HTTP 200 from
-Maven Central. GitHub Pages deployment run `26337058162` completed successfully,
-and the live version governance page showed:
+2026-05-23 release train에서 `bluetape4k.github.io` PR #11은
+`bluetape4k-dependencies 1.1.3`이 Maven Central에서 HTTP 200을 반환한 뒤
+공개 coordinate를 갱신했습니다. GitHub Pages deployment run `26337058162`가
+성공했고 live version governance 페이지에 다음 version이 표시되었습니다.
 
 - `bluetape4k-dependencies` `1.1.3`
 - `bluetape4k-bom` `1.9.1`
@@ -35,18 +33,18 @@ and the live version governance page showed:
 - `bluetape4k-javers-bom` `0.1.2`
 - `bluetape4k-text-bom` `0.1.2`
 
-## Verification
+## 검증
 
-- Updated `docs/release/central-portal-release-runbook.md`.
-- Updated `docs/release/pre-release-checklist.md`.
-- Ran Markdown and diff checks in this repository.
-- Ran `npm run build` and `git diff --check` in `bluetape4k.github.io`.
-- Verified the live `https://bluetape4k.github.io/ecosystem/version-governance/`
-  page after Pages deployment.
+- `docs/release/central-portal-release-runbook.md` 갱신
+- `docs/release/pre-release-checklist.md` 갱신
+- 이 저장소에서 Markdown과 diff 검사 실행
+- `bluetape4k.github.io`에서 `npm run build`와 `git diff --check` 실행
+- Pages deployment 뒤 live `https://bluetape4k.github.io/ecosystem/version-governance/`
+  페이지 확인
 
-## Future Guidance
+## 다음 지침
 
-For every release train, update `bluetape4k.github.io` immediately after
-`bluetape4k-dependencies` is published and Maven Central returns HTTP 200 for
-the imported BOMs. Verify `npm run build`, the Pages deployment run, and the
-live version governance page before reporting the release complete.
+매 release train마다 `bluetape4k-dependencies`가 publish되고 imported BOM이
+Maven Central에서 HTTP 200을 반환한 직후 `bluetape4k.github.io`를 갱신합니다.
+완료를 보고하기 전에 `npm run build`, Pages deployment run, live version
+governance 페이지를 확인합니다.
