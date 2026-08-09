@@ -43,7 +43,7 @@ jobs:
     env:
       ORG_WORKFLOW_TOKEN: ${{ secrets.ORG_WORKFLOW_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Confirm real release dispatch
         if: ${{ !inputs.dryRun && inputs.confirm != 'release train' }}
