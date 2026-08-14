@@ -1,5 +1,18 @@
 # AGENTS.md - bluetape4k Workspace Root
 
+## Guidance hierarchy
+
+Before any task in this workspace, read and follow the applicable guidance in
+this order:
+
+1. User scope: `${CODEX_HOME:-$HOME/.codex}/AGENTS.md`.
+2. Workspace scope: this canonical file; the workspace-root `AGENTS.md` is its
+   synchronized copy.
+3. Repository/worktree scope: every applicable repository or nested worktree
+   `AGENTS.md` on the target path.
+
+Apply broader scopes before repository-specific rules.
+
 This directory is the local workspace for the bluetape4k GitHub organization.
 Each child directory is an independent Git repository. This file applies to all
 repositories below this directory; repo-local `AGENTS.md` files add narrower
